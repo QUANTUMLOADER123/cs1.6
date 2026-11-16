@@ -1,0 +1,16 @@
+# Большие бинарники Ghidra и CS 1.6 не коммитить
+tools/*.zip
+tools/ghidra_*/
+tools/ghidra-src/
+cs1.6/cstrike/
+cs1.6/valve/
+cs1.6/*.zip
+cs1.6/*.exe
+cs1.6/*.dll
+cs1.6/*.so
+cs1.6/*.pak
+cs1.6/*.bsp
+*.zip
+*.exe
+*.dll
+*.so
