@@ -2,108 +2,165 @@
 """
 r2_decompile.py — прогон radare2 по DLL и выгрузка декомпиляции всех функций.
 
-Делает:
-  1. r2 -A (aa) — базовый анализ
-  2. список функций + размеры
-  3. pdc по каждой функции -> analysis/<name>/decomp/<addr>_<func>.c
-  4. список экспортов/импортов с адресами -> analysis/<name>/symbols.txt
-  5. vtable-скан (avrr) -> analysis/<name>/vtables.txt
-  6. строки с адресами -> analysis/<name>/strings.txt
+Работает через один долгоживущий процесс r2 (pipe-режим `r2 -q -`), поэтому
+анализ `aaa` делается ровно один раз, а не на каждую функцию. Это в сотни раз
+быстрее запуска отдельного процесса на функцию.
+
+Что выгружает в <out>/:
+  decomp/<addr>_<name>.c   — pdc-декомпиляция каждой функции
+  symbols.txt              — экспорты и импорты с адресами
+  vtables.txt              — vtables (C++ классы)
+  strings.txt              — строки с адресами
+  index.json               — машинный индекс
+  README.md                — сводка: топ функций по размеру
 
 Использование:
-  python3 tools/analysis/r2_decompile.py cs1.6/cstrike/cl_dll/client.dll
-  python3 tools/analysis/r2_decompile.py file.dll --min-size 16 --jobs 8
+  python3 tools/analysis/r2_decompile.py hw.dll
+  python3 tools/analysis/r2_decompile.py hw.dll -o out --min-size 32
 """
 from __future__ import annotations
 
 import argparse
-import concurrent.futures as cf
 import json
 import os
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 R2 = os.environ.get("R2", "r2")
 
 
-def run_r2(target: Path, commands: str, timeout: int = 600, project: Path | None = None,
-           extra: list[str] | None = None) -> str:
-    """Запуск r2. Если project задан — грузим готовый проект (-p), а не бинарник."""
-    if project is not None:
-        cmd = [R2, "-q", "-e", "scr.color=0", "-p", str(project)]
-    else:
-        cmd = [R2, "-q", "-e", "scr.color=0", "-e", "bin.relocs.apply=true"]
-    if extra:
-        cmd.extend(extra)
-    cmd.extend(["-c", commands, str(target)])
-    try:
-        p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    except subprocess.TimeoutExpired:
-        return ""
-    out = p.stdout
-    # отрезаем INFO/HINT строки анализа
-    return "\n".join(l for l in out.splitlines() if not l.startswith(("INFO:", "HINT:")))
+class R2Pipe:
+    """Клиент radare2 в pipe-режиме через PTY.
 
+    Почему PTY, а не обычные pipe'ы: r2 определяет, что stdout не терминал,
+    и уходит в полностью буферизованный вывод — ответы приходят пачкой в конце.
+    С псевдотерминалом буферизация построчная, и диалог идёт в реальном времени.
+    """
 
-def build_project(path: Path, project: Path, level: str = "aaa") -> bool:
-    """Один раз анализируем бинарник и сохраняем проект r2 — чтобы не гонять aaa на каждую функцию."""
-    project.parent.mkdir(parents=True, exist_ok=True)
-    if project.exists():
-        return True
-    cmd = [R2, "-q", "-e", "scr.color=0", "-e", "bin.relocs.apply=true",
-           "-c", f"{level}; Ps {project}; q", str(path)]
-    try:
-        subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
-    except subprocess.TimeoutExpired:
-        return False
-    return project.exists()
+    def __init__(self, path: Path):
+        import pty
+        self.master, slave = pty.openpty()
+        self.p = subprocess.Popen(
+            [R2, "-q", "-e", "scr.color=0", "-e", "bin.relocs.apply=true", "-N", str(path)],
+            stdin=slave, stdout=slave, stderr=slave, close_fds=True)
+        os.close(slave)
+        # ждём, пока r2 поднимется и загрузит бинарник: иначе первые команды
+        # уходят в пустоту, пока идёт инициализация
+        self._warmup()
 
+    def _warmup(self, timeout: float = 120.0) -> None:
+        import select
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            r, _, _ = select.select([self.master], [], [], 0.3)
+            if r:
+                try:
+                    if os.read(self.master, 65536):
+                        break
+                except OSError:
+                    break
+        # пробный запрос: должен вернуть непустой ответ
+        for _ in range(5):
+            probe = self._raw("iI", timeout=30)
+            if "arch" in probe or "bits" in probe:
+                return
+            time.sleep(0.3)
 
-def list_functions(path: Path, project: Path | None = None) -> list[dict]:
-    """aflj -> JSON со всеми функциями."""
-    raw = run_r2(path, "aflj", timeout=900, project=project)
-    start = raw.find("[")
-    if start < 0:
-        return []
-    try:
-        data = json.loads(raw[start:])
-    except json.JSONDecodeError:
-        return []
-    funcs = []
-    for f in data:
-        funcs.append({
-            "name": f.get("name", "?"),
-            "offset": f.get("addr", f.get("offset", 0)),
-            "size": f.get("size", 0),
-            "nbbs": f.get("nbbs", 0),
-            "cc": f.get("cc", 0),
-            "type": f.get("type", ""),
-        })
-    return funcs
+    def _raw(self, command: str, timeout: float = 600.0) -> str:
+        marker = b"__R2_MARK_%d__" % (int(time.time() * 1000) % 100000)
+        try:
+            os.write(self.master, command.encode() + b"\n?e " + marker + b"\n")
+        except OSError:
+            return ""
+        import select
+        buf = b""
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            r, _, _ = select.select([self.master], [], [], 1.0)
+            if not r:
+                if self.p.poll() is not None:
+                    break
+                continue
+            try:
+                chunk = os.read(self.master, 65536)
+            except OSError:
+                break
+            if not chunk:
+                break
+            buf += chunk
+            if marker in buf:
+                break
+        return buf.decode("utf-8", "replace")
 
+    def cmd(self, command: str, timeout: float = 600.0) -> str:
+        import select
+        marker = b"__R2_MARK_%d__" % (int(time.time() * 1000) % 100000)
+        try:
+            os.write(self.master, command.encode() + b"\n?e " + marker + b"\n")
+        except OSError:
+            return ""
 
-def decompile_one(path: Path, func: dict, project: Path | None = None) -> str | None:
-    """pdc одной функции (в отдельном процессе — параллелится)."""
-    cmds = f"s {func['offset']}; pdc"
-    out = run_r2(path, cmds, timeout=300, project=project)
-    # убираем мусор от aa
-    lines = [l for l in out.splitlines()
-             if l.strip() and not l.startswith(("INFO:", "HINT:", "WARN:"))]
-    body = "\n".join(lines).strip()
-    if not body or "Cannot seek" in body:
-        return None
-    return body
+        buf = b""
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            r, _, _ = select.select([self.master], [], [], 1.0)
+            if not r:
+                if self.p.poll() is not None:
+                    break
+                continue
+            try:
+                chunk = os.read(self.master, 65536)
+            except OSError:
+                break
+            if not chunk:
+                break
+            buf += chunk
+            if marker in buf:
+                break
+
+        text = buf.decode("utf-8", "replace")
+        text = text.replace(marker.decode(), "")
+        # эхо команды назад + escape-последовательности терминала
+        text = re.sub(r"\x1b\[[0-9;?]*[a-zA-Z]", "", text)
+        lines = text.splitlines()
+        # PTY эхо: первая строка может быть остатком предыдущей команды
+        # или эхом текущей. Отбрасываем всё, что похоже на «s <адрес>».
+        if lines:
+            first = lines[0].strip()
+            if first == command.strip() or re.fullmatch(r"s\s+(0x)?[0-9a-fA-F]+", first):
+                lines = lines[1:]
+        # и ещё раз: иногда эхо протекает вторым куском
+        while lines and re.fullmatch(r"(s|pdc|aaa)\s*(0x)?[0-9a-fA-F]*", lines[0].strip()):
+            lines = lines[1:]
+        if command.strip() in ("aflj", "afij", "iij", "iSj"):
+            # JSON отдаём как есть: фильтрация по префиксам может испортить структуру
+            return text.strip()
+        lines = [l for l in lines if l.strip() and not l.startswith(("INFO:", "HINT:", "WARN:"))]
+        return "\n".join(lines)
+
+    def close(self):
+        try:
+            os.write(self.master, b"q\n")
+            self.p.wait(timeout=10)
+        except Exception:
+            self.p.kill()
+        finally:
+            try:
+                os.close(self.master)
+            except OSError:
+                pass
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("binary", type=Path)
-    ap.add_argument("-o", "--out", type=Path, help="папка вывода (по умолчанию cs1.6/analysis/<stem>)")
-    ap.add_argument("--jobs", type=int, default=min(16, (os.cpu_count() or 4)))
-    ap.add_argument("--min-size", type=int, default=8, help="пропускать функции меньше N байт")
-    ap.add_argument("--max-funcs", type=int, default=0, help="0 = все")
+    ap.add_argument("-o", "--out", type=Path)
+    ap.add_argument("--min-size", type=int, default=8)
+    ap.add_argument("--max-funcs", type=int, default=0)
+    ap.add_argument("--limit", type=int, default=0, help="взять только N самых крупных (для теста)")
     args = ap.parse_args()
 
     b = args.binary
@@ -114,81 +171,97 @@ def main() -> int:
     (out / "decomp").mkdir(parents=True, exist_ok=True)
 
     print(f"[*] {b} ({b.stat().st_size:,} байт)")
-    proj = out / f"{b.stem}.r2proj"
-    print(f"[*] анализ (aaa -> проект {proj.name}) ...")
-    if not build_project(b, proj):
-        print("[!] проект не создался, работаю без кэша (медленно)")
-        proj = None
-    funcs = list_functions(b, proj)
-    print(f"[*] функций: {len(funcs)}")
+    print("[*] поднимаю r2 ...")
+    r2 = R2Pipe(b)
+    try:
+        t0 = time.time()
+        print("[*] aaa ...")
+        r2.cmd("aaa", timeout=3600)
+        print(f"    заняло {time.time() - t0:.1f}с")
 
-    funcs_sorted = sorted(funcs, key=lambda f: -f["size"])
-    selected = [f for f in funcs_sorted if f["size"] >= args.min_size]
-    if args.max_funcs:
-        selected = selected[: args.max_funcs]
-    print(f"[*] декомпилирую {len(selected)} (jobs={args.jobs}) ...")
+        # aaa иногда ещё дописывает вывод, когда мы уже просим aflj:
+        # повторяем, пока не получим валидный JSON
+        raw = ""
+        funcs = []
+        for attempt in range(5):
+            raw = r2.cmd("aflj", timeout=600)
+            if raw.find("[") >= 0 and raw.rfind("]") > raw.find("["):
+                break
+            print(f"    [!] aflj пуст (попытка {attempt + 1}), жду ...")
+            time.sleep(2)
+        start, end = raw.find("["), raw.rfind("]")
+        funcs = []
+        if start >= 0 and end > start:
+            try:
+                for f in json.loads(raw[start:end + 1]):
+                    funcs.append({
+                        "name": f.get("name", "?"),
+                        "offset": f.get("addr", 0),
+                        "size": f.get("size", 0),
+                        "nbbs": f.get("nbbs", 0),
+                        "cc": f.get("cc", 0),
+                    })
+            except json.JSONDecodeError as e:
+                print(f"[!] JSON не разобрался: {e}")
+        print(f"[*] функций: {len(funcs)}")
 
-    # symbols
-    print("[*] экспорты/импорты ...")
-    sym = run_r2(b, "is; ii", timeout=600, project=proj)
-    (out / "symbols.txt").write_text(sym, encoding="utf-8")
+        funcs_sorted = sorted(funcs, key=lambda f: -f["size"])
+        selected = [f for f in funcs_sorted if f["size"] >= args.min_size]
+        if args.limit:
+            selected = selected[: args.limit]
+        if args.max_funcs:
+            selected = selected[: args.max_funcs]
+        print(f"[*] декомпилирую {len(selected)} ...")
 
-    # vtables
-    print("[*] vtables ...")
-    vt = run_r2(b, "avrr; avr", timeout=600, project=proj)
-    (out / "vtables.txt").write_text(vt, encoding="utf-8")
+        # служебные выгрузки — до декомпиляции, они быстрые
+        print("[*] символы ...")
+        (out / "symbols.txt").write_text(r2.cmd("is; ii", 600), encoding="utf-8")
+        print("[*] vtables ...")
+        (out / "vtables.txt").write_text(r2.cmd("avrr; avr", 900), encoding="utf-8")
+        print("[*] строки ...")
+        (out / "strings.txt").write_text(r2.cmd("izz", 900), encoding="utf-8")
 
-    # strings with addresses
-    print("[*] строки ...")
-    strs = run_r2(b, "izz", timeout=600, project=proj)
-    (out / "strings.txt").write_text(strs, encoding="utf-8")
-
-    done = 0
-    failed = 0
-    index = []
-
-    def work(f):
-        return f, decompile_one(b, f, proj)
-
-    with cf.ThreadPoolExecutor(max_workers=args.jobs) as ex:
-        for f, code in ex.map(work, selected):
+        done, failed = 0, 0
+        index = []
+        t0 = time.time()
+        for i, f in enumerate(selected):
+            code = r2.cmd(f"s {f['offset']}; pdc", timeout=300)
             safe = re.sub(r"[^\w.@$?-]", "_", f["name"])[:80]
             fn = out / "decomp" / f"{f['offset']:08x}_{safe}.c"
-            if code:
-                header = (
-                    f"// {f['name']}  @ {f['offset']:#x}  size={f['size']}  "
-                    f"blocks={f['nbbs']}  complexity={f['cc']}\n\n"
-                )
+            if code and "Cannot seek" not in code:
+                header = (f"// {f['name']}  @ {f['offset']:#x}  size={f['size']}  "
+                          f"blocks={f['nbbs']}  complexity={f['cc']}\n\n")
                 fn.write_text(header + code + "\n", encoding="utf-8")
                 done += 1
                 index.append({"name": f["name"], "offset": hex(f["offset"]),
                               "size": f["size"], "file": fn.name})
             else:
                 failed += 1
+            if (i + 1) % 50 == 0 or i + 1 == len(selected):
+                rate = (i + 1) / max(time.time() - t0, 0.001)
+                eta = (len(selected) - i - 1) / rate if rate > 0 else 0
+                print(f"    {i+1}/{len(selected)}  {rate:.1f} ф/с  ETA {eta/60:.1f} мин", flush=True)
 
-    (out / "index.json").write_text(
-        json.dumps({"binary": str(b), "functions": funcs, "decompiled": index},
-                   indent=2, ensure_ascii=False), encoding="utf-8")
+        (out / "index.json").write_text(
+            json.dumps({"binary": str(b), "functions": funcs, "decompiled": index},
+                       indent=2, ensure_ascii=False), encoding="utf-8")
 
-    # сводка
-    summary = [
-        f"# {b.name}",
-        f"",
-        f"- размер: {b.stat().st_size:,} байт",
-        f"- функций: {len(funcs)}",
-        f"- декомпилировано: {done}",
-        f"- не удалось: {failed}",
-        f"",
-        "## Функции (по размеру)",
-        "",
-        "| адрес | имя | размер | блоков | сложность |",
-        "| --- | --- | --- | --- | --- |",
-    ]
-    for f in funcs_sorted[:80]:
-        summary.append(f"| `{f['offset']:#x}` | `{f['name']}` | {f['size']} | {f['nbbs']} | {f['cc']} |")
-    (out / "README.md").write_text("\n".join(summary) + "\n", encoding="utf-8")
+        summary = [f"# {b.name}", "",
+                   f"- размер: {b.stat().st_size:,} байт",
+                   f"- функций: {len(funcs)}",
+                   f"- декомпилировано: {done}",
+                   f"- пропущено: {failed}", "",
+                   "## Крупнейшие функции", "",
+                   "| адрес | имя | размер | блоков | сложность |",
+                   "| --- | --- | --- | --- | --- |"]
+        for f in funcs_sorted[:100]:
+            summary.append(f"| `{f['offset']:#x}` | `{f['name']}` | {f['size']} | "
+                           f"{f['nbbs']} | {f['cc']} |")
+        (out / "README.md").write_text("\n".join(summary) + "\n", encoding="utf-8")
 
-    print(f"[+] готово: {out}  ({done} декомпилировано, {failed} пропущено)")
+        print(f"[+] готово: {out}  ({done} декомпилировано, {failed} пропущено)")
+    finally:
+        r2.close()
     return 0
 
 
