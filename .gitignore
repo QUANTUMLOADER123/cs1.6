@@ -1,7 +1,16 @@
-# Большие бинарники Ghidra и CS 1.6 не коммитить
+# Бинарники и вендорные исходники — вне git
+# (восстанавливаются скриптом tools/fetch_deps.sh)
+
+# Ghidra
 tools/*.zip
 tools/ghidra_*/
 tools/ghidra-src/
+
+# Вендорные репозитории (чужие исходники, тянем скриптом)
+tools/hooks/
+cs1.6-src/
+
+# Файлы самой игры CS 1.6 (коммерческий контент Valve)
 cs1.6/cstrike/
 cs1.6/valve/
 cs1.6/*.zip
@@ -10,7 +19,11 @@ cs1.6/*.dll
 cs1.6/*.so
 cs1.6/*.pak
 cs1.6/*.bsp
+
+# Общие
 *.zip
 *.exe
 *.dll
 *.so
+*.gpr
+*.rep
