@@ -362,7 +362,7 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
             if (amt > 255.0f)
                 amt = 255.0f;
             ent->curstate.renderamt = (i32)amt;
-            ent->curstate.renderfx = 20;
+            ent->curstate.renderfx = sh_renderfx_glowshell;
             ent->curstate.rendermode = 0;
         }
         else
