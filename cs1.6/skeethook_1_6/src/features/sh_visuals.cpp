@@ -15,6 +15,24 @@ typedef struct sh_tracer_s
 static sh_tracer_t g_tracers[sh_max_tracers];
 static i32 g_tracer_cursor;
 static i32 g_saved_rendermode = -1;
+static f32 g_saved_monolights;
+static f32 g_saved_overbright;
+static f32 g_saved_fog;
+static f32 g_saved_lightholes;
+static f32 g_saved_flashblend;
+
+static f32 sh_get_cvar(const char *name)
+{
+    if (!g_engfuncs || !g_engfuncs->pfnGetCvarPointer)
+        return 0.0f;
+
+    void *cv = g_engfuncs->pfnGetCvarPointer(name);
+
+    if (!cv)
+        return 0.0f;
+
+    return *(f32 *)((u8 *)cv + 12);
+}
 
 static f32 sh_now(void)
 {
@@ -97,38 +115,62 @@ void sh_visuals_effects_draw(void)
 
 void sh_visuals_apply_nightmode(void)
 {
-    if (!g_engfuncs)
+    if (!g_engfuncs || !g_engfuncs->pfnCvar_SetValue)
         return;
-
-    if (g_cfg.visuals.nightmode && g_saved_rendermode < 0)
-        g_saved_rendermode = 0;
 
     if (!g_cfg.visuals.nightmode)
+    {
+        if (g_saved_rendermode >= 0)
+            sh_visuals_restore();
         return;
+    }
 
     col4_t w = g_cfg.visuals.col_world;
     col4_t s = g_cfg.visuals.col_sky;
     col4_t l = g_cfg.visuals.col_light;
 
-    f32 wr = (f32)w.r / 255.0f, wg = (f32)w.g / 255.0f, wb = (f32)w.b / 255.0f;
-    f32 sr = (f32)s.r / 255.0f, sg = (f32)s.g / 255.0f, sb = (f32)s.b / 255.0f;
-    f32 lr = (f32)l.r / 255.0f, lg = (f32)l.g / 255.0f, lb = (f32)l.b / 255.0f;
+    f32 wr = (f32)w.r / 255.0f;
+    f32 wg = (f32)w.g / 255.0f;
+    f32 wb = (f32)w.b / 255.0f;
 
-    if (g_engfuncs->pfnCvar_SetValue)
+    f32 sr = (f32)s.r / 255.0f;
+    f32 sg = (f32)s.g / 255.0f;
+    f32 sb = (f32)s.b / 255.0f;
+
+    f32 lr = (f32)l.r / 255.0f;
+    f32 lg = (f32)l.g / 255.0f;
+    f32 lb = (f32)l.b / 255.0f;
+
+    if (g_saved_rendermode < 0)
     {
-        if (g_engfuncs->pfnCvar_SetValue) g_engfuncs->pfnCvar_SetValue("r_reflect", wb);
-        if (g_engfuncs->pfnCvar_SetValue) g_engfuncs->pfnCvar_SetValue("gl_skycolor_r", sr);
-        if (g_engfuncs->pfnCvar_SetValue) g_engfuncs->pfnCvar_SetValue("gl_skycolor_g", sg);
-        if (g_engfuncs->pfnCvar_SetValue) g_engfuncs->pfnCvar_SetValue("gl_skycolor_b", sb);
-        if (g_engfuncs->pfnCvar_SetValue) g_engfuncs->pfnCvar_SetValue("gl_world_light", (wr + wg + wb) / 3.0f);
-        if (g_engfuncs->pfnCvar_SetValue) g_engfuncs->pfnCvar_SetValue("gl_light", (lr + lg + lb) / 3.0f);
+        g_saved_rendermode = 1;
+        g_saved_monolights = sh_get_cvar("gl_monolights");
+        g_saved_overbright = sh_get_cvar("gl_overbright");
+        g_saved_fog = sh_get_cvar("gl_fog");
+        g_saved_lightholes = sh_get_cvar("gl_lightholes");
+        g_saved_flashblend = sh_get_cvar("gl_flashblend");
     }
+
+    g_engfuncs->pfnCvar_SetValue("gl_monolights", (wr + wg + wb) / 3.0f);
+    g_engfuncs->pfnCvar_SetValue("gl_overbright", (lr + lg + lb) / 3.0f);
+    g_engfuncs->pfnCvar_SetValue("gl_fog", (f32)(g_cfg.visuals.world_color ? 1 : 0));
+    g_engfuncs->pfnCvar_SetValue("gl_lightholes", sr);
+    g_engfuncs->pfnCvar_SetValue("gl_flashblend", sg);
 }
 
 void sh_visuals_restore(void)
 {
     if (g_saved_rendermode < 0)
         return;
+
+    if (g_engfuncs && g_engfuncs->pfnCvar_SetValue)
+    {
+        g_engfuncs->pfnCvar_SetValue("gl_monolights", g_saved_monolights);
+        g_engfuncs->pfnCvar_SetValue("gl_overbright", g_saved_overbright);
+        g_engfuncs->pfnCvar_SetValue("gl_fog", g_saved_fog);
+        g_engfuncs->pfnCvar_SetValue("gl_lightholes", g_saved_lightholes);
+        g_engfuncs->pfnCvar_SetValue("gl_flashblend", g_saved_flashblend);
+    }
 
     g_saved_rendermode = -1;
 }

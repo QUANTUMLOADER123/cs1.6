@@ -543,7 +543,11 @@ typedef struct sh_engfuncs_s
     f32 (*pfnRandomFloat)(f32 lo, f32 hi);
     i32 (*pfnRandomLong)(i32 lo, i32 hi);
 
-    void *pad_114[13];
+    void *pad_114[3];
+
+    void *(*pfnGetCvarPointer)(const char *name);
+
+    void *pad_124[9];
 
     void *p_tri_api;
     void *p_efx_api;
