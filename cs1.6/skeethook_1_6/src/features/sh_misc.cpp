@@ -1,3 +1,4 @@
+#include "../../include/sh_knife.h"
 #include "../../include/sh_features.h"
 #include "../../include/sh_math.h"
 
@@ -163,6 +164,9 @@ void sh_misc_run(sh_usercmd_t *cmd)
 
     if (g_cfg.misc.fast_reload)
         sh_fast_reload(cmd);
+
+    if (g_cfg.misc.knife_bot)
+        sh_knife_run(cmd);
 
     if (g_cfg.misc.no_scope && (cmd->buttons & sh_in_attack2))
         cmd->buttons &= ~sh_in_attack2;
