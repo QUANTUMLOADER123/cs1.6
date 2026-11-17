@@ -230,9 +230,19 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
 
     if (g_cfg.aimbot.auto_stop && sh_rage_should_fire(r))
     {
-        cmd->forwardmove = 0.0f;
-        cmd->sidemove = 0.0f;
-        cmd->buttons &= ~2;
+        if (g_pmove && g_pmove->onground != -1)
+        {
+            cmd->forwardmove = 0.0f;
+            cmd->sidemove = 0.0f;
+        }
+        else if (g_pmove)
+        {
+            f32 vx = g_pmove->velocity.x;
+            f32 vy = g_pmove->velocity.y;
+
+            if (sh_sqrt(vx * vx + vy * vy) > 30.0f)
+                cmd->sidemove = 0.0f;
+        }
     }
 
     if (sh_rage_should_fire(r))
