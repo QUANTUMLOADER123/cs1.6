@@ -122,6 +122,7 @@ static void sh_player_fill(sh_player_t *p, i32 index)
     p->health = ent->curstate.health;
     p->armor = 0;
     p->weapon_id = sh_weapon_from_model(ent->curstate.weaponmodel);
+    p->fake_ent = 0;
 
     if (g_engfuncs && g_engfuncs->pfnGetPlayerInfo)
         g_engfuncs->pfnGetPlayerInfo(index, &p->info);
@@ -189,6 +190,8 @@ void sh_players_collect(void)
         if (g_players[i].ent)
             g_players[i].visible = sh_player_visible(&g_players[i]);
     }
+
+    sh_players_resolve_fakes();
 }
 
 i32 sh_players_count(void)
@@ -349,6 +352,95 @@ void sh_players_track_anim(void)
 
         if (p->weapon_id == 9 && anim == 6)
             sh_smoke_add(&p->origin);
+    }
+}
+
+static char *sh_entity_model_name(sh_cl_entity_t *ent)
+{
+    if (!ent || !ent->model)
+        return 0;
+
+    sh_model_t *m = (sh_model_t *)ent->model;
+
+    return m->name;
+}
+
+static i32 sh_substr(const char *hay, const char *needle)
+{
+    if (!hay || !needle)
+        return 0;
+
+    for (i32 i = 0; hay[i]; ++i)
+    {
+        i32 k = 0;
+
+        while (needle[k] && hay[i + k] == needle[k])
+            ++k;
+
+        if (!needle[k])
+            return 1;
+    }
+
+    return 0;
+}
+
+void sh_players_resolve_fakes(void)
+{
+    if (!g_engfuncs || !g_engfuncs->pfnGetEntityByIndex)
+        return;
+
+    i32 max_clients = 32;
+
+    for (i32 i = 1; i <= max_clients; ++i)
+        g_players[i].fake_ent = 0;
+
+    for (i32 i = max_clients + 1; i < 256; ++i)
+    {
+        sh_cl_entity_t *ent = (sh_cl_entity_t *)g_engfuncs->pfnGetEntityByIndex(i);
+
+        if (!ent)
+            continue;
+
+        char *name = sh_entity_model_name(ent);
+
+        if (!name)
+            continue;
+
+        if (!sh_substr(name, "sprites/laserbeam.spr"))
+            continue;
+
+        if (ent->curstate.movetype != sh_movetype_noclip)
+            continue;
+
+        if (!(ent->curstate.effects & sh_ef_nodraw) &&
+            ent->curstate.rendermode != sh_rendermode_transalpha)
+            continue;
+
+        f32 best = 1.0e10f;
+        i32 owner = 0;
+
+        for (i32 j = 1; j <= max_clients; ++j)
+        {
+            sh_player_t *pl = sh_player_get(j);
+
+            if (!pl || !pl->ent || pl->health <= 0)
+                continue;
+
+            f32 dx = pl->origin.x - ent->origin.x;
+            f32 dy = pl->origin.y - ent->origin.y;
+            f32 dz = pl->origin.z - ent->origin.z;
+
+            f32 d = dx * dx + dy * dy + dz * dz;
+
+            if (d < best)
+            {
+                best = d;
+                owner = j;
+            }
+        }
+
+        if (owner > 0 && best < 200.0f * 200.0f)
+            g_players[owner].fake_ent = ent;
     }
 }
 

@@ -169,6 +169,18 @@ static void sh_draw_weapon(const sh_player_t *p, const sh_box_t *b)
     }
 }
 
+static void sh_draw_fake_marker(const sh_player_t *p, const sh_box_t *b)
+{
+    if (!g_cfg.visuals.draw_fakes)
+        return;
+
+    if (!p->fake_ent)
+        return;
+
+    sh_text_center((b->left + b->right) * 0.5f, b->top - sh_text_height() - 3.0f,
+                   (col4_t)SH_COL_RGBA(255, 60, 60, 255), "FAKE");
+}
+
 static void sh_draw_distance(const sh_player_t *p, const sh_box_t *b)
 {
     if (!g_cfg.visuals.distance)
@@ -335,6 +347,7 @@ void sh_esp_draw_player(const sh_player_t *p)
     sh_draw_name(p, &box);
     sh_draw_weapon(p, &box);
     sh_draw_distance(p, &box);
+    sh_draw_fake_marker(p, &box);
     sh_draw_head_dot(p, &box);
     sh_draw_skeleton(p, &box);
     sh_draw_snapline(p, &box);

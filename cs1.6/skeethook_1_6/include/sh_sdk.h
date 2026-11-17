@@ -12,6 +12,7 @@
 #define sh_fl_ducking (1 << 14)
 
 #define sh_ef_muzzleflash 2
+#define sh_ef_nodraw      128
 
 #define sh_rendermode_normal     0
 #define sh_rendermode_transcolor 1

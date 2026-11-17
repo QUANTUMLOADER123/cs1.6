@@ -6,6 +6,7 @@
 
 typedef struct sh_player_s
 {
+    void *fake_ent;
     sh_cl_entity_t *ent;
     i32 index;
     sh_hud_player_info_t info;
@@ -47,6 +48,7 @@ void sh_players_collect(void);
 i32 sh_players_count(void);
 sh_player_t *sh_player_get(i32 index);
 sh_player_t *sh_player_local(void);
+void sh_players_resolve_fakes(void);
 
 qbool sh_player_visible(const sh_player_t *p);
 void sh_smoke_add(const vec3_t *origin);

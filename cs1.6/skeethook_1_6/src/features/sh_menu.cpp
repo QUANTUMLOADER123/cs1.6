@@ -398,6 +398,10 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
 
     sh_menu_checkbox(x, cy, "sound esp", &g_cfg.visuals.sound_esp);
     sh_menu_checkbox(x + colw, cy, "player model", &g_cfg.visuals.model_changer);
+
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "fake markers", &g_cfg.visuals.draw_fakes);
     cy += row;
 
     {
