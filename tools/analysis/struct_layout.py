@@ -171,6 +171,19 @@ def main():
         text += strip_comments(open(h, encoding='utf-8', errors='replace').read()) + '\n'
 
     structs = {}
+    # вариант 1: struct TAG { ... };  (без typedef)
+    for m in re.finditer(r'\bstruct\s+(\w+)\s*\{', text):
+        start = m.end()
+        depth, i = 1, start
+        while i < len(text) and depth:
+            if text[i] == '{':
+                depth += 1
+            elif text[i] == '}':
+                depth -= 1
+            i += 1
+        if m.group(1) not in structs:
+            structs[m.group(1)] = text[start:i - 1]
+
     for m in re.finditer(r'typedef\s+struct[^;{]*\{', text, re.S):
         start = m.end()
         depth, i = 1, start
@@ -181,8 +194,15 @@ def main():
                 depth -= 1
             i += 1
         mt = re.match(r'\s*([A-Za-z_]\w*)\s*;', text[i:i + 120])
-        if mt:
+        if mt and mt.group(1) not in structs:
             structs[mt.group(1)] = text[start:i - 1]
+
+    # обратный маппинг: если "typedef struct X_s {...};" без typedef-имени,
+    # то X_t (из typedef struct X_s X_t;) должен ссылаться на X_s
+    for m in re.finditer(r'typedef\s+struct\s+(\w+)\s+(\w+)\s*;', text):
+        tag, alias = m.group(1), m.group(2)
+        if tag in structs and alias not in structs:
+            structs[alias] = structs[tag]
 
     for s in args.struct:
         if s not in structs:

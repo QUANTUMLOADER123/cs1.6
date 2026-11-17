@@ -14,11 +14,13 @@ typedef i32(__cdecl *create_move_fn)(f32 frametime, sh_usercmd_t *cmd);
 typedef i32(__cdecl *hud_redraw_fn)(f32 time, i32 intermission);
 typedef i32(__cdecl *player_move_fn)(sh_playermove_t *pmove, i32 server);
 typedef i32(__cdecl *hook_user_msg_fn)(const char *name, i32 size);
+typedef i32(__cdecl *add_entity_fn)(i32 type, sh_cl_entity_t *ent);
 
 static create_move_fn g_create_move_orig;
 static hud_redraw_fn g_hud_redraw_orig;
 static player_move_fn g_player_move_orig;
 static hook_user_msg_fn g_user_msg_orig;
+static add_entity_fn g_add_entity_orig;
 
 static qbool g_init_done;
 static qbool g_render_ready;
@@ -169,6 +171,27 @@ i32 __cdecl sh_player_move_hook(sh_playermove_t *pmove, i32 server)
     return 0;
 }
 
+i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent)
+{
+    i32 result = 0;
+
+    if (g_add_entity_orig)
+        result = g_add_entity_orig(type, ent);
+
+    if (!ent || type != 0)
+        return result;
+
+    if (g_cfg.visuals.chams || g_cfg.visuals.glow)
+    {
+        ent->curstate.rendermode = 0;
+        ent->curstate.renderamt = g_cfg.visuals.glow ? 60 : 255;
+        if (g_cfg.visuals.glow)
+            ent->curstate.renderfx = 20;
+    }
+
+    return result;
+}
+
 i32 __cdecl sh_user_msg_hook(const char *name, i32 size)
 {
     if (g_user_msg_orig)
@@ -200,6 +223,14 @@ qbool sh_hooks_install(void)
         if (MH_CreateHook(hud_redraw, (void *)sh_hud_redraw_hook,
                           (void **)&g_hud_redraw_orig) == MH_OK)
             MH_EnableHook(hud_redraw);
+    }
+
+    void *add_entity = sh_find_export_body("client.dll", "HUD_AddEntity");
+    if (add_entity)
+    {
+        if (MH_CreateHook(add_entity, (void *)sh_add_entity_hook,
+                          (void **)&g_add_entity_orig) == MH_OK)
+            MH_EnableHook(add_entity);
     }
 
     if (player_move)

@@ -52,10 +52,10 @@ static void sh_player_fill(sh_player_t *p, i32 index)
     p->ent = ent;
     p->index = index;
     p->origin = ent->origin;
-    p->mins = ent->curstate.origin[0] != 0.0f ? ent->mins : ent->mins;
-    p->maxs = ent->maxs;
+    p->mins = ent->curstate.mins;
+    p->maxs = ent->curstate.maxs;
     p->health = ent->curstate.health;
-    p->armor = ent->curstate.armorvalue;
+    p->armor = 0;
     p->weapon_id = ent->curstate.weaponmodel;
 
     if (g_engfuncs && g_engfuncs->pfnGetPlayerInfo)

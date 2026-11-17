@@ -152,6 +152,16 @@ f32 sh_normalize_yaw(f32 y)
 
 qbool sh_world_to_screen(const vec3_t *origin, vec2_t *out)
 {
+    if (g_tri_api && g_tri_api->world_to_screen)
+    {
+        f32 scr[2];
+        if (g_tri_api->world_to_screen((f32 *)origin, scr))
+            return false;
+        out->x = scr[0];
+        out->y = scr[1];
+        return true;
+    }
+
     if (!g_globals)
         return false;
 

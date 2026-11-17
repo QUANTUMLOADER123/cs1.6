@@ -12,6 +12,7 @@ sh_cl_entity_t *(*g_get_entity)(i32 index) = 0;
 i32 g_local_player = 0;
 void *g_module_client = 0;
 void *g_module_hw = 0;
+sh_triapi_t *g_tri_api = 0;
 void **g_pmove_slot = 0;
 void **g_engfuncs_slot = 0;
 
@@ -41,6 +42,22 @@ static const u8 pat_hud_redraw[] = {
     0x00, 0x00, 0x00, 0xC3};
 static const char pat_hud_redraw_mask[] = "xxxxxxxxxxx????x????xxxxxx";
 
+
+static const u8 pat_process_state[] = {
+    0x56, 0x8B, 0x74, 0x24, 0x0C, 0x57, 0x8B, 0x7C, 0x24, 0x0C, 0x8B,
+    0x46, 0x04, 0x8B, 0x8E, 0x10, 0x01, 0x00, 0x00, 0x89};
+static const char pat_process_state_mask[] = "xxxxxxxxxxxxxxxxxxxx";
+
+static const u8 pat_add_entity[] = {
+    0x8B, 0x44, 0x24, 0x04, 0x56, 0x8B, 0x74, 0x24, 0x0C, 0x85, 0xC0,
+    0x7C, 0x53, 0x83, 0xF8, 0x01, 0x7F, 0x4E, 0x8B, 0x4E};
+static const char pat_add_entity_mask[] = "xxxxxxxxxxxxxxxxxxxx";
+
+static const u8 pat_txfer_overrides[] = {
+    0x8B, 0x44, 0x24, 0x08, 0x8B, 0x4C, 0x24, 0x04, 0x8B, 0x10, 0x89,
+    0x51, 0x10, 0x8B, 0x50, 0x04, 0x89, 0x51, 0x14, 0x8B};
+static const char pat_txfer_overrides_mask[] = "xxxxxxxxxxxxxxxxxxxx";
+
 typedef struct sh_named_pat_s
 {
     const char *name;
@@ -57,6 +74,12 @@ static const sh_named_pat_t g_sig_table[] = {
                      (i32)sizeof(pat_create_move)}},
     {"hud_redraw", {"hud_redraw", pat_hud_redraw, pat_hud_redraw_mask,
                     (i32)sizeof(pat_hud_redraw)}},
+    {"process_state", {"process_state", pat_process_state, pat_process_state_mask,
+                       (i32)sizeof(pat_process_state)}},
+    {"add_entity", {"add_entity", pat_add_entity, pat_add_entity_mask,
+                    (i32)sizeof(pat_add_entity)}},
+    {"txfer_overrides", {"txfer_overrides", pat_txfer_overrides,
+                         pat_txfer_overrides_mask, (i32)sizeof(pat_txfer_overrides)}},
 };
 
 static void *sh_va_to_ptr(u32 va)
@@ -131,6 +154,7 @@ void sh_sdk_resolve(void)
     if (g_engfuncs)
     {
         g_get_entity = (sh_cl_entity_t * (*)(i32)) g_engfuncs->pfnGetEntityByIndex;
+        g_tri_api = (sh_triapi_t *)g_engfuncs->p_tri_api;
 
         if (g_engfuncs->pfnGetLocalPlayer)
         {

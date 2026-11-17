@@ -78,6 +78,27 @@ E8 ?? ?? ?? ?? 8B 44 24 08 8B 4C 24 04 50 51 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? C3
 Уникальна. Внутри `push str` — `"WeaponList"`, рядом регистрируются
 `SayText`, `TextMsg`, `Health`, `Battery`, `Money`, `TeamInfo`, `ScoreAttrib`.
 
+### `HUD_ProcessPlayerState` — состояние игрока
+
+```
+56 8B 74 24 0C 57 8B 7C 24 0C 8B 46 04 8B 8E 10 01 00 00 89
+```
+
+### `HUD_AddEntity` — точка чеймов ⭐
+
+```
+8B 44 24 04 56 8B 74 24 0C 85 C0 7C 53 83 F8 01 7F 4E 8B 4E
+```
+
+Здесь движок просит клиент «добавить сущность в кадр». Подмена
+`rendermode`/`renderamt` до возврата = чеймы и glow.
+
+### `HUD_TxferLocalOverrides`
+
+```
+8B 44 24 08 8B 4C 24 04 8B 10 89 51 10 8B 50 04 89 51 14 8B
+```
+
 ### Тунты экспортов
 
 ```

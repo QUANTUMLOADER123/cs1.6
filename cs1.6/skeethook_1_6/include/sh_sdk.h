@@ -213,6 +213,170 @@ typedef struct sh_playermove_s
     f32 player_maxs[4][3];
 } sh_playermove_t;
 
+typedef struct sh_color24_s
+{
+    u8 r;
+    u8 g;
+    u8 b;
+} sh_color24_t;
+
+typedef struct sh_colorvec_s
+{
+    u32 r;
+    u32 g;
+    u32 b;
+} sh_colorvec_t;
+
+typedef struct sh_entity_state_s
+{
+    i32 entity_type;
+    i32 number;
+    f32 msg_time;
+    i32 messagenum;
+    vec3_t origin;
+    vec3_t angles;
+    i32 modelindex;
+    i32 sequence;
+    f32 frame;
+    i32 colormap;
+    i16 skin;
+    i16 solid;
+    i32 effects;
+    f32 scale;
+    u8 eflags;
+    u8 pad_eflags[3];
+    i32 rendermode;
+    i32 renderamt;
+    sh_color24_t rendercolor;
+    u8 pad_rendercolor;
+    i32 renderfx;
+    i32 movetype;
+    f32 animtime;
+    f32 framerate;
+    i32 body;
+    u8 controller[4];
+    u8 blending[4];
+    vec3_t velocity;
+    vec3_t mins;
+    vec3_t maxs;
+    i32 aiment;
+    i32 owner;
+    f32 friction;
+    f32 gravity;
+    i32 team;
+    i32 playerclass;
+    i32 health;
+    i32 spectator;
+    i32 weaponmodel;
+    i32 gaitsequence;
+    vec3_t basevelocity;
+    i32 usehull;
+    i32 oldbuttons;
+    i32 onground;
+    i32 step_left;
+    f32 fall_velocity;
+    f32 fov;
+    i32 weaponanim;
+    vec3_t startpos;
+    vec3_t endpos;
+    f32 impacttime;
+    f32 starttime;
+    i32 iuser1;
+    i32 iuser2;
+    i32 iuser3;
+    i32 iuser4;
+    f32 fuser1;
+    f32 fuser2;
+    f32 fuser3;
+    f32 fuser4;
+    vec3_t vuser1;
+    vec3_t vuser2;
+    vec3_t vuser3;
+    vec3_t vuser4;
+} sh_entity_state_t;
+
+typedef char sh_entity_state_size_check[(sizeof(sh_entity_state_t) == 0x154) ? 1 : -1];
+
+typedef struct sh_position_history_s
+{
+    f32 animtime;
+    vec3_t origin;
+    vec3_t angles;
+} sh_position_history_t;
+
+typedef struct sh_mouth_s
+{
+    u8 mouthopen;
+    u8 sndcount;
+    u8 pad0[2];
+    i32 sndavg;
+} sh_mouth_t;
+
+typedef struct sh_latchedvars_s
+{
+    f32 prevanimtime;
+    f32 sequencetime;
+    u8 prevseqblending[2];
+    u8 pad0[2];
+    vec3_t prevorigin;
+    vec3_t prevangles;
+    i32 prevsequence;
+    f32 prevframe;
+    u8 prevcontroller[4];
+    u8 prevblending[2];
+    u8 pad1[2];
+} sh_latchedvars_t;
+
+typedef struct sh_cl_entity_s
+{
+    i32 index;
+    i32 player;
+    sh_entity_state_t baseline;
+    sh_entity_state_t prevstate;
+    sh_entity_state_t curstate;
+    i32 current_position;
+    sh_position_history_t ph[64];
+    sh_mouth_t mouth;
+    sh_latchedvars_t latched;
+    f32 lastmove;
+    vec3_t origin;
+    vec3_t angles;
+    vec3_t attachment[4];
+    i32 trivial_accept;
+    void *model;
+    void *efrag;
+    void *topnode;
+    f32 syncbase;
+    i32 visframe;
+    sh_colorvec_t floor_color;
+} sh_cl_entity_t;
+
+typedef char sh_cl_entity_size_check[(sizeof(sh_cl_entity_t) == 0xBB4) ? 1 : -1];
+
+typedef struct sh_triapi_s
+{
+    i32 version;
+    void (*render_mode)(i32 mode);
+    void (*begin)(i32 primitive);
+    void (*end)(void);
+    void (*color4f)(f32 r, f32 g, f32 b, f32 a);
+    void (*color4ub)(u8 r, u8 g, u8 b, u8 a);
+    void (*tex_coord_2f)(f32 u, f32 v);
+    void (*vertex3fv)(f32 *p);
+    void (*vertex3f)(f32 x, f32 y, f32 z);
+    void (*brightness)(f32 b);
+    void (*cull_face)(i32 style);
+    i32 (*sprite_texture)(void *model, i32 frame);
+    i32 (*world_to_screen)(f32 *world, f32 *screen);
+    void (*fog)(f32 color[3], f32 start, f32 end, i32 on);
+    void (*screen_to_world)(f32 *screen, f32 *world);
+    void (*get_matrix)(const i32 name, f32 *matrix);
+    i32 (*box_in_pvs)(f32 *mins, f32 *maxs);
+    void (*light_at_point)(f32 *pos, f32 *value);
+    void (*color4f_rendermode)(f32 r, f32 g, f32 b, f32 a, i32 rendermode);
+    void (*fog_params)(f32 density, i32 skybox);
+} sh_triapi_t;
+
 typedef struct sh_screeninfo_s
 {
     i32 width;
@@ -249,59 +413,6 @@ typedef struct sh_client_data_s
     i32 weaponanim;
     u8 m_flNextAttack;
 } sh_client_data_t;
-
-typedef struct sh_entity_state_s
-{
-    i32 entityType;
-    i32 number;
-    f32 msg_time;
-    i32 messageNum;
-    f32 origin[3];
-    f32 angles[3];
-    i32 modelindex;
-    i32 sequence;
-    f32 frame;
-    i32 colormap;
-    i16 skin;
-    i16 solid;
-    i32 effects;
-    f32 scale;
-    u8 eflags;
-    i32 rendermode;
-    f32 renderamt;
-    u8 rendercolor[3];
-    i32 renderfx;
-    i16 movetype;
-    f32 animtime;
-    f32 framerate;
-    i32 body;
-    u8 controller[4];
-    u8 blending[2];
-    u16 weaponmodel;
-    u16 gaitsequence;
-    u8 health;
-    i32 armorvalue;
-} sh_entity_state_t;
-
-typedef struct sh_cl_entity_s
-{
-    i32 index;
-    vec3_t origin;
-    vec3_t angles;
-    vec3_t mins;
-    vec3_t maxs;
-    sh_entity_state_t baseline;
-    sh_entity_state_t prevstate;
-    sh_entity_state_t curstate;
-    qbool player;
-    qbool subtle;
-    f32 distance;
-    i32 *latched;
-    void *model;
-    void *studiomodel;
-    vec3_t player_mins;
-    vec3_t player_maxs;
-} sh_cl_entity_t;
 
 typedef struct sh_globalvars_s
 {
@@ -405,6 +516,11 @@ typedef struct sh_engfuncs_s
 
 typedef char sh_engfuncs_size_check[(sizeof(sh_engfuncs_t) == 0x21C) ? 1 : -1];
 
+extern sh_triapi_t *g_tri_api;
+extern sh_engfuncs_t *g_engfuncs;
+
+
+extern sh_triapi_t *g_tri_api;
 extern sh_engfuncs_t *g_engfuncs;
 extern sh_playermove_t *g_pmove;
 extern sh_globalvars_t *g_globals;

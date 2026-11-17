@@ -12,6 +12,8 @@
 | [`03-interfaces.md`](03-interfaces.md) | `cl_enginefunc_t` (540 Б), `enginefuncs_t` (632 Б), `playermove_t`, `usercmd_t` |
 | [`04-hud.md`](04-hud.md) | `CHudBase`, 23 элемента, связный список, флаги, порядок отрисовки |
 | [`05-rules-server.md`](05-rules-server.md) | происхождение бинарников, RTTI 651 класс, `AddToFullPack`, правила, боты |
+| [`06-networking.md`](06-networking.md) | `entity_state_t` 340Б, `cl_entity_t` 2996Б, 150 user messages |
+| [`07-render.md`](07-render.md) | `triangleapi_t`, `WorldToScreen`, `BoxInPVS`, порядок кадра |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,
@@ -37,6 +39,8 @@ mp.dll       ReGameDLL version: 5.23.0.620-dev  /  commit ac07e89
 | `physent_t` | 224 | код `i*7<<5` = 224 | ✅ |
 | `playermove_t` | 1508 | оффсеты полей совпали | ✅ |
 | `INTERFACE_VERSION` | 7 | `cmp eax,7` в `Initialize` | ✅ |
+| `entity_state_t` | 340 | `cl+0x364` weaponmodel читается кодом | ✅ |
+| `cl_entity_t` | 2996 | `cl+0xB54/0xB58/0xB5C` = angles.x/y/z | ✅ |
 
 ## Ключевые адреса (найдены и проверены)
 
@@ -76,8 +80,8 @@ python3 tools/analysis/sig_gen.py client.dll --min 22 --at 0x1944710 0x1963050
 
 ## Следующее
 
-- `06-networking.md` — дельта-кодирование, интерполяция, `svc_*` сообщения
-- `07-render.md` — `tri_api`, мировые матрицы, проекция 3D→2D
+- `08-events.md` — `PlaybackEvent`, `events/*.sc`, партиклы
+- `09-chams.md` — `StudioDrawModel`, подмена `rendermode`
 - сверка клиентских сигнатур между версиями сборки
 
 ---

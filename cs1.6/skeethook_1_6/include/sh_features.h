@@ -68,4 +68,32 @@ void sh_esp_draw_player(const sh_player_t *p);
 
 void sh_hud_run(void);
 
+#define sh_msg_deathmsg 0
+#define sh_msg_scoreattrib 1
+
+typedef struct sh_killfeed_s
+{
+    char killer[32];
+    char victim[32];
+    char weapon[32];
+    qbool headshot;
+    f32 time;
+} sh_killfeed_t;
+
+typedef struct sh_msg_state_s
+{
+    u8 attrib[SH_MAX_ENTITIES];
+    i32 money[SH_MAX_ENTITIES];
+    sh_killfeed_t feed[8];
+    i32 feed_head;
+    i32 round_seconds;
+} sh_msg_state_t;
+
+extern sh_msg_state_t g_msgs;
+
+void sh_msgs_reset(void);
+void sh_msg_score_attrib(i32 index, u8 attrib);
+void sh_msg_round_time(i32 seconds);
+i32 sh_player_is_dead(i32 index);
+
 void sh_menu_draw(void);
