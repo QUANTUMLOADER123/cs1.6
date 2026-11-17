@@ -130,6 +130,19 @@ static void sh_draw_name(const sh_player_t *p, const sh_box_t *b)
 
 static void sh_draw_weapon(const sh_player_t *p, const sh_box_t *b)
 {
+    if (g_cfg.visuals.weapon_icon)
+    {
+        const char *icon = sh_weapon_icon(p->weapon_id);
+
+        if (icon && icon[0])
+        {
+            f32 tw = sh_text_width(icon);
+            sh_text(b->right + 4.0f, b->top + 2.0f,
+                    g_cfg.visuals.col_weapon, "%s", icon);
+            (void)tw;
+        }
+    }
+
     if (!g_cfg.visuals.weapon)
         return;
 
@@ -265,6 +278,18 @@ void sh_esp_draw_player(const sh_player_t *p)
 
     if (g_cfg.visuals.health_bar)
         sh_draw_health(p, &box);
+
+    if (g_cfg.visuals.ammo)
+    {
+        const sh_weapon_list_t *w = sh_weapon_get(p->weapon_id);
+
+        if (w)
+        {
+            sh_text(box.right + 4.0f, box.top + 14.0f,
+                    g_cfg.visuals.col_weapon, "%d/%d",
+                    w->clip, w->clip_max);
+        }
+    }
 
     sh_draw_armor(p, &box);
     sh_draw_name(p, &box);

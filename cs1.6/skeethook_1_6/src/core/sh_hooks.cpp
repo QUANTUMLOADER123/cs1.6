@@ -10,6 +10,7 @@
 #include "../../include/sh_visuals.h"
 #include "../../include/sh_fakelag.h"
 #include "../../include/sh_rage.h"
+#include "../../include/sh_features.h"
 
 
 #include <windows.h>
@@ -137,6 +138,8 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     g_frame_time = time;
 
     sh_first_init();
+
+    sh_msgs_register();
 
     i32 w = 640;
     i32 h = 480;

@@ -80,8 +80,23 @@ typedef struct sh_killfeed_s
     f32 time;
 } sh_killfeed_t;
 
+typedef struct sh_weapon_list_s
+{
+    char name[32];
+    i32 id;
+    i32 slot;
+    i32 clip;
+    i32 clip_max;
+    i32 ammo_type;
+    qbool valid;
+} sh_weapon_list_t;
+
 typedef struct sh_msg_state_s
 {
+    sh_weapon_list_t weapons[64];
+    i32 weapon_count;
+    i32 cur_weapon_id;
+    i32 cur_weapon_clip;
     u8 attrib[SH_MAX_ENTITIES];
     i32 money[SH_MAX_ENTITIES];
     sh_killfeed_t feed[8];
@@ -92,6 +107,14 @@ typedef struct sh_msg_state_s
 extern sh_msg_state_t g_msgs;
 
 void sh_msgs_reset(void);
+void sh_msgs_register(void);
+
+void sh_msg_weapon_list(const char *name, i32 id, i32 slot, i32 clip,
+                        i32 clip_max, i32 ammo_type);
+void sh_msg_cur_weapon(i32 state, i32 id, i32 clip);
+
+const sh_weapon_list_t *sh_weapon_get(i32 id);
+const char *sh_weapon_icon(i32 id);
 void sh_msg_score_attrib(i32 index, u8 attrib);
 void sh_msg_round_time(i32 seconds);
 i32 sh_player_is_dead(i32 index);
