@@ -265,24 +265,35 @@ void sh_spread_compensate(vec3_t *viewangles)
         return;
 
     i32 wid = sh_local_weapon_id();
-    const sh_recoil_t *rec = sh_recoil_for(wid);
-
-    if (!rec || rec->up_base <= 0.0f)
-        return;
-
-    u32 seed = (u32)sh_u_random();
-    vec2_t sp;
-
-    sh_spread_compute((i32)seed, rec->up_base * 10.0f, &sp);
 
     if (g_pmove)
     {
         viewangles->x -= g_pmove->punchangle.x;
         viewangles->y -= g_pmove->punchangle.y;
+
+        if (viewangles->x > 89.0f)
+            viewangles->x = 89.0f;
+        if (viewangles->x < -89.0f)
+            viewangles->x = -89.0f;
+
+        while (viewangles->y > 180.0f)
+            viewangles->y -= 360.0f;
+        while (viewangles->y < -180.0f)
+            viewangles->y += 360.0f;
     }
 
-    viewangles->x -= sp.y;
-    viewangles->y -= sp.x;
+    f32 sx = 0.0f, sy = 0.0f;
+
+    sh_spread_angle(wid, 0, &sx, &sy);
+
+    if (sx == 0.0f && sy == 0.0f)
+        return;
+
+    f32 pitch_off = sy * 90.0f;
+    f32 yaw_off = sx * 90.0f;
+
+    viewangles->x -= pitch_off;
+    viewangles->y -= yaw_off;
 
     if (viewangles->x > 89.0f)
         viewangles->x = 89.0f;
