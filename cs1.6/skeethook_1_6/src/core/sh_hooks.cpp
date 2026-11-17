@@ -220,10 +220,41 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent)
 
     if (g_cfg.visuals.chams || g_cfg.visuals.glow)
     {
-        ent->curstate.rendermode = 0;
-        ent->curstate.renderamt = g_cfg.visuals.glow ? 60 : 255;
         if (g_cfg.visuals.glow)
+        {
+            f32 amt = g_cfg.visuals.glow_amount;
+            if (amt < 20.0f)
+                amt = 20.0f;
+            if (amt > 255.0f)
+                amt = 255.0f;
+            ent->curstate.renderamt = (i32)amt;
             ent->curstate.renderfx = 20;
+            ent->curstate.rendermode = 0;
+        }
+        else
+        {
+            ent->curstate.rendermode = 0;
+            ent->curstate.renderamt = 255;
+            ent->curstate.renderfx = 0;
+        }
+
+        if (g_cfg.visuals.chams_team_color)
+        {
+            i32 idx = ent->player;
+
+            if (idx > 0 && idx <= 32)
+            {
+                sh_player_t *pl = sh_player_get(idx);
+
+                if (pl)
+                {
+                    if (pl->team == 1)
+                        ent->curstate.rendercolor = (sh_color24_t){ 255, 90, 90 };
+                    else if (pl->team == 2)
+                        ent->curstate.rendercolor = (sh_color24_t){ 90, 140, 255 };
+                }
+            }
+        }
     }
 
     return result;

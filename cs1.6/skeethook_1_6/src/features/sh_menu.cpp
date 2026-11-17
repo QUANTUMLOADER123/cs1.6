@@ -328,6 +328,20 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
 
     sh_menu_slider(x, cy, colw, "max distance", &g_cfg.visuals.max_distance,
                    200.0f, 8192.0f, "");
+    cy += row + 6.0f * s;
+
+    sh_menu_section("models", x, cy);
+    cy += 20.0f * s;
+
+    sh_menu_checkbox(x, cy, "chams", &g_cfg.visuals.chams);
+    sh_menu_checkbox(x + colw, cy, "glow", &g_cfg.visuals.glow);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "team colors", &g_cfg.visuals.chams_team_color);
+    cy += row + 6.0f * s;
+
+    sh_menu_slider(x, cy, colw, "glow amount", &g_cfg.visuals.glow_amount,
+                   20.0f, 255.0f, "");
 }
 
 static void sh_menu_draw_misc(f32 x, f32 y)
@@ -528,8 +542,10 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
+    static const f32 tab_h[6] = { 330.0f, 330.0f, 400.0f, 360.0f, 330.0f, 330.0f };
+
     f32 w = 560.0f * s;
-    f32 h = 330.0f * s;
+    f32 h = tab_h[g_tab] * s;
     f32 ox = ((f32)sh_screen_width() - w) * 0.5f;
     f32 oy = ((f32)sh_screen_height() - h) * 0.5f;
 

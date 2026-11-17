@@ -84,6 +84,8 @@ void sh_config_defaults(void)
     g_cfg.visuals.head_dot = (qbool)1;
     g_cfg.visuals.snaplines = (qbool)0;
     g_cfg.visuals.chams = (qbool)0;
+    g_cfg.visuals.chams_team_color = (qbool)1;
+    g_cfg.visuals.glow_amount = 60.0f;
     g_cfg.visuals.glow = (qbool)0;
     g_cfg.visuals.team_check = (qbool)1;
     g_cfg.visuals.visible_only = (qbool)0;

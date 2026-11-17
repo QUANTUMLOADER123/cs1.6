@@ -79,7 +79,9 @@ typedef struct sh_visuals_cfg
     qbool head_dot;
     qbool snaplines;
     qbool chams;
+    qbool chams_team_color;
     qbool glow;
+    f32 glow_amount;
     qbool team_check;
     qbool visible_only;
     f32 max_distance;
