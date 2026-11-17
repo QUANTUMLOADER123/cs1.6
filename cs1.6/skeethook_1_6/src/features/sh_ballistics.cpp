@@ -83,6 +83,17 @@ void sh_spread_compute(i32 seed, f32 spread, vec2_t *out)
 const sh_recoil_t *sh_recoil_for(i32 weapon_id);
 
 static sh_accuracy_t g_accuracy;
+static u32 g_server_seed;
+
+void sh_spread_feed_seed(u32 seed)
+{
+    g_server_seed = seed;
+}
+
+u32 sh_spread_seed(void)
+{
+    return g_server_seed;
+}
 
 static const f32 g_wpn_accuracy_init[] =
 {
@@ -226,6 +237,9 @@ void sh_spread_angle(i32 weapon_id, i32 seed, f32 *out_x, f32 *out_y)
         spread = 0.03f * acc;
         break;
     }
+
+    if (seed == 0)
+        seed = (i32)g_server_seed;
 
     vec2_t sp;
     sh_spread_compute(seed, spread, &sp);

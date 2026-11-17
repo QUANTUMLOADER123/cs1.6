@@ -30,6 +30,8 @@ void sh_spread_trace_dir(const vec3_t *forward, const vec3_t *right,
                          const vec3_t *up, f32 sx, f32 sy, vec3_t *out);
 f32  sh_spread_accuracy(i32 weapon_id);
 void sh_spread_reset(void);
+void sh_spread_feed_seed(u32 seed);
+u32  sh_spread_seed(void);
 void sh_spread_compensate(vec3_t *viewangles);
 
 const sh_recoil_t *sh_recoil_for(i32 weapon_id);

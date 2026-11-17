@@ -66,6 +66,13 @@ void sh_antiaim_apply_yaw(vec3_t *angles, sh_usercmd_t *cmd, f32 frametime);
 
 void sh_misc_run(sh_usercmd_t *cmd);
 
+void sh_events_reset(void);
+void sh_events_on_fire(i32 entindex, const vec3_t *origin, i32 event_id);
+i32  sh_events_fire_count(i32 entindex);
+f32  sh_events_last_fire(i32 entindex);
+qbool sh_events_is_firing(i32 entindex, f32 window);
+void sh_misc_on_post_run(sh_usercmd_t *cmd, i32 runfuncs, f64 time);
+
 void sh_esp_run(void);
 void sh_esp_draw_player(const sh_player_t *p);
 

@@ -32,6 +32,29 @@ void sh_indicators_draw(void);
 
 typedef i32(__cdecl *create_move_fn)(f32 frametime, sh_usercmd_t *cmd);
 typedef i32(__cdecl *hud_redraw_fn)(f32 time, i32 intermission);
+
+typedef struct sh_stdioevent_s
+{
+    i32 frame;
+    i32 event;
+    i32 type;
+    char options[64];
+} sh_stdioevent_t;
+
+typedef struct sh_local_state_s
+{
+    sh_entity_state_t playerstate;
+    sh_client_data_t client;
+    sh_weapon_data_t weapondata[32];
+} sh_local_state_t;
+
+typedef i32(__cdecl *sh_slot_fn_i32)(void);
+typedef void(__cdecl *hud_studio_event_fn)(const sh_stdioevent_t *ev,
+                                           sh_cl_entity_t *ent);
+typedef void(__cdecl *hud_post_run_cmd_fn)(sh_local_state_t *from,
+                                           sh_local_state_t *to,
+                                           sh_usercmd_t *cmd, i32 runfuncs,
+                                           f64 time, u32 random_seed);
 typedef i32(__cdecl *player_move_fn)(sh_playermove_t *pmove, i32 server);
 typedef i32(__cdecl *hook_user_msg_fn)(const char *name, i32 size);
 typedef i32(__cdecl *add_entity_fn)(i32 type, sh_cl_entity_t *ent,
@@ -135,6 +158,9 @@ void __cdecl sh_txfer_pred_hook(void *ps, const void *pps, void *pcd,
 
 static create_move_fn g_create_move_orig;
 static hud_redraw_fn g_hud_redraw_orig;
+static hud_studio_event_fn g_hud_studio_event_orig;
+static hud_post_run_cmd_fn g_hud_post_run_cmd_orig;
+static u32 g_server_random_seed;
 static player_move_fn g_player_move_orig;
 static hook_user_msg_fn g_user_msg_orig;
 static add_entity_fn g_add_entity_orig;
@@ -142,6 +168,37 @@ static add_entity_fn g_add_entity_orig;
 static qbool g_init_done;
 static qbool g_render_ready;
 static f32 g_frame_time;
+
+static void __cdecl sh_hud_studio_event_hook(const sh_stdioevent_t *ev,
+                                            sh_cl_entity_t *ent)
+{
+    if (ev && ent)
+    {
+        i32 is_muzzle = (ev->event == 5001 || ev->event == 5011 ||
+                         ev->event == 5021 || ev->event == 5031);
+
+        if (is_muzzle)
+            sh_events_on_fire(ent->index, &ent->origin, ev->event);
+    }
+
+    if (g_hud_studio_event_orig)
+        g_hud_studio_event_orig(ev, ent);
+}
+
+static void __cdecl sh_hud_post_run_cmd_hook(sh_local_state_t *from,
+                                             sh_local_state_t *to,
+                                             sh_usercmd_t *cmd, i32 runfuncs,
+                                             f64 time, u32 random_seed)
+{
+    g_server_random_seed = random_seed;
+    sh_spread_feed_seed(random_seed);
+
+    if (cmd)
+        sh_misc_on_post_run(cmd, runfuncs, time);
+
+    if (g_hud_post_run_cmd_orig)
+        g_hud_post_run_cmd_orig(from, to, cmd, runfuncs, time, random_seed);
+}
 
 static void *sh_find_export_body(const char *module, const char *name)
 {
@@ -425,6 +482,23 @@ qbool sh_hooks_install(void)
 {
     if (!sh_is_ready())
         return false;
+
+    void *studio_event = sh_find_export_body("client.dll", "HUD_StudioEvent");
+    void *post_run_cmd = sh_find_export_body("client.dll", "HUD_PostRunCmd");
+
+    if (studio_event)
+    {
+        if (MH_CreateHook(studio_event, (void *)sh_hud_studio_event_hook,
+                          (void **)&g_hud_studio_event_orig) == MH_OK)
+            MH_EnableHook(studio_event);
+    }
+
+    if (post_run_cmd)
+    {
+        if (MH_CreateHook(post_run_cmd, (void *)sh_hud_post_run_cmd_hook,
+                          (void **)&g_hud_post_run_cmd_orig) == MH_OK)
+            MH_EnableHook(post_run_cmd);
+    }
 
     void *create_move = sh_find_export_body("client.dll", "CL_CreateMove");
     void *hud_redraw = sh_find_export_body("client.dll", "HUD_Redraw");
