@@ -211,15 +211,20 @@ static void sh_draw_skeleton(const sh_player_t *p, const sh_box_t *b)
     {
         static const i32 links[][2] = {
             { sh_bone_head, sh_bone_neck },
-            { sh_bone_neck, sh_bone_spine1 },
-            { sh_bone_spine1, sh_bone_spine },
-            { sh_bone_spine, sh_bone_pelvis },
-            { sh_bone_spine1, sh_bone_l_upperarm },
+            { sh_bone_neck, sh_bone_spine3 },
+            { sh_bone_spine3, sh_bone_spine2 },
+            { sh_bone_spine2, sh_bone_spine1 },
+            { sh_bone_spine1, sh_bone_pelvis },
+
+            { sh_bone_spine3, sh_bone_l_clavicle },
+            { sh_bone_l_clavicle, sh_bone_l_upperarm },
             { sh_bone_l_upperarm, sh_bone_l_forearm },
             { sh_bone_l_forearm, sh_bone_l_hand },
-            { sh_bone_spine1, sh_bone_r_upperarm },
+            { sh_bone_spine3, sh_bone_r_clavicle },
+            { sh_bone_r_clavicle, sh_bone_r_upperarm },
             { sh_bone_r_upperarm, sh_bone_r_forearm },
             { sh_bone_r_forearm, sh_bone_r_hand },
+
             { sh_bone_pelvis, sh_bone_l_thigh },
             { sh_bone_l_thigh, sh_bone_l_calf },
             { sh_bone_l_calf, sh_bone_l_foot },

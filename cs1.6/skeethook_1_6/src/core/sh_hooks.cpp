@@ -109,6 +109,9 @@ i32 __cdecl sh_studio_iface_hook(i32 version, void **ppinterface,
     if (pstudio)
         sh_bones_studio_set(pstudio);
 
+    if (ppinterface && *ppinterface)
+        sh_bones_hook_iface((sh_studio_iface_t *)*ppinterface);
+
     return r;
 }
 
@@ -316,7 +319,7 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent)
         return result;
 
     if (type == 0 && ent->player > 0 && ent->player <= 32)
-        sh_bones_capture(ent->player);
+        sh_bones_set_capture_index(ent->player);
 
     if (type != 0)
     {

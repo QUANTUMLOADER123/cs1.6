@@ -444,15 +444,70 @@ typedef struct sh_client_data_s
 typedef char sh_client_data_size_check[(sizeof(sh_client_data_t) == 0x1DC) ? 1 : -1];
 
 
+
+
+typedef struct sh_studio_bone_s
+{
+    char name[32];
+    i32 parent;
+    i32 flags;
+    i32 bonecontroller[6];
+    f32 value[6];
+    f32 scale[6];
+} sh_studio_bone_t;
+
+typedef char sh_studio_bone_size_check[(sizeof(sh_studio_bone_t) == 112) ? 1 : -1];
+
+typedef struct sh_studio_header_s
+{
+    i32 id;
+    i32 version;
+    char name[64];
+    i32 length;
+    f32 eyeposition[3];
+    f32 min[3];
+    f32 max[3];
+    f32 bbmin[3];
+    f32 bbmax[3];
+    i32 flags;
+    i32 numbones;
+    i32 boneindex;
+    i32 numbonecontrollers;
+    i32 bonecontrollerindex;
+    i32 numhitboxes;
+    i32 hitboxindex;
+    i32 numseq;
+    i32 seqindex;
+    i32 numseqgroups;
+    i32 seqgroupindex;
+    i32 numtextures;
+    i32 textureindex;
+    i32 texturedataindex;
+    i32 numskinref;
+    i32 numskinfamilies;
+    i32 skinindex;
+    i32 numbodyparts;
+    i32 bodypartindex;
+    i32 numattachments;
+    i32 attachmentindex;
+} sh_studio_header_t;
+
+typedef struct sh_studio_iface_s
+{
+    i32 version;
+    i32 (*studio_draw_model)(i32 flags);
+    i32 (*studio_draw_player)(i32 flags, sh_entity_state_t *pplayer);
+} sh_studio_iface_t;
+
 typedef struct sh_studio_api_s
 {
     void *mem_calloc;
     void *cache_check;
     void *load_cache_file;
     void *mod_for_name;
-    void *mod_extradata;
+    void *(*mod_extradata)(void *mod);
     void *get_model_by_index;
-    void *get_current_entity;
+    sh_cl_entity_t *(*get_current_entity)(void);
     void *player_info;
     void *get_player_state;
     void *get_view_entity;
