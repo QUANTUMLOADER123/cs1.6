@@ -137,6 +137,9 @@ void sh_rage_scan(sh_rage_result_t *out)
         if (g_cfg.aimbot.visible_check && !visible)
             continue;
 
+        if (g_cfg.aimbot.smoke_check && sh_player_behind_smoke(p))
+            continue;
+
         if (dealt <= 0.0f)
             continue;
 

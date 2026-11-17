@@ -49,6 +49,8 @@ sh_player_t *sh_player_get(i32 index);
 sh_player_t *sh_player_local(void);
 
 qbool sh_player_visible(const sh_player_t *p);
+void sh_smoke_add(const vec3_t *origin);
+void sh_smoke_tick(f32 now);
 qbool sh_player_behind_smoke(const sh_player_t *p);
 
 void sh_aim_run(sh_usercmd_t *cmd);

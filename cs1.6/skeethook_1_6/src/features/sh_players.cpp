@@ -175,6 +175,9 @@ void sh_players_track_anim(void)
             if (p->index != g_local_player)
                 sh_msg_enemy_fire(i);
         }
+
+        if (p->weapon_id == 9 && anim == 6)
+            sh_smoke_add(&p->origin);
     }
 }
 
@@ -196,8 +199,98 @@ qbool sh_player_visible(const sh_player_t *p)
     return hit != 0;
 }
 
+#define sh_max_smokes 8
+
+typedef struct sh_smoke_s
+{
+    vec3_t origin;
+    f32 born;
+    qbool active;
+} sh_smoke_t;
+
+static sh_smoke_t g_smokes[sh_max_smokes];
+static i32 g_smoke_cursor;
+
+void sh_smoke_add(const vec3_t *origin)
+{
+    if (!origin)
+        return;
+
+    sh_smoke_t *s = &g_smokes[g_smoke_cursor];
+
+    s->origin = *origin;
+    s->born = g_pmove ? g_pmove->time : 0.0f;
+    s->active = 1;
+
+    g_smoke_cursor = (g_smoke_cursor + 1) % sh_max_smokes;
+}
+
+void sh_smoke_tick(f32 now)
+{
+    for (i32 i = 0; i < sh_max_smokes; ++i)
+    {
+        if (!g_smokes[i].active)
+            continue;
+
+        if (now - g_smokes[i].born > 18.0f)
+            g_smokes[i].active = 0;
+    }
+}
+
+static qbool sh_segment_sphere(const vec3_t *a, const vec3_t *b,
+                               const vec3_t *c, f32 radius)
+{
+    vec3_t ab = *b;
+    ab.x -= a->x;
+    ab.y -= a->y;
+    ab.z -= a->z;
+
+    f32 len2 = sh_dot(&ab, &ab);
+
+    if (len2 < 0.001f)
+        return 0;
+
+    vec3_t ac = *c;
+    ac.x -= a->x;
+    ac.y -= a->y;
+    ac.z -= a->z;
+
+    f32 t = sh_dot(&ac, &ab) / len2;
+
+    if (t < 0.0f)
+        t = 0.0f;
+    if (t > 1.0f)
+        t = 1.0f;
+
+    vec3_t closest = *a;
+    closest.x += ab.x * t;
+    closest.y += ab.y * t;
+    closest.z += ab.z * t;
+
+    vec3_t d = *c;
+    d.x -= closest.x;
+    d.y -= closest.y;
+    d.z -= closest.z;
+
+    return sh_len3d(&d) <= radius;
+}
+
 qbool sh_player_behind_smoke(const sh_player_t *p)
 {
-    (void)p;
-    return false;
+    if (!p || !g_pmove)
+        return 0;
+
+    vec3_t eye = g_pmove->origin;
+    eye.z += sh_eye_height(g_pmove->flags);
+
+    for (i32 i = 0; i < sh_max_smokes; ++i)
+    {
+        if (!g_smokes[i].active)
+            continue;
+
+        if (sh_segment_sphere(&eye, &p->head, &g_smokes[i].origin, 200.0f))
+            return 1;
+    }
+
+    return 0;
 }
