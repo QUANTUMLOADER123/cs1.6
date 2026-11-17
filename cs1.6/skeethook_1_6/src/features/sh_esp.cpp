@@ -660,6 +660,124 @@ void sh_wallbang_draw(void)
                    walls);
 }
 
+void sh_hitbox_scan_draw(void)
+{
+    if (!g_cfg.visuals.hitbox_scan)
+        return;
+
+    if (!g_pmove)
+        return;
+
+    sh_player_t *local = sh_player_local();
+
+    if (!local)
+        return;
+
+    vec3_t eye = g_pmove->origin;
+    eye.z += g_pmove->view_ofs.z;
+
+    vec3_t fwd, right, up;
+    vec3_t ang = g_pmove->angles;
+
+    sh_angle_vectors(&ang, &fwd, &right, &up);
+
+    vec3_t end;
+    end.x = eye.x + fwd.x * 8192.0f;
+    end.y = eye.y + fwd.y * 8192.0f;
+    end.z = eye.z + fwd.z * 8192.0f;
+
+    f32 hit_x = 0.0f;
+    f32 hit_y = 0.0f;
+    f32 hit_z = 0.0f;
+    i32 best_bone = -1;
+    i32 best_player = 0;
+    f32 best_dist = 1.0e10f;
+
+    for (i32 i = 1; i <= 32; ++i)
+    {
+        if (i == local->index)
+            continue;
+
+        sh_player_t *p = sh_player_get(i);
+
+        if (!p || !p->ent || p->health <= 0)
+            continue;
+
+        const sh_bone_snapshot_t *snap = sh_bones_get(p->index);
+
+        if (!snap || !snap->valid)
+            continue;
+
+        for (i32 b = 0; b < sh_bone_count; ++b)
+        {
+            vec3_t bp = snap->pos[b];
+
+            if (bp.x == 0.0f && bp.y == 0.0f && bp.z == 0.0f)
+                continue;
+
+            vec3_t d;
+            d.x = bp.x - eye.x;
+            d.y = bp.y - eye.y;
+            d.z = bp.z - eye.z;
+
+            f32 len = sh_len3d(&d);
+
+            if (len < 1.0f)
+                continue;
+
+            d.x /= len;
+            d.y /= len;
+            d.z /= len;
+
+            if (sh_dot(&d, &fwd) < 0.985f)
+                continue;
+
+            if (len < best_dist)
+            {
+                best_dist = len;
+                best_bone = b;
+                best_player = i;
+                hit_x = bp.x;
+                hit_y = bp.y;
+                hit_z = bp.z;
+            }
+        }
+    }
+
+    if (best_bone < 0)
+        return;
+
+    static const char *names[sh_bone_count] = {
+        "head", "neck", "spine3", "spine2", "spine1", "pelvis",
+        "lclav", "lupper", "lfore", "lhand",
+        "rclav", "rupper", "rfore", "rhand",
+        "lthigh", "lcalf", "lfoot", "rthigh", "rcalf", "rfoot"
+    };
+
+    vec3_t label = { hit_x, hit_y, hit_z + 8.0f };
+    vec2_t sp;
+
+    if (!sh_world_to_screen(&label, &sp))
+        return;
+
+    i32 grp = 2;
+
+    if (best_bone == sh_bone_head || best_bone == sh_bone_neck)
+        grp = 1;
+    else if (best_bone == sh_bone_pelvis)
+        grp = 3;
+    else if (best_bone >= sh_bone_l_thigh)
+        grp = 4;
+
+    f32 mult = (f32)sh_hitgroup_multiplier(grp);
+
+    sh_text_center(sp.x, sp.y - 10.0f,
+                   (col4_t)SH_COL_RGBA(120, 255, 160, 240),
+                   "p%d %s x%.2f", best_player,
+                   (best_bone < sh_bone_count) ? names[best_bone] : "?",
+                   mult);
+}
+
 void sh_esp_run(void)
 {
     if (!g_cfg.visuals.enabled)
