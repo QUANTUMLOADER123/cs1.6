@@ -20,24 +20,6 @@ static f32 sh_frametime(void)
     return 0.015f;
 }
 
-static void sh_bhop(sh_usercmd_t *cmd)
-{
-    if (!g_pmove)
-        return;
-
-    if (!(g_pmove->flags & sh_fl_onground))
-    {
-        cmd->buttons |= sh_in_jump;
-        return;
-    }
-
-    if (g_jump_held)
-        cmd->buttons &= ~sh_in_jump;
-    else
-        cmd->buttons |= sh_in_jump;
-
-    g_jump_held = !g_jump_held;
-}
 
 
 static void sh_edge_jump(sh_usercmd_t *cmd)
