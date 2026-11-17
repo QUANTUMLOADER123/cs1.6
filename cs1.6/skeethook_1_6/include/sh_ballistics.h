@@ -35,6 +35,7 @@ u32  sh_spread_seed(void);
 void sh_spread_compensate(vec3_t *viewangles);
 
 const sh_recoil_t *sh_recoil_for(i32 weapon_id);
+i32 sh_recoil_state_index(void);
 void sh_recoil_apply(i32 shots, const sh_recoil_t *r, vec2_t *punch);
 void sh_recoil_compensate(vec3_t *viewangles, i32 weapon_id, i32 shots);
 

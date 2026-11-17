@@ -295,30 +295,123 @@ void sh_spread_compensate(vec3_t *viewangles)
         viewangles->y += 360.0f;
 }
 
-static const sh_recoil_t g_recoil[] =
+typedef struct sh_recoil_set_s
 {
-    { 0,  1.5f,  0.45f,  0.225f, 0.05f,  6.5f,  2.5f,  7 },
-    { 0,  1.0f,  0.45f,  0.200f, 0.05f,  5.0f,  2.5f,  7 },
-    { 0,  0.9f,  0.475f, 0.180f, 0.0475f,4.5f,  2.375f,8 },
-    { 0,  1.8f,  0.65f,  0.360f, 0.13f,  9.0f,  6.5f,  5 },
-    { 0,  2.0f,  0.0f,   0.400f, 0.0f,  10.0f,  0.0f,  4 }
+    i32 weapon_id;
+    sh_recoil_t st[4];
+} sh_recoil_set_t;
+
+static const sh_recoil_set_t g_recoil_tbl[] =
+{
+    { 28, { { 28, 1.5f, 0.45f, 0.225f, 0.05f, 6.5f, 2.5f, 7 },
+            { 28, 2.0f, 1.0f, 0.5f, 0.35f, 9.0f, 6.0f, 5 },
+            { 28, 0.9f, 0.35f, 0.15f, 0.025f, 5.5f, 1.5f, 9 },
+            { 28, 1.0f, 0.375f, 0.175f, 0.0375f, 5.75f, 1.75f, 8 } } },
+
+    { 22, { { 22, 1.0f, 0.45f, 0.28f, 0.045f, 3.75f, 3.0f, 7 },
+            { 22, 1.2f, 0.5f, 0.23f, 0.15f, 5.5f, 3.5f, 6 },
+            { 22, 0.6f, 0.3f, 0.2f, 0.0125f, 3.25f, 2.0f, 7 },
+            { 22, 0.65f, 0.35f, 0.25f, 0.015f, 3.5f, 2.25f, 7 } } },
+
+    { 19, { { 19, 0.9f, 0.475f, 0.35f, 0.0425f, 5.0f, 3.0f, 6 },
+            { 19, 1.1f, 0.55f, 0.3f, 0.14f, 5.5f, 3.5f, 6 },
+            { 19, 0.5f, 0.275f, 0.2f, 0.03f, 3.0f, 2.0f, 10 },
+            { 19, 0.55f, 0.3f, 0.225f, 0.033f, 3.25f, 2.25f, 10 } } },
+
+    { 8,  { { 8, 0.625f, 0.375f, 0.25f, 0.0125f, 3.5f, 2.25f, 8 },
+            { 8, 0.75f, 0.45f, 0.25f, 0.13f, 5.0f, 3.25f, 7 },
+            { 8, 0.55f, 0.3f, 0.2f, 0.0125f, 3.0f, 2.0f, 9 },
+            { 8, 0.575f, 0.325f, 0.225f, 0.015f, 3.25f, 2.125f, 9 } } },
+
+    { 15, { { 15, 0.625f, 0.375f, 0.25f, 0.0125f, 3.5f, 2.25f, 8 },
+            { 15, 0.75f, 0.45f, 0.25f, 0.13f, 5.0f, 3.25f, 7 },
+            { 15, 0.55f, 0.3f, 0.2f, 0.0125f, 3.0f, 2.0f, 9 },
+            { 15, 0.575f, 0.325f, 0.225f, 0.015f, 3.25f, 2.125f, 9 } } },
+
+    { 27, { { 27, 0.625f, 0.375f, 0.25f, 0.0125f, 4.0f, 2.25f, 9 },
+            { 27, 0.775f, 0.45f, 0.25f, 0.13f, 5.5f, 3.25f, 8 },
+            { 27, 0.55f, 0.3f, 0.2f, 0.0125f, 3.0f, 2.0f, 10 },
+            { 27, 0.575f, 0.325f, 0.225f, 0.015f, 3.25f, 2.125f, 10 } } },
+
+    { 14, { { 14, 0.65f, 0.35f, 0.25f, 0.015f, 3.5f, 2.25f, 7 },
+            { 14, 0.8f, 0.45f, 0.25f, 0.13f, 5.0f, 3.25f, 7 },
+            { 14, 0.55f, 0.3f, 0.2f, 0.0125f, 3.0f, 2.0f, 9 },
+            { 14, 0.575f, 0.325f, 0.225f, 0.015f, 3.25f, 2.125f, 9 } } },
+
+    { 16, { { 16, 0.625f, 0.375f, 0.25f, 0.0125f, 3.5f, 2.25f, 8 },
+            { 16, 0.75f, 0.45f, 0.25f, 0.13f, 5.0f, 3.25f, 7 },
+            { 16, 0.55f, 0.3f, 0.2f, 0.0125f, 3.0f, 2.0f, 9 },
+            { 16, 0.575f, 0.325f, 0.225f, 0.015f, 3.25f, 2.125f, 9 } } },
+
+    { 30, { { 30, 0.3f, 0.225f, 0.125f, 0.02f, 3.25f, 1.25f, 8 },
+            { 30, 0.4f, 0.3f, 0.15f, 0.12f, 4.5f, 2.0f, 7 },
+            { 30, 0.225f, 0.15f, 0.1f, 0.015f, 2.25f, 1.0f, 10 },
+            { 30, 0.25f, 0.175f, 0.125f, 0.02f, 2.5f, 1.125f, 10 } } },
+
+    { 12, { { 12, 0.275f, 0.2f, 0.15f, 0.0225f, 2.5f, 1.5f, 10 },
+            { 12, 0.4f, 0.275f, 0.15f, 0.12f, 4.0f, 2.25f, 9 },
+            { 12, 0.2f, 0.14f, 0.1f, 0.015f, 2.0f, 1.0f, 10 },
+            { 12, 0.225f, 0.16f, 0.125f, 0.02f, 2.25f, 1.125f, 10 } } },
+
+    { 7,  { { 7, 0.775f, 0.425f, 0.2f, 0.03f, 3.0f, 2.75f, 9 },
+            { 7, 0.9f, 0.5f, 0.2f, 0.15f, 4.5f, 3.5f, 8 },
+            { 7, 0.6f, 0.325f, 0.15f, 0.0225f, 2.75f, 2.0f, 10 },
+            { 7, 0.625f, 0.35f, 0.175f, 0.025f, 3.0f, 2.125f, 10 } } },
+
+    { 23, { { 23, 0.725f, 0.375f, 0.15f, 0.025f, 2.75f, 2.25f, 9 },
+            { 23, 0.85f, 0.5f, 0.15f, 0.15f, 4.25f, 3.25f, 8 },
+            { 23, 0.5f, 0.275f, 0.1f, 0.02f, 2.25f, 1.5f, 10 },
+            { 23, 0.525f, 0.3f, 0.125f, 0.0225f, 2.5f, 1.625f, 10 } } },
+
+    { 20, { { 20, 0.8f, 0.35f, 0.3f, 0.03f, 3.75f, 3.0f, 9 },
+            { 20, 1.0f, 0.5f, 0.3f, 0.15f, 5.0f, 4.0f, 8 },
+            { 20, 0.6f, 0.275f, 0.25f, 0.0225f, 3.0f, 2.25f, 10 },
+            { 20, 0.625f, 0.3f, 0.275f, 0.025f, 3.25f, 2.375f, 10 } } }
 };
+
+static sh_recoil_t g_recoil_fallback = { 0, 0.65f, 0.375f, 0.25f, 0.015f, 3.5f, 2.25f, 8 };
+
+static const sh_recoil_set_t *sh_recoil_set_for(i32 weapon_id)
+{
+    for (i32 i = 0; i < (i32)(sizeof(g_recoil_tbl) / sizeof(g_recoil_tbl[0])); ++i)
+    {
+        if (g_recoil_tbl[i].weapon_id == weapon_id)
+            return &g_recoil_tbl[i];
+    }
+
+    return 0;
+}
+
+i32 sh_recoil_state_index(void)
+{
+    if (!g_pmove)
+        return 3;
+
+    f32 vx = g_pmove->velocity.x;
+    f32 vy = g_pmove->velocity.y;
+
+    f32 speed = sh_sqrt(vx * vx + vy * vy);
+
+    if (speed > 0.0f)
+        return 0;
+
+    if (g_pmove->onground == -1)
+        return 1;
+
+    if (g_pmove->usehull == 1)
+        return 2;
+
+    return 3;
+}
 
 const sh_recoil_t *sh_recoil_for(i32 weapon_id)
 {
-    if (weapon_id == 7 || weapon_id == 8 || weapon_id == 13 || weapon_id == 15)
-        return &g_recoil[4];
+    const sh_recoil_set_t *set = sh_recoil_set_for(weapon_id);
 
-    if (weapon_id == 17)
-        return &g_recoil[3];
+    if (!set)
+        return &g_recoil_fallback;
 
-    if (weapon_id == 5 || weapon_id == 10 || weapon_id == 16)
-        return &g_recoil[2];
-
-    if (weapon_id == 4 || weapon_id == 11 || weapon_id == 12 || weapon_id == 14)
-        return &g_recoil[1];
-
-    return &g_recoil[0];
+    return &set->st[sh_recoil_state_index()];
 }
 
 void sh_recoil_apply(i32 shots, const sh_recoil_t *r, vec2_t *punch)
