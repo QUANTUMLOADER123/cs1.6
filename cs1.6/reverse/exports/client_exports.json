@@ -1,0 +1,649 @@
+{
+ "binary": "client.dll",
+ "image_base": 26214400,
+ "sections": [
+  {
+   "name": ".text",
+   "va": 4096,
+   "vsize": 796437,
+   "raw": 4096,
+   "rsize": 798720,
+   "chars": 1610612768
+  },
+  {
+   "name": ".rdata",
+   "va": 802816,
+   "vsize": 120686,
+   "raw": 802816,
+   "rsize": 122880,
+   "chars": 1073741888
+  },
+  {
+   "name": ".data",
+   "va": 925696,
+   "vsize": 413708,
+   "raw": 925696,
+   "rsize": 69632,
+   "chars": 3221225536
+  },
+  {
+   "name": ".reloc",
+   "va": 1343488,
+   "vsize": 91988,
+   "raw": 995328,
+   "rsize": 94208,
+   "chars": 1107296320
+  }
+ ],
+ "exports": [
+  {
+   "name": "?AttemptToMaterialize@CBasePlayerItem@@QAEXXZ",
+   "ordinal": 1,
+   "rva": 47200,
+   "va": 26261600,
+   "forward": null
+  },
+  {
+   "name": "?CorpseFallThink@CBaseMonster@@QAEXXZ",
+   "ordinal": 2,
+   "rva": 45552,
+   "va": 26259952,
+   "forward": null
+  },
+  {
+   "name": "?DefaultTouch@CBasePlayerAmmo@@QAEXPAVCBaseEntity@@@Z",
+   "ordinal": 3,
+   "rva": 47552,
+   "va": 26261952,
+   "forward": null
+  },
+  {
+   "name": "?DefaultTouch@CBasePlayerItem@@QAEXPAVCBaseEntity@@@Z",
+   "ordinal": 4,
+   "rva": 47264,
+   "va": 26261664,
+   "forward": null
+  },
+  {
+   "name": "?DestroyItem@CBasePlayerItem@@QAEXXZ",
+   "ordinal": 5,
+   "rva": 47280,
+   "va": 26261680,
+   "forward": null
+  },
+  {
+   "name": "?FallThink@CBasePlayerItem@@QAEXXZ",
+   "ordinal": 6,
+   "rva": 47168,
+   "va": 26261568,
+   "forward": null
+  },
+  {
+   "name": "?Materialize@CBasePlayerAmmo@@QAEXXZ",
+   "ordinal": 7,
+   "rva": 47536,
+   "va": 26261936,
+   "forward": null
+  },
+  {
+   "name": "?Materialize@CBasePlayerItem@@QAEXXZ",
+   "ordinal": 8,
+   "rva": 47184,
+   "va": 26261584,
+   "forward": null
+  },
+  {
+   "name": "?PlayerDeathThink@CBasePlayer@@QAEXXZ",
+   "ordinal": 9,
+   "rva": 45936,
+   "va": 26260336,
+   "forward": null
+  },
+  {
+   "name": "?SUB_CallUseToggle@CBaseEntity@@QAEXXZ",
+   "ordinal": 10,
+   "rva": 47648,
+   "va": 26262048,
+   "forward": null
+  },
+  {
+   "name": "?SUB_Remove@CBaseEntity@@QAEXXZ",
+   "ordinal": 11,
+   "rva": 44368,
+   "va": 26258768,
+   "forward": null
+  },
+  {
+   "name": "?Smack@CKnife@@QAEXXZ",
+   "ordinal": 12,
+   "rva": 90496,
+   "va": 26304896,
+   "forward": null
+  },
+  {
+   "name": "?SwingAgain@CKnife@@QAEXXZ",
+   "ordinal": 13,
+   "rva": 90528,
+   "va": 26304928,
+   "forward": null
+  },
+  {
+   "name": "CAM_Think",
+   "ordinal": 14,
+   "rva": 357216,
+   "va": 26571616,
+   "forward": null
+  },
+  {
+   "name": "CL_CameraOffset",
+   "ordinal": 15,
+   "rva": 360176,
+   "va": 26574576,
+   "forward": null
+  },
+  {
+   "name": "CL_CreateMove",
+   "ordinal": 16,
+   "rva": 363712,
+   "va": 26578112,
+   "forward": null
+  },
+  {
+   "name": "CL_IsThirdPerson",
+   "ordinal": 17,
+   "rva": 360128,
+   "va": 26574528,
+   "forward": null
+  },
+  {
+   "name": "ClientFactory",
+   "ordinal": 18,
+   "rva": 281520,
+   "va": 26495920,
+   "forward": null
+  },
+  {
+   "name": "CreateInterface",
+   "ordinal": 19,
+   "rva": 367376,
+   "va": 26581776,
+   "forward": null
+  },
+  {
+   "name": "Demo_ReadBuffer",
+   "ordinal": 20,
+   "rva": 286352,
+   "va": 26500752,
+   "forward": null
+  },
+  {
+   "name": "F",
+   "ordinal": 21,
+   "rva": 281536,
+   "va": 26495936,
+   "forward": null
+  },
+  {
+   "name": "HUD_AddEntity",
+   "ordinal": 22,
+   "rva": 286480,
+   "va": 26500880,
+   "forward": null
+  },
+  {
+   "name": "HUD_ChatInputPosition",
+   "ordinal": 23,
+   "rva": 163760,
+   "va": 26378160,
+   "forward": null
+  },
+  {
+   "name": "HUD_ConnectionlessPacket",
+   "ordinal": 24,
+   "rva": 280048,
+   "va": 26494448,
+   "forward": null
+  },
+  {
+   "name": "HUD_CreateEntities",
+   "ordinal": 25,
+   "rva": 287568,
+   "va": 26501968,
+   "forward": null
+  },
+  {
+   "name": "HUD_DirectorMessage",
+   "ordinal": 26,
+   "rva": 281440,
+   "va": 26495840,
+   "forward": null
+  },
+  {
+   "name": "HUD_DrawNormalTriangles",
+   "ordinal": 27,
+   "rva": 434784,
+   "va": 26649184,
+   "forward": null
+  },
+  {
+   "name": "HUD_DrawTransparentTriangles",
+   "ordinal": 28,
+   "rva": 434800,
+   "va": 26649200,
+   "forward": null
+  },
+  {
+   "name": "HUD_Frame",
+   "ordinal": 29,
+   "rva": 281264,
+   "va": 26495664,
+   "forward": null
+  },
+  {
+   "name": "HUD_GetHullBounds",
+   "ordinal": 30,
+   "rva": 280016,
+   "va": 26494416,
+   "forward": null
+  },
+  {
+   "name": "HUD_GetPlayerTeam",
+   "ordinal": 31,
+   "rva": 281472,
+   "va": 26495872,
+   "forward": null
+  },
+  {
+   "name": "HUD_GetStudioModelInterface",
+   "ordinal": 32,
+   "rva": 305216,
+   "va": 26519616,
+   "forward": null
+  },
+  {
+   "name": "HUD_GetUserEntity",
+   "ordinal": 33,
+   "rva": 290368,
+   "va": 26504768,
+   "forward": null
+  },
+  {
+   "name": "HUD_Init",
+   "ordinal": 34,
+   "rva": 281040,
+   "va": 26495440,
+   "forward": null
+  },
+  {
+   "name": "HUD_Key_Event",
+   "ordinal": 35,
+   "rva": 361264,
+   "va": 26575664,
+   "forward": null
+  },
+  {
+   "name": "HUD_PlayerMove",
+   "ordinal": 36,
+   "rva": 280096,
+   "va": 26494496,
+   "forward": null
+  },
+  {
+   "name": "HUD_PlayerMoveInit",
+   "ordinal": 37,
+   "rva": 280064,
+   "va": 26494464,
+   "forward": null
+  },
+  {
+   "name": "HUD_PlayerMoveTexture",
+   "ordinal": 38,
+   "rva": 280080,
+   "va": 26494480,
+   "forward": null
+  },
+  {
+   "name": "HUD_PostRunCmd",
+   "ordinal": 39,
+   "rva": 60480,
+   "va": 26274880,
+   "forward": null
+  },
+  {
+   "name": "HUD_ProcessPlayerState",
+   "ordinal": 40,
+   "rva": 286736,
+   "va": 26501136,
+   "forward": null
+  },
+  {
+   "name": "HUD_Redraw",
+   "ordinal": 41,
+   "rva": 281184,
+   "va": 26495584,
+   "forward": null
+  },
+  {
+   "name": "HUD_Reset",
+   "ordinal": 42,
+   "rva": 281248,
+   "va": 26495648,
+   "forward": null
+  },
+  {
+   "name": "HUD_Shutdown",
+   "ordinal": 43,
+   "rva": 281056,
+   "va": 26495456,
+   "forward": null
+  },
+  {
+   "name": "HUD_StudioEvent",
+   "ordinal": 44,
+   "rva": 287600,
+   "va": 26502000,
+   "forward": null
+  },
+  {
+   "name": "HUD_TempEntUpdate",
+   "ordinal": 45,
+   "rva": 287936,
+   "va": 26502336,
+   "forward": null
+  },
+  {
+   "name": "HUD_TxferLocalOverrides",
+   "ordinal": 46,
+   "rva": 286656,
+   "va": 26501056,
+   "forward": null
+  },
+  {
+   "name": "HUD_TxferPredictionData",
+   "ordinal": 47,
+   "rva": 287184,
+   "va": 26501584,
+   "forward": null
+  },
+  {
+   "name": "HUD_UpdateClientData",
+   "ordinal": 48,
+   "rva": 281216,
+   "va": 26495616,
+   "forward": null
+  },
+  {
+   "name": "HUD_VidInit",
+   "ordinal": 49,
+   "rva": 281024,
+   "va": 26495424,
+   "forward": null
+  },
+  {
+   "name": "HUD_VoiceStatus",
+   "ordinal": 50,
+   "rva": 281296,
+   "va": 26495696,
+   "forward": null
+  },
+  {
+   "name": "IN_Accumulate",
+   "ordinal": 51,
+   "rva": 192944,
+   "va": 26407344,
+   "forward": null
+  },
+  {
+   "name": "IN_ActivateMouse",
+   "ordinal": 52,
+   "rva": 190848,
+   "va": 26405248,
+   "forward": null
+  },
+  {
+   "name": "IN_ClearStates",
+   "ordinal": 53,
+   "rva": 193328,
+   "va": 26407728,
+   "forward": null
+  },
+  {
+   "name": "IN_DeactivateMouse",
+   "ordinal": 54,
+   "rva": 190912,
+   "va": 26405312,
+   "forward": null
+  },
+  {
+   "name": "IN_MouseEvent",
+   "ordinal": 55,
+   "rva": 191520,
+   "va": 26405920,
+   "forward": null
+  },
+  {
+   "name": "Initialize",
+   "ordinal": 56,
+   "rva": 280336,
+   "va": 26494736,
+   "forward": null
+  },
+  {
+   "name": "KB_Find",
+   "ordinal": 57,
+   "rva": 360496,
+   "va": 26574896,
+   "forward": null
+  },
+  {
+   "name": "V_CalcRefdef",
+   "ordinal": 58,
+   "rva": 448768,
+   "va": 26663168,
+   "forward": null
+  },
+  {
+   "name": "weapon_ak47",
+   "ordinal": 59,
+   "rva": 63088,
+   "va": 26277488,
+   "forward": null
+  },
+  {
+   "name": "weapon_aug",
+   "ordinal": 60,
+   "rva": 64816,
+   "va": 26279216,
+   "forward": null
+  },
+  {
+   "name": "weapon_awp",
+   "ordinal": 61,
+   "rva": 66704,
+   "va": 26281104,
+   "forward": null
+  },
+  {
+   "name": "weapon_c4",
+   "ordinal": 62,
+   "rva": 68576,
+   "va": 26282976,
+   "forward": null
+  },
+  {
+   "name": "weapon_deagle",
+   "ordinal": 63,
+   "rva": 70480,
+   "va": 26284880,
+   "forward": null
+  },
+  {
+   "name": "weapon_elite",
+   "ordinal": 64,
+   "rva": 72208,
+   "va": 26286608,
+   "forward": null
+  },
+  {
+   "name": "weapon_famas",
+   "ordinal": 65,
+   "rva": 74256,
+   "va": 26288656,
+   "forward": null
+  },
+  {
+   "name": "weapon_fiveseven",
+   "ordinal": 66,
+   "rva": 76288,
+   "va": 26290688,
+   "forward": null
+  },
+  {
+   "name": "weapon_flashbang",
+   "ordinal": 67,
+   "rva": 78080,
+   "va": 26292480,
+   "forward": null
+  },
+  {
+   "name": "weapon_g3sg1",
+   "ordinal": 68,
+   "rva": 80400,
+   "va": 26294800,
+   "forward": null
+  },
+  {
+   "name": "weapon_galil",
+   "ordinal": 69,
+   "rva": 82272,
+   "va": 26296672,
+   "forward": null
+  },
+  {
+   "name": "weapon_glock18",
+   "ordinal": 70,
+   "rva": 84032,
+   "va": 26298432,
+   "forward": null
+  },
+  {
+   "name": "weapon_hegrenade",
+   "ordinal": 71,
+   "rva": 86448,
+   "va": 26300848,
+   "forward": null
+  },
+  {
+   "name": "weapon_knife",
+   "ordinal": 72,
+   "rva": 88816,
+   "va": 26303216,
+   "forward": null
+  },
+  {
+   "name": "weapon_m249",
+   "ordinal": 73,
+   "rva": 92512,
+   "va": 26306912,
+   "forward": null
+  },
+  {
+   "name": "weapon_m3",
+   "ordinal": 74,
+   "rva": 94240,
+   "va": 26308640,
+   "forward": null
+  },
+  {
+   "name": "weapon_m4a1",
+   "ordinal": 75,
+   "rva": 96048,
+   "va": 26310448,
+   "forward": null
+  },
+  {
+   "name": "weapon_mac10",
+   "ordinal": 76,
+   "rva": 98336,
+   "va": 26312736,
+   "forward": null
+  },
+  {
+   "name": "weapon_mp5navy",
+   "ordinal": 77,
+   "rva": 99936,
+   "va": 26314336,
+   "forward": null
+  },
+  {
+   "name": "weapon_p228",
+   "ordinal": 78,
+   "rva": 101536,
+   "va": 26315936,
+   "forward": null
+  },
+  {
+   "name": "weapon_p90",
+   "ordinal": 79,
+   "rva": 103328,
+   "va": 26317728,
+   "forward": null
+  },
+  {
+   "name": "weapon_scout",
+   "ordinal": 80,
+   "rva": 105040,
+   "va": 26319440,
+   "forward": null
+  },
+  {
+   "name": "weapon_sg550",
+   "ordinal": 81,
+   "rva": 106768,
+   "va": 26321168,
+   "forward": null
+  },
+  {
+   "name": "weapon_sg552",
+   "ordinal": 82,
+   "rva": 108624,
+   "va": 26323024,
+   "forward": null
+  },
+  {
+   "name": "weapon_smokegrenade",
+   "ordinal": 83,
+   "rva": 110544,
+   "va": 26324944,
+   "forward": null
+  },
+  {
+   "name": "weapon_tmp",
+   "ordinal": 84,
+   "rva": 112960,
+   "va": 26327360,
+   "forward": null
+  },
+  {
+   "name": "weapon_ump45",
+   "ordinal": 85,
+   "rva": 114528,
+   "va": 26328928,
+   "forward": null
+  },
+  {
+   "name": "weapon_usp",
+   "ordinal": 86,
+   "rva": 116128,
+   "va": 26330528,
+   "forward": null
+  },
+  {
+   "name": "weapon_xm1014",
+   "ordinal": 87,
+   "rva": 118448,
+   "va": 26332848,
+   "forward": null
+  }
+ ]
+}

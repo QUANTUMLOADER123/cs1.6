@@ -1,0 +1,135 @@
+#pragma once
+
+#include "sh_types.h"
+
+#define SH_MAX_ENTITIES 256
+
+enum sh_key
+{
+    sh_key_insert = 0x2D,
+    sh_key_delete = 0x2E,
+    sh_key_home = 0x24,
+    sh_key_end = 0x23,
+    sh_key_f1 = 0x70,
+    sh_key_f2 = 0x71,
+    sh_key_mouse1 = 0x01,
+    sh_key_mouse2 = 0x02,
+    sh_key_mouse3 = 0x04,
+    sh_key_mouse4 = 0x05,
+    sh_key_mouse5 = 0x06,
+    sh_key_shift = 0x10,
+    sh_key_ctrl = 0x11,
+    sh_key_alt = 0x12,
+    sh_key_space = 0x20,
+    sh_key_tab = 0x09
+};
+
+typedef struct sh_aimbot_cfg
+{
+    qbool enabled;
+    qbool silent;
+    qbool auto_fire;
+    qbool auto_wall;
+    qbool visible_check;
+    qbool smoke_check;
+    f32 fov;
+    f32 smooth;
+    i32 hitbox;
+    i32 priority;
+    f32 min_damage;
+    i32 key;
+} sh_aimbot_cfg;
+
+typedef struct sh_antiaim_cfg
+{
+    qbool enabled;
+    i32 pitch_mode;
+    i32 yaw_mode;
+    f32 yaw_base;
+    f32 yaw_jitter;
+    qbool desync;
+    f32 desync_amount;
+    qbool fake_duck;
+    qbool micro_move;
+    f32 micro_move_speed;
+    qbool spin;
+    f32 spin_speed;
+} sh_antiaim_cfg;
+
+typedef struct sh_visuals_cfg
+{
+    qbool enabled;
+    qbool box;
+    qbool box_outline;
+    qbool name;
+    qbool health;
+    qbool health_bar;
+    qbool armor;
+    qbool weapon;
+    qbool weapon_icon;
+    qbool ammo;
+    qbool distance;
+    qbool skeleton;
+    qbool head_dot;
+    qbool snaplines;
+    qbool chams;
+    qbool glow;
+    qbool team_check;
+    qbool visible_only;
+    f32 max_distance;
+    i32 box_style;
+    col4_t col_visible;
+    col4_t col_hidden;
+    col4_t col_name;
+    col4_t col_health;
+    col4_t col_armor;
+    col4_t col_weapon;
+    col4_t col_skeleton;
+} sh_visuals_cfg;
+
+typedef struct sh_misc_cfg
+{
+    qbool bhop;
+    qbool auto_strafe;
+    qbool edge_jump;
+    qbool fast_ladder;
+    qbool no_fall_damage;
+    qbool auto_pistol;
+    qbool knife_bot;
+    qbool fast_reload;
+    qbool no_recoil;
+    qbool no_spread;
+    qbool no_flash;
+    qbool no_smoke;
+    qbool no_scope;
+    qbool crosshair;
+    qbool radar_hack;
+    qbool thirdperson;
+    f32 thirdperson_dist;
+    qbool spectator_list;
+} sh_misc_cfg;
+
+typedef struct sh_esp_shared
+{
+    qbool enemy_only;
+    f32 text_scale;
+    i32 font;
+    qbool show_local;
+} sh_esp_shared;
+
+typedef struct sh_config
+{
+    qbool ready;
+    qbool menu_open;
+    sh_aimbot_cfg aimbot;
+    sh_antiaim_cfg antiaim;
+    sh_visuals_cfg visuals;
+    sh_misc_cfg misc;
+    sh_esp_shared esp;
+} sh_config;
+
+extern sh_config g_cfg;
+
+void sh_config_load(void);
+void sh_config_save(void);
+void sh_config_defaults(void);

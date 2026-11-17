@@ -1,0 +1,2309 @@
+{
+ "binary": "hw.dll",
+ "image_base": 30408704,
+ "sections": [
+  {
+   "name": ".text",
+   "va": 4096,
+   "vsize": 1158342,
+   "raw": 4096,
+   "rsize": 1159168,
+   "chars": 1610612768
+  },
+  {
+   "name": ".rdata",
+   "va": 1163264,
+   "vsize": 99557,
+   "raw": 1163264,
+   "rsize": 102400,
+   "chars": 1073741888
+  },
+  {
+   "name": ".data",
+   "va": 1265664,
+   "vsize": 17805976,
+   "raw": 1265664,
+   "rsize": 204800,
+   "chars": 3221225536
+  },
+  {
+   "name": ".rsrc",
+   "va": 19075072,
+   "vsize": 15968,
+   "raw": 1470464,
+   "rsize": 16384,
+   "chars": 1073741888
+  },
+  {
+   "name": ".reloc",
+   "va": 19091456,
+   "vsize": 143582,
+   "raw": 1486848,
+   "rsize": 147456,
+   "chars": 1107296320
+  }
+ ],
+ "exports": [
+  {
+   "name": "??0?$Dar@D@vgui@@QAE@H@Z",
+   "ordinal": 1,
+   "rva": 762080,
+   "va": 31170784,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@D@vgui@@QAE@XZ",
+   "ordinal": 2,
+   "rva": 761936,
+   "va": 31170640,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@H@vgui@@QAE@H@Z",
+   "ordinal": 3,
+   "rva": 765040,
+   "va": 31173744,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@H@vgui@@QAE@XZ",
+   "ordinal": 4,
+   "rva": 764896,
+   "va": 31173600,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAD@vgui@@QAE@H@Z",
+   "ordinal": 5,
+   "rva": 763520,
+   "va": 31172224,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAD@vgui@@QAE@XZ",
+   "ordinal": 6,
+   "rva": 763376,
+   "va": 31172080,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 7,
+   "rva": 778720,
+   "va": 31187424,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 8,
+   "rva": 778576,
+   "va": 31187280,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVActionSignal@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 9,
+   "rva": 774160,
+   "va": 31182864,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVActionSignal@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 10,
+   "rva": 774016,
+   "va": 31182720,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVButton@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 11,
+   "rva": 766560,
+   "va": 31175264,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVButton@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 12,
+   "rva": 766416,
+   "va": 31175120,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVChangeSignal@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 13,
+   "rva": 783280,
+   "va": 31191984,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVChangeSignal@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 14,
+   "rva": 783136,
+   "va": 31191840,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 15,
+   "rva": 781760,
+   "va": 31190464,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 16,
+   "rva": 781616,
+   "va": 31190320,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 17,
+   "rva": 771120,
+   "va": 31179824,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 18,
+   "rva": 770976,
+   "va": 31179680,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVFrame@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 19,
+   "rva": 780240,
+   "va": 31188944,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVFrame@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 20,
+   "rva": 780096,
+   "va": 31188800,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVFrameSignal@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 21,
+   "rva": 772640,
+   "va": 31181344,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVFrameSignal@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 22,
+   "rva": 772496,
+   "va": 31181200,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVInputSignal@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 23,
+   "rva": 769600,
+   "va": 31178304,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVInputSignal@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 24,
+   "rva": 769456,
+   "va": 31178160,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 25,
+   "rva": 775680,
+   "va": 31184384,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 26,
+   "rva": 775536,
+   "va": 31184240,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVLabel@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 27,
+   "rva": 786320,
+   "va": 31195024,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVLabel@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 28,
+   "rva": 786176,
+   "va": 31194880,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVPanel@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 29,
+   "rva": 784800,
+   "va": 31193504,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVPanel@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 30,
+   "rva": 784656,
+   "va": 31193360,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 31,
+   "rva": 787840,
+   "va": 31196544,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 32,
+   "rva": 787696,
+   "va": 31196400,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 33,
+   "rva": 768080,
+   "va": 31176784,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 34,
+   "rva": 767936,
+   "va": 31176640,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVTickSignal@vgui@@@vgui@@QAE@H@Z",
+   "ordinal": 35,
+   "rva": 777200,
+   "va": 31185904,
+   "forward": null
+  },
+  {
+   "name": "??0?$Dar@PAVTickSignal@vgui@@@vgui@@QAE@XZ",
+   "ordinal": 36,
+   "rva": 777056,
+   "va": 31185760,
+   "forward": null
+  },
+  {
+   "name": "??0App@vgui@@QAE@ABV01@@Z",
+   "ordinal": 37,
+   "rva": 755184,
+   "va": 31163888,
+   "forward": null
+  },
+  {
+   "name": "??0Bitmap@vgui@@QAE@ABV01@@Z",
+   "ordinal": 38,
+   "rva": 757072,
+   "va": 31165776,
+   "forward": null
+  },
+  {
+   "name": "??0BitmapTGA@vgui@@QAE@ABV01@@Z",
+   "ordinal": 39,
+   "rva": 757248,
+   "va": 31165952,
+   "forward": null
+  },
+  {
+   "name": "??0Color@vgui@@QAE@ABV01@@Z",
+   "ordinal": 40,
+   "rva": 754192,
+   "va": 31162896,
+   "forward": null
+  },
+  {
+   "name": "??0Cursor@vgui@@QAE@ABV01@@Z",
+   "ordinal": 41,
+   "rva": 754256,
+   "va": 31162960,
+   "forward": null
+  },
+  {
+   "name": "??0FileInputStream@vgui@@QAE@ABV01@@Z",
+   "ordinal": 42,
+   "rva": 756864,
+   "va": 31165568,
+   "forward": null
+  },
+  {
+   "name": "??0Font@vgui@@QAE@ABV01@@Z",
+   "ordinal": 43,
+   "rva": 753952,
+   "va": 31162656,
+   "forward": null
+  },
+  {
+   "name": "??0Frame@vgui@@QAE@ABV01@@Z",
+   "ordinal": 44,
+   "rva": 789776,
+   "va": 31198480,
+   "forward": null
+  },
+  {
+   "name": "??0Image@vgui@@QAE@ABV01@@Z",
+   "ordinal": 45,
+   "rva": 756928,
+   "va": 31165632,
+   "forward": null
+  },
+  {
+   "name": "??0ImagePanel@vgui@@QAE@ABV01@@Z",
+   "ordinal": 46,
+   "rva": 755952,
+   "va": 31164656,
+   "forward": null
+  },
+  {
+   "name": "??0ImagePanel@vgui@@QAE@XZ",
+   "ordinal": 47,
+   "rva": 755920,
+   "va": 31164624,
+   "forward": null
+  },
+  {
+   "name": "??0InputStream@vgui@@QAE@ABV01@@Z",
+   "ordinal": 48,
+   "rva": 756832,
+   "va": 31165536,
+   "forward": null
+  },
+  {
+   "name": "??0InputStream@vgui@@QAE@XZ",
+   "ordinal": 49,
+   "rva": 756816,
+   "va": 31165520,
+   "forward": null
+  },
+  {
+   "name": "??0Panel@vgui@@QAE@ABV01@@Z",
+   "ordinal": 50,
+   "rva": 754352,
+   "va": 31163056,
+   "forward": null
+  },
+  {
+   "name": "??0Scheme@vgui@@QAE@ABV01@@Z",
+   "ordinal": 51,
+   "rva": 754032,
+   "va": 31162736,
+   "forward": null
+  },
+  {
+   "name": "??0SurfaceBase@vgui@@QAE@ABV01@@Z",
+   "ordinal": 52,
+   "rva": 753792,
+   "va": 31162496,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@D@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 53,
+   "rva": 753216,
+   "va": 31161920,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@H@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 54,
+   "rva": 753280,
+   "va": 31161984,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAD@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 55,
+   "rva": 753248,
+   "va": 31161952,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 56,
+   "rva": 753568,
+   "va": 31162272,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVActionSignal@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 57,
+   "rva": 753472,
+   "va": 31162176,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVButton@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 58,
+   "rva": 753312,
+   "va": 31162016,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 59,
+   "rva": 753664,
+   "va": 31162368,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 60,
+   "rva": 753632,
+   "va": 31162336,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 61,
+   "rva": 753408,
+   "va": 31162112,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVFrame@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 62,
+   "rva": 753600,
+   "va": 31162304,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 63,
+   "rva": 753440,
+   "va": 31162144,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVInputSignal@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 64,
+   "rva": 753376,
+   "va": 31162080,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 65,
+   "rva": 753504,
+   "va": 31162208,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVLabel@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 66,
+   "rva": 753728,
+   "va": 31162432,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVPanel@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 67,
+   "rva": 753696,
+   "va": 31162400,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 68,
+   "rva": 753760,
+   "va": 31162464,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 69,
+   "rva": 753344,
+   "va": 31162048,
+   "forward": null
+  },
+  {
+   "name": "??4?$Dar@PAVTickSignal@vgui@@@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 70,
+   "rva": 753536,
+   "va": 31162240,
+   "forward": null
+  },
+  {
+   "name": "??4App@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 71,
+   "rva": 755568,
+   "va": 31164272,
+   "forward": null
+  },
+  {
+   "name": "??4Bitmap@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 72,
+   "rva": 757168,
+   "va": 31165872,
+   "forward": null
+  },
+  {
+   "name": "??4BitmapTGA@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 73,
+   "rva": 757344,
+   "va": 31166048,
+   "forward": null
+  },
+  {
+   "name": "??4Color@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 74,
+   "rva": 754224,
+   "va": 31162928,
+   "forward": null
+  },
+  {
+   "name": "??4Cursor@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 75,
+   "rva": 754304,
+   "va": 31163008,
+   "forward": null
+  },
+  {
+   "name": "??4FileInputStream@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 76,
+   "rva": 756896,
+   "va": 31165600,
+   "forward": null
+  },
+  {
+   "name": "??4Font@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 77,
+   "rva": 754000,
+   "va": 31162704,
+   "forward": null
+  },
+  {
+   "name": "??4Frame@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 78,
+   "rva": 790480,
+   "va": 31199184,
+   "forward": null
+  },
+  {
+   "name": "??4Image@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 79,
+   "rva": 757008,
+   "va": 31165712,
+   "forward": null
+  },
+  {
+   "name": "??4ImagePanel@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 80,
+   "rva": 756400,
+   "va": 31165104,
+   "forward": null
+  },
+  {
+   "name": "??4InputStream@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 81,
+   "rva": 756848,
+   "va": 31165552,
+   "forward": null
+  },
+  {
+   "name": "??4Panel@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 82,
+   "rva": 754784,
+   "va": 31163488,
+   "forward": null
+  },
+  {
+   "name": "??4Scheme@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 83,
+   "rva": 754112,
+   "va": 31162816,
+   "forward": null
+  },
+  {
+   "name": "??4SurfaceBase@vgui@@QAEAAV01@ABV01@@Z",
+   "ordinal": 84,
+   "rva": 753872,
+   "va": 31162576,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@D@vgui@@QAEDH@Z",
+   "ordinal": 85,
+   "rva": 763344,
+   "va": 31172048,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@H@vgui@@QAEHH@Z",
+   "ordinal": 86,
+   "rva": 766384,
+   "va": 31175088,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAD@vgui@@QAEPADH@Z",
+   "ordinal": 87,
+   "rva": 764864,
+   "va": 31173568,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEPAV?$Dar@D@1@H@Z",
+   "ordinal": 88,
+   "rva": 780064,
+   "va": 31188768,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVActionSignal@vgui@@@vgui@@QAEPAVActionSignal@1@H@Z",
+   "ordinal": 89,
+   "rva": 775504,
+   "va": 31184208,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVButton@vgui@@@vgui@@QAEPAVButton@1@H@Z",
+   "ordinal": 90,
+   "rva": 767904,
+   "va": 31176608,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEPAVChangeSignal@1@H@Z",
+   "ordinal": 91,
+   "rva": 784624,
+   "va": 31193328,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEPAVDesktopIcon@1@H@Z",
+   "ordinal": 92,
+   "rva": 783104,
+   "va": 31191808,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEPAVFocusChangeSignal@1@H@Z",
+   "ordinal": 93,
+   "rva": 772464,
+   "va": 31181168,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVFrame@vgui@@@vgui@@QAEPAVFrame@1@H@Z",
+   "ordinal": 94,
+   "rva": 781584,
+   "va": 31190288,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEPAVFrameSignal@1@H@Z",
+   "ordinal": 95,
+   "rva": 773984,
+   "va": 31182688,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVInputSignal@vgui@@@vgui@@QAEPAVInputSignal@1@H@Z",
+   "ordinal": 96,
+   "rva": 770944,
+   "va": 31179648,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEPAVIntChangeSignal@1@H@Z",
+   "ordinal": 97,
+   "rva": 777024,
+   "va": 31185728,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVLabel@vgui@@@vgui@@QAEPAVLabel@1@H@Z",
+   "ordinal": 98,
+   "rva": 787664,
+   "va": 31196368,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVPanel@vgui@@@vgui@@QAEPAVPanel@1@H@Z",
+   "ordinal": 99,
+   "rva": 786144,
+   "va": 31194848,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEPAVRepaintSignal@1@H@Z",
+   "ordinal": 100,
+   "rva": 789184,
+   "va": 31197888,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEPAVSurfaceBase@1@H@Z",
+   "ordinal": 101,
+   "rva": 769424,
+   "va": 31178128,
+   "forward": null
+  },
+  {
+   "name": "??A?$Dar@PAVTickSignal@vgui@@@vgui@@QAEPAVTickSignal@1@H@Z",
+   "ordinal": 102,
+   "rva": 778544,
+   "va": 31187248,
+   "forward": null
+  },
+  {
+   "name": "??_7App@vgui@@6B@",
+   "ordinal": 103,
+   "rva": 1173580,
+   "va": 31582284,
+   "forward": null
+  },
+  {
+   "name": "??_7Bitmap@vgui@@6B@",
+   "ordinal": 104,
+   "rva": 1174492,
+   "va": 31583196,
+   "forward": null
+  },
+  {
+   "name": "??_7BitmapTGA@vgui@@6B@",
+   "ordinal": 105,
+   "rva": 1174596,
+   "va": 31583300,
+   "forward": null
+  },
+  {
+   "name": "??_7Color@vgui@@6B@",
+   "ordinal": 106,
+   "rva": 1173020,
+   "va": 31581724,
+   "forward": null
+  },
+  {
+   "name": "??_7Cursor@vgui@@6B@",
+   "ordinal": 107,
+   "rva": 1173048,
+   "va": 31581752,
+   "forward": null
+  },
+  {
+   "name": "??_7FileInputStream@vgui@@6B@",
+   "ordinal": 108,
+   "rva": 1174352,
+   "va": 31583056,
+   "forward": null
+  },
+  {
+   "name": "??_7Font@vgui@@6B@",
+   "ordinal": 109,
+   "rva": 1172964,
+   "va": 31581668,
+   "forward": null
+  },
+  {
+   "name": "??_7Frame@vgui@@6B@",
+   "ordinal": 110,
+   "rva": 1174900,
+   "va": 31583604,
+   "forward": null
+  },
+  {
+   "name": "??_7Image@vgui@@6B@",
+   "ordinal": 111,
+   "rva": 1174388,
+   "va": 31583092,
+   "forward": null
+  },
+  {
+   "name": "??_7ImagePanel@vgui@@6B@",
+   "ordinal": 112,
+   "rva": 1173804,
+   "va": 31582508,
+   "forward": null
+  },
+  {
+   "name": "??_7InputStream@vgui@@6B@",
+   "ordinal": 113,
+   "rva": 1174320,
+   "va": 31583024,
+   "forward": null
+  },
+  {
+   "name": "??_7Panel@vgui@@6B@",
+   "ordinal": 114,
+   "rva": 1173068,
+   "va": 31581772,
+   "forward": null
+  },
+  {
+   "name": "??_7Scheme@vgui@@6B@",
+   "ordinal": 115,
+   "rva": 1172992,
+   "va": 31581696,
+   "forward": null
+  },
+  {
+   "name": "??_7SurfaceBase@vgui@@6B@",
+   "ordinal": 116,
+   "rva": 1172820,
+   "va": 31581524,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@D@vgui@@QAEXD@Z",
+   "ordinal": 117,
+   "rva": 762416,
+   "va": 31171120,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@H@vgui@@QAEXH@Z",
+   "ordinal": 118,
+   "rva": 765392,
+   "va": 31174096,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAD@vgui@@QAEXPAD@Z",
+   "ordinal": 119,
+   "rva": 763872,
+   "va": 31172576,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXPAV?$Dar@D@2@@Z",
+   "ordinal": 120,
+   "rva": 779072,
+   "va": 31187776,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXPAVActionSignal@2@@Z",
+   "ordinal": 121,
+   "rva": 774512,
+   "va": 31183216,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVButton@vgui@@@vgui@@QAEXPAVButton@2@@Z",
+   "ordinal": 122,
+   "rva": 766912,
+   "va": 31175616,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXPAVChangeSignal@2@@Z",
+   "ordinal": 123,
+   "rva": 783632,
+   "va": 31192336,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXPAVDesktopIcon@2@@Z",
+   "ordinal": 124,
+   "rva": 782112,
+   "va": 31190816,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXPAVFocusChangeSignal@2@@Z",
+   "ordinal": 125,
+   "rva": 771472,
+   "va": 31180176,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVFrame@vgui@@@vgui@@QAEXPAVFrame@2@@Z",
+   "ordinal": 126,
+   "rva": 780592,
+   "va": 31189296,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXPAVFrameSignal@2@@Z",
+   "ordinal": 127,
+   "rva": 772992,
+   "va": 31181696,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXPAVInputSignal@2@@Z",
+   "ordinal": 128,
+   "rva": 769952,
+   "va": 31178656,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXPAVIntChangeSignal@2@@Z",
+   "ordinal": 129,
+   "rva": 776032,
+   "va": 31184736,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVLabel@vgui@@@vgui@@QAEXPAVLabel@2@@Z",
+   "ordinal": 130,
+   "rva": 786672,
+   "va": 31195376,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVPanel@vgui@@@vgui@@QAEXPAVPanel@2@@Z",
+   "ordinal": 131,
+   "rva": 785152,
+   "va": 31193856,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXPAVRepaintSignal@2@@Z",
+   "ordinal": 132,
+   "rva": 788192,
+   "va": 31196896,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXPAVSurfaceBase@2@@Z",
+   "ordinal": 133,
+   "rva": 768432,
+   "va": 31177136,
+   "forward": null
+  },
+  {
+   "name": "?addElement@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXPAVTickSignal@2@@Z",
+   "ordinal": 134,
+   "rva": 777552,
+   "va": 31186256,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@D@vgui@@QAEXH@Z",
+   "ordinal": 135,
+   "rva": 762224,
+   "va": 31170928,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@H@vgui@@QAEXH@Z",
+   "ordinal": 136,
+   "rva": 765200,
+   "va": 31173904,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAD@vgui@@QAEXH@Z",
+   "ordinal": 137,
+   "rva": 763680,
+   "va": 31172384,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 138,
+   "rva": 778880,
+   "va": 31187584,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 139,
+   "rva": 774320,
+   "va": 31183024,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVButton@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 140,
+   "rva": 766720,
+   "va": 31175424,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 141,
+   "rva": 783440,
+   "va": 31192144,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 142,
+   "rva": 781920,
+   "va": 31190624,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 143,
+   "rva": 771280,
+   "va": 31179984,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVFrame@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 144,
+   "rva": 780400,
+   "va": 31189104,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 145,
+   "rva": 772800,
+   "va": 31181504,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 146,
+   "rva": 769760,
+   "va": 31178464,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 147,
+   "rva": 775840,
+   "va": 31184544,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVLabel@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 148,
+   "rva": 786480,
+   "va": 31195184,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVPanel@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 149,
+   "rva": 784960,
+   "va": 31193664,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 150,
+   "rva": 788000,
+   "va": 31196704,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 151,
+   "rva": 768240,
+   "va": 31176944,
+   "forward": null
+  },
+  {
+   "name": "?ensureCapacity@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 152,
+   "rva": 777360,
+   "va": 31186064,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@D@vgui@@QAEHXZ",
+   "ordinal": 153,
+   "rva": 762400,
+   "va": 31171104,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@H@vgui@@QAEHXZ",
+   "ordinal": 154,
+   "rva": 765376,
+   "va": 31174080,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAD@vgui@@QAEHXZ",
+   "ordinal": 155,
+   "rva": 763856,
+   "va": 31172560,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 156,
+   "rva": 779056,
+   "va": 31187760,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 157,
+   "rva": 774496,
+   "va": 31183200,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVButton@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 158,
+   "rva": 766896,
+   "va": 31175600,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 159,
+   "rva": 783616,
+   "va": 31192320,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 160,
+   "rva": 782096,
+   "va": 31190800,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 161,
+   "rva": 771456,
+   "va": 31180160,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVFrame@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 162,
+   "rva": 780576,
+   "va": 31189280,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 163,
+   "rva": 772976,
+   "va": 31181680,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 164,
+   "rva": 769936,
+   "va": 31178640,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 165,
+   "rva": 776016,
+   "va": 31184720,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVLabel@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 166,
+   "rva": 786656,
+   "va": 31195360,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVPanel@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 167,
+   "rva": 785136,
+   "va": 31193840,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 168,
+   "rva": 788176,
+   "va": 31196880,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 169,
+   "rva": 768416,
+   "va": 31177120,
+   "forward": null
+  },
+  {
+   "name": "?getCount@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEHXZ",
+   "ordinal": 170,
+   "rva": 777536,
+   "va": 31186240,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@D@vgui@@QAE_ND@Z",
+   "ordinal": 171,
+   "rva": 762576,
+   "va": 31171280,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@H@vgui@@QAE_NH@Z",
+   "ordinal": 172,
+   "rva": 765552,
+   "va": 31174256,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAD@vgui@@QAE_NPAD@Z",
+   "ordinal": 173,
+   "rva": 764032,
+   "va": 31172736,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAE_NPAV?$Dar@D@2@@Z",
+   "ordinal": 174,
+   "rva": 779232,
+   "va": 31187936,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVActionSignal@vgui@@@vgui@@QAE_NPAVActionSignal@2@@Z",
+   "ordinal": 175,
+   "rva": 774672,
+   "va": 31183376,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVButton@vgui@@@vgui@@QAE_NPAVButton@2@@Z",
+   "ordinal": 176,
+   "rva": 767072,
+   "va": 31175776,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAE_NPAVChangeSignal@2@@Z",
+   "ordinal": 177,
+   "rva": 783792,
+   "va": 31192496,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAE_NPAVDesktopIcon@2@@Z",
+   "ordinal": 178,
+   "rva": 782272,
+   "va": 31190976,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAE_NPAVFocusChangeSignal@2@@Z",
+   "ordinal": 179,
+   "rva": 771632,
+   "va": 31180336,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVFrame@vgui@@@vgui@@QAE_NPAVFrame@2@@Z",
+   "ordinal": 180,
+   "rva": 780752,
+   "va": 31189456,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAE_NPAVFrameSignal@2@@Z",
+   "ordinal": 181,
+   "rva": 773152,
+   "va": 31181856,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVInputSignal@vgui@@@vgui@@QAE_NPAVInputSignal@2@@Z",
+   "ordinal": 182,
+   "rva": 770112,
+   "va": 31178816,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAE_NPAVIntChangeSignal@2@@Z",
+   "ordinal": 183,
+   "rva": 776192,
+   "va": 31184896,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVLabel@vgui@@@vgui@@QAE_NPAVLabel@2@@Z",
+   "ordinal": 184,
+   "rva": 786832,
+   "va": 31195536,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVPanel@vgui@@@vgui@@QAE_NPAVPanel@2@@Z",
+   "ordinal": 185,
+   "rva": 785312,
+   "va": 31194016,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAE_NPAVRepaintSignal@2@@Z",
+   "ordinal": 186,
+   "rva": 788352,
+   "va": 31197056,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAE_NPAVSurfaceBase@2@@Z",
+   "ordinal": 187,
+   "rva": 768592,
+   "va": 31177296,
+   "forward": null
+  },
+  {
+   "name": "?hasElement@?$Dar@PAVTickSignal@vgui@@@vgui@@QAE_NPAVTickSignal@2@@Z",
+   "ordinal": 188,
+   "rva": 777712,
+   "va": 31186416,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@D@vgui@@QAEXDH@Z",
+   "ordinal": 189,
+   "rva": 762816,
+   "va": 31171520,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@H@vgui@@QAEXHH@Z",
+   "ordinal": 190,
+   "rva": 765792,
+   "va": 31174496,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAD@vgui@@QAEXPADH@Z",
+   "ordinal": 191,
+   "rva": 764272,
+   "va": 31172976,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXPAV?$Dar@D@2@H@Z",
+   "ordinal": 192,
+   "rva": 779472,
+   "va": 31188176,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXPAVActionSignal@2@H@Z",
+   "ordinal": 193,
+   "rva": 774912,
+   "va": 31183616,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVButton@vgui@@@vgui@@QAEXPAVButton@2@H@Z",
+   "ordinal": 194,
+   "rva": 767312,
+   "va": 31176016,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXPAVChangeSignal@2@H@Z",
+   "ordinal": 195,
+   "rva": 784032,
+   "va": 31192736,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXPAVDesktopIcon@2@H@Z",
+   "ordinal": 196,
+   "rva": 782512,
+   "va": 31191216,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXPAVFocusChangeSignal@2@H@Z",
+   "ordinal": 197,
+   "rva": 771872,
+   "va": 31180576,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVFrame@vgui@@@vgui@@QAEXPAVFrame@2@H@Z",
+   "ordinal": 198,
+   "rva": 780992,
+   "va": 31189696,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXPAVFrameSignal@2@H@Z",
+   "ordinal": 199,
+   "rva": 773392,
+   "va": 31182096,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXPAVInputSignal@2@H@Z",
+   "ordinal": 200,
+   "rva": 770352,
+   "va": 31179056,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXPAVIntChangeSignal@2@H@Z",
+   "ordinal": 201,
+   "rva": 776432,
+   "va": 31185136,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVLabel@vgui@@@vgui@@QAEXPAVLabel@2@H@Z",
+   "ordinal": 202,
+   "rva": 787072,
+   "va": 31195776,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVPanel@vgui@@@vgui@@QAEXPAVPanel@2@H@Z",
+   "ordinal": 203,
+   "rva": 785552,
+   "va": 31194256,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXPAVRepaintSignal@2@H@Z",
+   "ordinal": 204,
+   "rva": 788592,
+   "va": 31197296,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXPAVSurfaceBase@2@H@Z",
+   "ordinal": 205,
+   "rva": 768832,
+   "va": 31177536,
+   "forward": null
+  },
+  {
+   "name": "?insertElementAt@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXPAVTickSignal@2@H@Z",
+   "ordinal": 206,
+   "rva": 777952,
+   "va": 31186656,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@D@vgui@@QAEXD@Z",
+   "ordinal": 207,
+   "rva": 762624,
+   "va": 31171328,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@H@vgui@@QAEXH@Z",
+   "ordinal": 208,
+   "rva": 765600,
+   "va": 31174304,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAD@vgui@@QAEXPAD@Z",
+   "ordinal": 209,
+   "rva": 764080,
+   "va": 31172784,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXPAV?$Dar@D@2@@Z",
+   "ordinal": 210,
+   "rva": 779280,
+   "va": 31187984,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXPAVActionSignal@2@@Z",
+   "ordinal": 211,
+   "rva": 774720,
+   "va": 31183424,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVButton@vgui@@@vgui@@QAEXPAVButton@2@@Z",
+   "ordinal": 212,
+   "rva": 767120,
+   "va": 31175824,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXPAVChangeSignal@2@@Z",
+   "ordinal": 213,
+   "rva": 783840,
+   "va": 31192544,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXPAVDesktopIcon@2@@Z",
+   "ordinal": 214,
+   "rva": 782320,
+   "va": 31191024,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXPAVFocusChangeSignal@2@@Z",
+   "ordinal": 215,
+   "rva": 771680,
+   "va": 31180384,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVFrame@vgui@@@vgui@@QAEXPAVFrame@2@@Z",
+   "ordinal": 216,
+   "rva": 780800,
+   "va": 31189504,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXPAVFrameSignal@2@@Z",
+   "ordinal": 217,
+   "rva": 773200,
+   "va": 31181904,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXPAVInputSignal@2@@Z",
+   "ordinal": 218,
+   "rva": 770160,
+   "va": 31178864,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXPAVIntChangeSignal@2@@Z",
+   "ordinal": 219,
+   "rva": 776240,
+   "va": 31184944,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVLabel@vgui@@@vgui@@QAEXPAVLabel@2@@Z",
+   "ordinal": 220,
+   "rva": 786880,
+   "va": 31195584,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVPanel@vgui@@@vgui@@QAEXPAVPanel@2@@Z",
+   "ordinal": 221,
+   "rva": 785360,
+   "va": 31194064,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXPAVRepaintSignal@2@@Z",
+   "ordinal": 222,
+   "rva": 788400,
+   "va": 31197104,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXPAVSurfaceBase@2@@Z",
+   "ordinal": 223,
+   "rva": 768640,
+   "va": 31177344,
+   "forward": null
+  },
+  {
+   "name": "?putElement@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXPAVTickSignal@2@@Z",
+   "ordinal": 224,
+   "rva": 777760,
+   "va": 31186464,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@D@vgui@@QAEXXZ",
+   "ordinal": 225,
+   "rva": 763328,
+   "va": 31172032,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@H@vgui@@QAEXXZ",
+   "ordinal": 226,
+   "rva": 766368,
+   "va": 31175072,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAD@vgui@@QAEXXZ",
+   "ordinal": 227,
+   "rva": 764848,
+   "va": 31173552,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 228,
+   "rva": 780048,
+   "va": 31188752,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 229,
+   "rva": 775488,
+   "va": 31184192,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVButton@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 230,
+   "rva": 767888,
+   "va": 31176592,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 231,
+   "rva": 784608,
+   "va": 31193312,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 232,
+   "rva": 783088,
+   "va": 31191792,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 233,
+   "rva": 772448,
+   "va": 31181152,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVFrame@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 234,
+   "rva": 781568,
+   "va": 31190272,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 235,
+   "rva": 773968,
+   "va": 31182672,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 236,
+   "rva": 770928,
+   "va": 31179632,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 237,
+   "rva": 777008,
+   "va": 31185712,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVLabel@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 238,
+   "rva": 787648,
+   "va": 31196352,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVPanel@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 239,
+   "rva": 786128,
+   "va": 31194832,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 240,
+   "rva": 789168,
+   "va": 31197872,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 241,
+   "rva": 769408,
+   "va": 31178112,
+   "forward": null
+  },
+  {
+   "name": "?removeAll@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXXZ",
+   "ordinal": 242,
+   "rva": 778528,
+   "va": 31187232,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@D@vgui@@QAEXD@Z",
+   "ordinal": 243,
+   "rva": 763248,
+   "va": 31171952,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@H@vgui@@QAEXH@Z",
+   "ordinal": 244,
+   "rva": 766272,
+   "va": 31174976,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAD@vgui@@QAEXPAD@Z",
+   "ordinal": 245,
+   "rva": 764752,
+   "va": 31173456,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXPAV?$Dar@D@2@@Z",
+   "ordinal": 246,
+   "rva": 779952,
+   "va": 31188656,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXPAVActionSignal@2@@Z",
+   "ordinal": 247,
+   "rva": 775392,
+   "va": 31184096,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVButton@vgui@@@vgui@@QAEXPAVButton@2@@Z",
+   "ordinal": 248,
+   "rva": 767792,
+   "va": 31176496,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXPAVChangeSignal@2@@Z",
+   "ordinal": 249,
+   "rva": 784512,
+   "va": 31193216,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXPAVDesktopIcon@2@@Z",
+   "ordinal": 250,
+   "rva": 782992,
+   "va": 31191696,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXPAVFocusChangeSignal@2@@Z",
+   "ordinal": 251,
+   "rva": 772352,
+   "va": 31181056,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVFrame@vgui@@@vgui@@QAEXPAVFrame@2@@Z",
+   "ordinal": 252,
+   "rva": 781472,
+   "va": 31190176,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXPAVFrameSignal@2@@Z",
+   "ordinal": 253,
+   "rva": 773872,
+   "va": 31182576,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXPAVInputSignal@2@@Z",
+   "ordinal": 254,
+   "rva": 770832,
+   "va": 31179536,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXPAVIntChangeSignal@2@@Z",
+   "ordinal": 255,
+   "rva": 776912,
+   "va": 31185616,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVLabel@vgui@@@vgui@@QAEXPAVLabel@2@@Z",
+   "ordinal": 256,
+   "rva": 787552,
+   "va": 31196256,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVPanel@vgui@@@vgui@@QAEXPAVPanel@2@@Z",
+   "ordinal": 257,
+   "rva": 786032,
+   "va": 31194736,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXPAVRepaintSignal@2@@Z",
+   "ordinal": 258,
+   "rva": 789072,
+   "va": 31197776,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXPAVSurfaceBase@2@@Z",
+   "ordinal": 259,
+   "rva": 769312,
+   "va": 31178016,
+   "forward": null
+  },
+  {
+   "name": "?removeElement@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXPAVTickSignal@2@@Z",
+   "ordinal": 260,
+   "rva": 778432,
+   "va": 31187136,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@D@vgui@@QAEXH@Z",
+   "ordinal": 261,
+   "rva": 763200,
+   "va": 31171904,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@H@vgui@@QAEXH@Z",
+   "ordinal": 262,
+   "rva": 766208,
+   "va": 31174912,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAD@vgui@@QAEXH@Z",
+   "ordinal": 263,
+   "rva": 764688,
+   "va": 31173392,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 264,
+   "rva": 779888,
+   "va": 31188592,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 265,
+   "rva": 775328,
+   "va": 31184032,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVButton@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 266,
+   "rva": 767728,
+   "va": 31176432,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 267,
+   "rva": 784448,
+   "va": 31193152,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 268,
+   "rva": 782928,
+   "va": 31191632,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 269,
+   "rva": 772288,
+   "va": 31180992,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVFrame@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 270,
+   "rva": 781408,
+   "va": 31190112,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 271,
+   "rva": 773808,
+   "va": 31182512,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 272,
+   "rva": 770768,
+   "va": 31179472,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 273,
+   "rva": 776848,
+   "va": 31185552,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVLabel@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 274,
+   "rva": 787488,
+   "va": 31196192,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVPanel@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 275,
+   "rva": 785968,
+   "va": 31194672,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 276,
+   "rva": 789008,
+   "va": 31197712,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 277,
+   "rva": 769248,
+   "va": 31177952,
+   "forward": null
+  },
+  {
+   "name": "?removeElementAt@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 278,
+   "rva": 778368,
+   "va": 31187072,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@D@vgui@@QAEXH@Z",
+   "ordinal": 279,
+   "rva": 762368,
+   "va": 31171072,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@H@vgui@@QAEXH@Z",
+   "ordinal": 280,
+   "rva": 765344,
+   "va": 31174048,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAD@vgui@@QAEXH@Z",
+   "ordinal": 281,
+   "rva": 763824,
+   "va": 31172528,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 282,
+   "rva": 779024,
+   "va": 31187728,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 283,
+   "rva": 774464,
+   "va": 31183168,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVButton@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 284,
+   "rva": 766864,
+   "va": 31175568,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 285,
+   "rva": 783584,
+   "va": 31192288,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 286,
+   "rva": 782064,
+   "va": 31190768,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 287,
+   "rva": 771424,
+   "va": 31180128,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVFrame@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 288,
+   "rva": 780544,
+   "va": 31189248,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 289,
+   "rva": 772944,
+   "va": 31181648,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 290,
+   "rva": 769904,
+   "va": 31178608,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 291,
+   "rva": 775984,
+   "va": 31184688,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVLabel@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 292,
+   "rva": 786624,
+   "va": 31195328,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVPanel@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 293,
+   "rva": 785104,
+   "va": 31193808,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 294,
+   "rva": 788144,
+   "va": 31196848,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 295,
+   "rva": 768384,
+   "va": 31177088,
+   "forward": null
+  },
+  {
+   "name": "?setCount@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXH@Z",
+   "ordinal": 296,
+   "rva": 777504,
+   "va": 31186208,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@D@vgui@@QAEXDH@Z",
+   "ordinal": 297,
+   "rva": 763168,
+   "va": 31171872,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@H@vgui@@QAEXHH@Z",
+   "ordinal": 298,
+   "rva": 766176,
+   "va": 31174880,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAD@vgui@@QAEXPADH@Z",
+   "ordinal": 299,
+   "rva": 764656,
+   "va": 31173360,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAV?$Dar@D@vgui@@@vgui@@QAEXPAV?$Dar@D@2@H@Z",
+   "ordinal": 300,
+   "rva": 779856,
+   "va": 31188560,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVActionSignal@vgui@@@vgui@@QAEXPAVActionSignal@2@H@Z",
+   "ordinal": 301,
+   "rva": 775296,
+   "va": 31184000,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVButton@vgui@@@vgui@@QAEXPAVButton@2@H@Z",
+   "ordinal": 302,
+   "rva": 767696,
+   "va": 31176400,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVChangeSignal@vgui@@@vgui@@QAEXPAVChangeSignal@2@H@Z",
+   "ordinal": 303,
+   "rva": 784416,
+   "va": 31193120,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVDesktopIcon@vgui@@@vgui@@QAEXPAVDesktopIcon@2@H@Z",
+   "ordinal": 304,
+   "rva": 782896,
+   "va": 31191600,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVFocusChangeSignal@vgui@@@vgui@@QAEXPAVFocusChangeSignal@2@H@Z",
+   "ordinal": 305,
+   "rva": 772256,
+   "va": 31180960,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVFrame@vgui@@@vgui@@QAEXPAVFrame@2@H@Z",
+   "ordinal": 306,
+   "rva": 781376,
+   "va": 31190080,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVFrameSignal@vgui@@@vgui@@QAEXPAVFrameSignal@2@H@Z",
+   "ordinal": 307,
+   "rva": 773776,
+   "va": 31182480,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVInputSignal@vgui@@@vgui@@QAEXPAVInputSignal@2@H@Z",
+   "ordinal": 308,
+   "rva": 770736,
+   "va": 31179440,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVIntChangeSignal@vgui@@@vgui@@QAEXPAVIntChangeSignal@2@H@Z",
+   "ordinal": 309,
+   "rva": 776816,
+   "va": 31185520,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVLabel@vgui@@@vgui@@QAEXPAVLabel@2@H@Z",
+   "ordinal": 310,
+   "rva": 787456,
+   "va": 31196160,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVPanel@vgui@@@vgui@@QAEXPAVPanel@2@H@Z",
+   "ordinal": 311,
+   "rva": 785936,
+   "va": 31194640,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVRepaintSignal@vgui@@@vgui@@QAEXPAVRepaintSignal@2@H@Z",
+   "ordinal": 312,
+   "rva": 788976,
+   "va": 31197680,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVSurfaceBase@vgui@@@vgui@@QAEXPAVSurfaceBase@2@H@Z",
+   "ordinal": 313,
+   "rva": 769216,
+   "va": 31177920,
+   "forward": null
+  },
+  {
+   "name": "?setElementAt@?$Dar@PAVTickSignal@vgui@@@vgui@@QAEXPAVTickSignal@2@H@Z",
+   "ordinal": 314,
+   "rva": 778336,
+   "va": 31187040,
+   "forward": null
+  },
+  {
+   "name": "CreateInterface",
+   "ordinal": 315,
+   "rva": 387264,
+   "va": 30795968,
+   "forward": null
+  },
+  {
+   "name": "F",
+   "ordinal": 316,
+   "rva": 703776,
+   "va": 31112480,
+   "forward": null
+  },
+  {
+   "name": "qwglChoosePixelFormat",
+   "ordinal": 317,
+   "rva": 11082132,
+   "va": 41490836,
+   "forward": null
+  },
+  {
+   "name": "qwglCreateContext",
+   "ordinal": 318,
+   "rva": 11081928,
+   "va": 41490632,
+   "forward": null
+  },
+  {
+   "name": "qwglDeleteContext",
+   "ordinal": 319,
+   "rva": 11083508,
+   "va": 41492212,
+   "forward": null
+  },
+  {
+   "name": "qwglGetCurrentContext",
+   "ordinal": 320,
+   "rva": 11081804,
+   "va": 41490508,
+   "forward": null
+  },
+  {
+   "name": "qwglGetCurrentDC",
+   "ordinal": 321,
+   "rva": 11083080,
+   "va": 41491784,
+   "forward": null
+  },
+  {
+   "name": "qwglMakeCurrent",
+   "ordinal": 322,
+   "rva": 11083788,
+   "va": 41492492,
+   "forward": null
+  },
+  {
+   "name": "qwglSetPixelFormat",
+   "ordinal": 323,
+   "rva": 11082120,
+   "va": 41490824,
+   "forward": null
+  }
+ ]
+}

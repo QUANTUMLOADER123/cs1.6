@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")"
+
+if command -v zig >/dev/null 2>&1; then ZIG=zig
+else ZIG=$(python3 -c 'import ziglang,os;print(os.path.join(os.path.dirname(ziglang.__file__),"zig"))'); fi
+
+OUT=build
+rm -rf "$OUT" && mkdir -p "$OUT"
+T=x86-windows-gnu
+
+CF="-target $T -O2 -Iext/minhook/include -Iext/minhook/src/hde -D_CRT_SECURE_NO_WARNINGS"
+for f in ext/minhook/src/hook.c ext/minhook/src/buffer.c ext/minhook/src/trampoline.c ext/minhook/src/hde/hde32.c; do
+  "$ZIG" cc $CF -c "$f" -o "$OUT/$(basename ${f%.c}).o"
+done
+
+CXF="-target $T -std=c++17 -O2 -fno-exceptions -fno-rtti -Iinclude -Iext/minhook/include -D_CRT_SECURE_NO_WARNINGS"
+SRC="src/core/sh_scanner.cpp src/core/sh_math.cpp src/core/sh_config.cpp src/core/sh_hooks.cpp src/core/sh_dllmain.cpp
+     src/sdk/sh_patterns.cpp src/render/sh_render.cpp src/render/sh_font.cpp src/render/sh_font_data.cpp
+     src/features/sh_players.cpp src/features/sh_aimbot.cpp src/features/sh_antiaim.cpp
+     src/features/sh_misc.cpp src/features/sh_esp.cpp src/features/sh_menu.cpp"
+for f in $SRC; do
+  "$ZIG" c++ $CXF -c "$f" -o "$OUT/$(basename ${f%.cpp}).o"
+done
+
+"$ZIG" c++ -target $T -shared -o "$OUT/skeethook_1_6.dll" "$OUT"/*.o \
+  -lopengl32 -lgdi32 -luser32 -lpsapi -static-libgcc -static-libstdc++
+
+echo "[+] $(ls -lh $OUT/skeethook_1_6.dll | awk '{print $5, $9}')"
