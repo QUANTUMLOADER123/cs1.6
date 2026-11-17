@@ -10,7 +10,10 @@ OBJ = $(SRC:.cpp=.o)
 menu.png: $(OBJ)
 	$(CXX) $(OBJ) -o $@ $(LDFLAGS)
 
-%.o: %.cpp
+# заголовки — зависимости, иначе make не пересобирает при их изменении
+HDR = $(wildcard include/*.h) imgui.h imgui_internal.h
+
+%.o: %.cpp $(HDR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:

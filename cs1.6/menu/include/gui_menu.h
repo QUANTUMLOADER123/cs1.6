@@ -1,4 +1,13 @@
-// gui_menu.h — само меню: сайдбар, вкладки, колонки, содержимое.
+// gui_menu.h — меню gamesense, геометрия 1в1 с референса 731×617.
+//
+// Раскладка (все значения сняты с пикселей):
+//   окно          731×617, фон #0C0C0C
+//   рамка         1px #3C3C3C + 2px #282828 + 1px #3C3C3C
+//   радуга        2px по всей ширине под рамкой
+//   сайдбар       88px, иконки 62px шаг, первая на y≈30
+//   колонка A     x 101, ширина 290
+//   колонка B     x 415, ширина 290
+//   подпись вкладки внизу сайдбара, 14px, белая
 #pragma once
 
 #include "imgui.h"
@@ -14,61 +23,36 @@ namespace gui
     struct Settings
     {
         bool menu_open = true;
-
-        // Rage
-        bool aimbot = false;
-        bool silent = false;
-        bool auto_fire = false;
-        bool auto_wall = false;
-        bool auto_scope = false;
-        int  hitbox = 1;
-        int  target_selection = 0;
-        float fov = 180.0f;
-        float smooth = 12.0f;
-        bool resolver = false;
-        bool backtrack = false;
-
-        // Visuals
-        bool esp = true;
-        bool box = true;
-        bool name = true;
-        bool health = true;
-        bool weapon = true;
-        bool skeleton = false;
-        bool chams = false;
-        int  esp_style = 0;
-        bool glow = false;
-        bool radar = false;
-
-        // Misc
-        bool bhop = true;
-        bool auto_strafe = false;
-        bool fake_lag = false;
-        int  fakelag_amount = 2;
-        bool edge_jump = false;
-        bool auto_peek = false;
-        bool thirdperson = false;
-        float thirdperson_dist = 120.0f;
-
-        // Settings
-        bool watermark = true;
-        bool debug_console = false;
-        bool save_on_exit = true;
-        int  accent_index = 0;
-        bool anti_screenshot = false;
-
-        // Skins
-        int  knife_model = 0;
-        int  ak_skin = 0;
-        int  m4_skin = 0;
-        int  awp_skin = 0;
-        bool stattrak = false;
-
-        // состояние UI
         int  active_tab = 0;
         bool show_demo = false;
-        char config_name[64] = "default";
-        int  config_index = 0;
+
+        // Rage
+        bool aimbot = false, silent = false, auto_fire = false;
+        bool auto_wall = false, auto_scope = false;
+        bool resolver = false, backtrack = false, double_tap = false;
+        int  hitbox = 0, target = 0;
+        float fov = 180.0f, smooth = 12.0f;
+
+        // Visuals
+        bool esp = true, box = true, name = true, health = true;
+        bool weapon = true, skeleton = false, chams = false;
+        bool glow = false, radar = false;
+        int  esp_style = 0;
+
+        // Misc
+        bool bhop = true, auto_strafe = false, edge_jump = false, auto_peek = false;
+        bool fake_lag = false, thirdperson = false;
+        int  fakelag_ticks = 2;
+        float tp_dist = 120.0f;
+
+        // Skins
+        int knife = 0, ak = 0, m4 = 0, awp = 0;
+        bool stattrak = false;
+
+        // Settings
+        bool watermark = true, debug_console = false, save_on_exit = true;
+        int  accent = 0;
+        char config[64] = "default";
     };
 
     inline Settings& State()
@@ -77,371 +61,296 @@ namespace gui
         return s;
     }
 
-    // ---- вкладка Rage ----
-    inline void TabRage(Settings& s, ImVec2 avail)
+    // ------------------------------------------------------------------
+    // Контент вкладок
+    // ------------------------------------------------------------------
+
+    inline void TabRage(Settings& s, float w, float h)
     {
         static const char* hitboxes[] = { "Head", "Neck", "Chest", "Stomach", "Pelvis" };
-        static const char* targets[] = { "Closest to crosshair", "Lowest health", "Highest threat" };
-        float col_w = (avail.x - geo::PAD) * 0.5f;
-        float col_h = avail.y - geo::HEADER_H;
+        static const char* targets[]  = { "Crosshair", "Lowest HP", "Highest threat" };
 
-        if (BeginColumn("##rage_a", ImVec2(col_w, col_h)))
+        ImVec2 base = ImGui::GetCursorScreenPos();
+        ImVec2 csz(geo::COL_W, h);
+
+        if (BeginColumn("##rage_a", base, csz, "A"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("A");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
             Checkbox("Enable aimbot", &s.aimbot);
-            ImGui::Indent(16);
-            Checkbox("Silent aim", &s.silent);
-            Checkbox("Auto fire", &s.auto_fire);
-            Checkbox("Auto wall", &s.auto_wall);
-            Checkbox("Auto scope", &s.auto_scope);
-            ImGui::Unindent(16);
+            Checkbox("Silent aim", &s.silent, 8 * geo::SCALE);
+            Checkbox("Auto fire", &s.auto_fire, 8 * geo::SCALE);
+            Checkbox("Auto wall", &s.auto_wall, 8 * geo::SCALE);
+            Checkbox("Auto scope", &s.auto_scope, 8 * geo::SCALE);
+            Checkbox("Double tap", &s.double_tap, 8 * geo::SCALE);
 
-            ImGui::Dummy(ImVec2(0, 6));
-            ImGui::TextDisabled("Hitbox");
-            Combo("##hitbox", &s.hitbox, hitboxes, IM_ARRAYSIZE(hitboxes), col_w - 30);
+            ImGui::Dummy(ImVec2(0, 6 * geo::SCALE));
+            Label("Hitbox");
+            Combo("##hitbox", &s.hitbox, hitboxes, IM_ARRAYSIZE(hitboxes), geo::COL_W - 2 * geo::COL_PAD);
 
-            ImGui::Dummy(ImVec2(0, 4));
-            ImGui::TextDisabled("Target selection");
-            Combo("##target", &s.target_selection, targets, IM_ARRAYSIZE(targets), col_w - 30);
+            Label("Target selection");
+            Combo("##target", &s.target, targets, IM_ARRAYSIZE(targets), geo::COL_W - 2 * geo::COL_PAD);
 
-            ImGui::Dummy(ImVec2(0, 6));
-            ImGui::TextDisabled("FOV");
-            ImGui::SetNextItemWidth(col_w - 30);
-            ImGui::SliderFloat("##fov", &s.fov, 0.0f, 180.0f, "%.0f deg");
-            ImGui::TextDisabled("Smooth");
-            ImGui::SetNextItemWidth(col_w - 30);
+            ImGui::Dummy(ImVec2(0, 6 * geo::SCALE));
+            Label("FOV");
+            ImGui::SetNextItemWidth(geo::COL_W - 2 * geo::COL_PAD);
+            ImGui::SliderFloat("##fov", &s.fov, 0.0f, 180.0f, "%.0f");
+            Label("Smooth");
+            ImGui::SetNextItemWidth(geo::COL_W - 2 * geo::COL_PAD);
             ImGui::SliderFloat("##smooth", &s.smooth, 1.0f, 30.0f, "%.1f");
         }
         EndColumn();
 
-        ImGui::SameLine();
-        if (BeginColumn("##rage_b", ImVec2(col_w, col_h)))
+        ImGui::SetCursorScreenPos(ImVec2(base.x + geo::COL_W + geo::COL_GAP, base.y));
+        if (BeginColumn("##rage_b", ImVec2(base.x + geo::COL_W + geo::COL_GAP, base.y), csz, "B"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("B");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
-            ImGui::TextDisabled("Accuracy");
             Checkbox("Resolver", &s.resolver);
             Checkbox("Backtrack", &s.backtrack);
-
-            ImGui::Dummy(ImVec2(0, 8));
-            ImGui::Separator();
-            ImGui::Dummy(ImVec2(0, 8));
-            ImGui::TextDisabled("State");
-            ImGui::Text("Aimbot:     %s", s.aimbot ? "on" : "off");
-            ImGui::Text("Silent:     %s", s.silent ? "on" : "off");
-            ImGui::Text("Auto wall:  %s", s.auto_wall ? "on" : "off");
-            ImGui::Text("Hitbox:     %s", hitboxes[s.hitbox]);
         }
         EndColumn();
     }
 
-    // ---- вкладка Visuals ----
-    inline void TabVisuals(Settings& s, ImVec2 avail)
+    inline void TabVisuals(Settings& s, float w, float h)
     {
-        float col_w = (avail.x - geo::PAD) * 0.5f;
-        float col_h = avail.y - geo::HEADER_H;
+        static const char* styles[] = { "Regular", "Corners", "3D", "Outline" };
+        ImVec2 base = ImGui::GetCursorScreenPos();
+        ImVec2 csz(geo::COL_W, h);
 
-        if (BeginColumn("##vis_a", ImVec2(col_w, col_h)))
+        if (BeginColumn("##vis_a", base, csz, "A"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("A");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
             Checkbox("Master switch", &s.esp);
-            ImGui::Indent(16);
-            Checkbox("Box", &s.box);
-            Checkbox("Name", &s.name);
-            Checkbox("Health", &s.health);
-            Checkbox("Weapon", &s.weapon);
-            Checkbox("Skeleton", &s.skeleton);
-            Checkbox("Chams", &s.chams);
-            ImGui::Unindent(16);
+            Checkbox("Box", &s.box, 8 * geo::SCALE);
+            Checkbox("Name", &s.name, 8 * geo::SCALE);
+            Checkbox("Health", &s.health, 8 * geo::SCALE);
+            Checkbox("Weapon", &s.weapon, 8 * geo::SCALE);
+            Checkbox("Skeleton", &s.skeleton, 8 * geo::SCALE);
+            Checkbox("Chams", &s.chams, 8 * geo::SCALE);
 
-            ImGui::Dummy(ImVec2(0, 6));
-            ImGui::TextDisabled("Box style");
-            static const char* styles[] = { "Regular", "Corners", "3D", "Outline" };
-            Combo("##espstyle", &s.esp_style, styles, IM_ARRAYSIZE(styles), col_w - 30);
+            ImGui::Dummy(ImVec2(0, 6 * geo::SCALE));
+            Label("Box style");
+            Combo("##style", &s.esp_style, styles, IM_ARRAYSIZE(styles), geo::COL_W - 2 * geo::COL_PAD);
         }
         EndColumn();
 
-        ImGui::SameLine();
-        if (BeginColumn("##vis_b", ImVec2(col_w, col_h)))
+        ImVec2 pb(base.x + geo::COL_W + geo::COL_GAP, base.y);
+        ImGui::SetCursorScreenPos(pb);
+        if (BeginColumn("##vis_b", pb, csz, "B"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("B");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
             Checkbox("Glow", &s.glow);
             Checkbox("Radar reveal", &s.radar);
 
-            ImGui::Dummy(ImVec2(0, 8));
-            ImGui::Separator();
-            ImGui::Dummy(ImVec2(0, 8));
-            ImGui::TextDisabled("Preview");
-            ImU32 box_col = s.esp ? col::ACCENT : col::TEXT_DIM;
+            ImGui::Dummy(ImVec2(0, 8 * geo::SCALE));
+            Label("Preview", col::TEXT_DIM);
+            ImDrawList* dl = ImGui::GetWindowDrawList();
             ImVec2 p = ImGui::GetCursorScreenPos();
-            ImGui::GetWindowDrawList()->AddRect(ImVec2(p.x + 10, p.y + 6),
-                                                ImVec2(p.x + 90, p.y + 60), box_col, 0, 0, 1.5f);
-            ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(p.x + 12, p.y + 46),
-                                                      ImVec2(p.x + 20, p.y + 58), col::ACCENT);
-            ImGui::GetWindowDrawList()->AddText(ImVec2(p.x + 10, p.y + 64), col::TEXT, "player");
-            ImGui::Dummy(ImVec2(0, 84));
+            const float bw = 70 * geo::SCALE, bh = 100 * geo::SCALE;
+            dl->AddRect(p, ImVec2(p.x + bw, p.y + bh), s.esp ? col::ACCENT : col::TEXT_DIM);
+            dl->AddRectFilled(ImVec2(p.x - 3 * geo::SCALE, p.y + bh * 0.55f),
+                              ImVec2(p.x - 1 * geo::SCALE, p.y + bh), col::ACCENT);
+            ImGui::Dummy(ImVec2(bw, bh + 4 * geo::SCALE));
+            Label("player", col::TEXT);
         }
         EndColumn();
     }
 
-    // ---- вкладка Misc ----
-    inline void TabMisc(Settings& s, ImVec2 avail)
+    inline void TabMisc(Settings& s, float w, float h)
     {
-        float col_w = (avail.x - geo::PAD) * 0.5f;
-        float col_h = avail.y - geo::HEADER_H;
+        ImVec2 base = ImGui::GetCursorScreenPos();
+        ImVec2 csz(geo::COL_W, h);
 
-        if (BeginColumn("##misc_a", ImVec2(col_w, col_h)))
+        if (BeginColumn("##misc_a", base, csz, "A"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("A");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
-            ImGui::TextDisabled("Movement");
             Checkbox("Bunnyhop", &s.bhop);
             Checkbox("Auto strafe", &s.auto_strafe);
             Checkbox("Edge jump", &s.edge_jump);
             Checkbox("Auto peek", &s.auto_peek);
 
-            ImGui::Dummy(ImVec2(0, 6));
-            ImGui::TextDisabled("Fake lag");
-            Checkbox("Enable fake lag", &s.fake_lag);
-            ImGui::SetNextItemWidth(col_w - 30);
-            ImGui::SliderInt("##fakelag", &s.fakelag_amount, 0, 16, "%d ticks");
+            ImGui::Dummy(ImVec2(0, 6 * geo::SCALE));
+            Checkbox("Fake lag", &s.fake_lag);
+            Label("Ticks");
+            ImGui::SetNextItemWidth(geo::COL_W - 2 * geo::COL_PAD);
+            ImGui::SliderInt("##ticks", &s.fakelag_ticks, 0, 16, "%d");
         }
         EndColumn();
 
-        ImGui::SameLine();
-        if (BeginColumn("##misc_b", ImVec2(col_w, col_h)))
+        ImVec2 pb(base.x + geo::COL_W + geo::COL_GAP, base.y);
+        ImGui::SetCursorScreenPos(pb);
+        if (BeginColumn("##misc_b", pb, csz, "B"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("B");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
-            ImGui::TextDisabled("Camera");
             Checkbox("Third person", &s.thirdperson);
-            ImGui::SetNextItemWidth(col_w - 30);
-            ImGui::SliderFloat("##tpdist", &s.thirdperson_dist, 40.0f, 300.0f, "%.0f units");
+            Label("Distance");
+            ImGui::SetNextItemWidth(geo::COL_W - 2 * geo::COL_PAD);
+            ImGui::SliderFloat("##tpdist", &s.tp_dist, 40.0f, 300.0f, "%.0f");
         }
         EndColumn();
     }
 
-    // ---- вкладка Skins ----
-    inline void TabSkins(Settings& s, ImVec2 avail)
+    inline void TabSkins(Settings& s, float w, float h)
     {
-        float col_w = (avail.x - geo::PAD) * 0.5f;
-        float col_h = avail.y - geo::HEADER_H;
+        static const char* knives[] = { "Default", "Karambit", "M9 Bayonet", "Butterfly", "Flip" };
+        static const char* skins[]  = { "Default", "Redline", "Vulcan", "Fire Serpent", "Case Hardened" };
+        ImVec2 base = ImGui::GetCursorScreenPos();
+        ImVec2 csz(geo::COL_W, h);
 
-        if (BeginColumn("##skin_a", ImVec2(col_w, col_h)))
+        if (BeginColumn("##skin_a", base, csz, "A"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("A");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
-            ImGui::TextDisabled("Knife");
-            static const char* knives[] = { "Default", "Karambit", "M9 Bayonet", "Butterfly", "Flip" };
-            Combo("##knife", &s.knife_model, knives, IM_ARRAYSIZE(knives), col_w - 30);
-
-            ImGui::Dummy(ImVec2(0, 6));
+            Label("Knife");
+            Combo("##knife", &s.knife, knives, IM_ARRAYSIZE(knives), geo::COL_W - 2 * geo::COL_PAD);
+            ImGui::Dummy(ImVec2(0, 6 * geo::SCALE));
             Checkbox("StatTrak counter", &s.stattrak);
         }
         EndColumn();
 
-        ImGui::SameLine();
-        if (BeginColumn("##skin_b", ImVec2(col_w, col_h)))
+        ImVec2 pb(base.x + geo::COL_W + geo::COL_GAP, base.y);
+        ImGui::SetCursorScreenPos(pb);
+        if (BeginColumn("##skin_b", pb, csz, "B"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("B");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
-            ImGui::TextDisabled("AK-47");
-            static const char* skins[] = { "Default", "Redline", "Vulcan", "Fire Serpent", "Case Hardened" };
-            Combo("##ak", &s.ak_skin, skins, IM_ARRAYSIZE(skins), col_w - 30);
-            ImGui::TextDisabled("M4A4");
-            Combo("##m4", &s.m4_skin, skins, IM_ARRAYSIZE(skins), col_w - 30);
-            ImGui::TextDisabled("AWP");
-            Combo("##awp", &s.awp_skin, skins, IM_ARRAYSIZE(skins), col_w - 30);
+            Label("AK-47");
+            Combo("##ak", &s.ak, skins, IM_ARRAYSIZE(skins), geo::COL_W - 2 * geo::COL_PAD);
+            Label("M4A4");
+            Combo("##m4", &s.m4, skins, IM_ARRAYSIZE(skins), geo::COL_W - 2 * geo::COL_PAD);
+            Label("AWP");
+            Combo("##awp", &s.awp, skins, IM_ARRAYSIZE(skins), geo::COL_W - 2 * geo::COL_PAD);
         }
         EndColumn();
     }
 
-    // ---- вкладка Settings ----
-    inline void TabSettings(Settings& s, ImVec2 avail)
+    inline void TabSettings(Settings& s, float w, float h)
     {
-        float col_w = (avail.x - geo::PAD) * 0.5f;
-        float col_h = avail.y - geo::HEADER_H;
+        static const char* accents[] = { "Green", "Blue", "Red", "Purple", "Orange" };
+        ImVec2 base = ImGui::GetCursorScreenPos();
+        ImVec2 csz(geo::COL_W, h);
 
-        if (BeginColumn("##set_a", ImVec2(col_w, col_h)))
+        if (BeginColumn("##set_a", base, csz, "A"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("A");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
-
-            ImGui::TextDisabled("Interface");
             Checkbox("Watermark", &s.watermark);
             Checkbox("Debug console", &s.debug_console);
-            Checkbox("Anti screenshot", &s.anti_screenshot);
-            Checkbox("Save config on exit", &s.save_on_exit);
-
-            ImGui::Dummy(ImVec2(0, 6));
-            ImGui::TextDisabled("Accent");
-            static const char* accents[] = { "Green", "Blue", "Red", "Purple", "Orange" };
-            Combo("##accent", &s.accent_index, accents, IM_ARRAYSIZE(accents), col_w - 30);
+            Checkbox("Save on exit", &s.save_on_exit);
+            ImGui::Dummy(ImVec2(0, 6 * geo::SCALE));
+            Label("Accent");
+            Combo("##accent", &s.accent, accents, IM_ARRAYSIZE(accents), geo::COL_W - 2 * geo::COL_PAD);
         }
         EndColumn();
 
-        ImGui::SameLine();
-        if (BeginColumn("##set_b", ImVec2(col_w, col_h)))
+        ImVec2 pb(base.x + geo::COL_W + geo::COL_GAP, base.y);
+        ImGui::SetCursorScreenPos(pb);
+        if (BeginColumn("##set_b", pb, csz, "B"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertU32ToFloat4(col::TEXT_DIM));
-            ImGui::TextUnformatted("B");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0, 4));
+            Label("Config name");
+            ImGui::SetNextItemWidth(geo::COL_W - 2 * geo::COL_PAD);
+            ImGui::InputText("##cfg", s.config, sizeof(s.config));
+            ImGui::Dummy(ImVec2(0, 4 * geo::SCALE));
+            ImGui::Button("Save", ImVec2(70 * geo::SCALE, 16 * geo::SCALE));
+            ImGui::SameLine(0, 6 * geo::SCALE);
+            ImGui::Button("Load", ImVec2(70 * geo::SCALE, 16 * geo::SCALE));
 
-            ImGui::TextDisabled("Config");
-            ImGui::SetNextItemWidth(col_w - 30);
-            ImGui::InputText("##cfgname", s.config_name, sizeof(s.config_name));
-
-            ImGui::Dummy(ImVec2(0, 6));
-            if (ImGui::Button("Save config", ImVec2(col_w - 60, 24)))
-                ImGui::OpenPopup("saved");
-            if (ImGui::BeginPopup("saved"))
-            {
-                ImGui::TextUnformatted("Config saved.");
-                ImGui::EndPopup();
-            }
-            ImGui::SameLine();
-            ImGui::Button("Load", ImVec2(col_w - 60, 24));
-
-            ImGui::Dummy(ImVec2(0, 10));
-            ImGui::TextDisabled("Dear ImGui demo");
-            Checkbox("Show demo window", &s.show_demo);
-
-            ImGui::Dummy(ImVec2(0, 10));
-            ImGui::Separator();
-            ImGui::Dummy(ImVec2(0, 6));
-            ImGui::TextDisabled("Build: test overlay | kiero + OpenGL");
-            ImGui::TextDisabled("Insert — toggle menu");
-            ImGui::TextDisabled("F12   — save screenshot");
+            ImGui::Dummy(ImVec2(0, 8 * geo::SCALE));
+            Checkbox("Show demo", &s.show_demo);
         }
         EndColumn();
     }
 
-    // ---- главное окно ----
+    // ------------------------------------------------------------------
+    // Окно
+    // ------------------------------------------------------------------
     inline void Render(Settings& s)
     {
         if (!s.menu_open) return;
 
-        ImGui::SetNextWindowSize(ImVec2(820.0f * geo::SCALE, 560.0f * geo::SCALE),
-                                 ImGuiCond_Always);
-        ImGui::SetNextWindowPos(ImVec2(60.0f * geo::SCALE, 60.0f * geo::SCALE),
-                                ImGuiCond_Always);
+        const float K = geo::SCALE;
+        ImGui::SetNextWindowSize(ImVec2(geo::WINDOW_W, geo::WINDOW_H), ImGuiCond_Always);
+        // центрируем окно по кадру: ImGui знает DisplaySize
+        const ImVec2 ds = ImGui::GetIO().DisplaySize;
+        ImGui::SetNextWindowPos(ImVec2((ds.x - geo::WINDOW_W) * 0.5f,
+                                       (ds.y - geo::WINDOW_H) * 0.5f), ImGuiCond_Always);
 
-        const ImGuiWindowFlags flags =
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
+        const ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar |
+                                       ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize |
+                                       ImGuiWindowFlags_NoBringToFrontOnFocus;
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImGui::ColorConvertU32ToFloat4(col::BG));
         ImGui::Begin("##gamesense", nullptr, flags);
+        ImGui::PopStyleColor();
         ImGui::PopStyleVar(2);
 
-        ImVec2 win_pos = ImGui::GetWindowPos();
-        ImVec2 win_size = ImGui::GetWindowSize();
+        ImVec2 wp = ImGui::GetWindowPos();
+        ImVec2 ws = ImGui::GetWindowSize();
         ImDrawList* dl = ImGui::GetWindowDrawList();
 
-        // --- левый сайдбар ---
-        const float sb_w = geo::SIDEBAR_W;
-        dl->AddRectFilled(win_pos, ImVec2(win_pos.x + sb_w, win_pos.y + win_size.y), col::SIDEBAR);
-        dl->AddLine(ImVec2(win_pos.x + sb_w, win_pos.y),
-                    ImVec2(win_pos.x + sb_w, win_pos.y + win_size.y), col::SEPARATOR);
+        // --- рамка: 1px #3C3C3C, 2px #282828, 1px #3C3C3C ---
+        const float f = geo::FRAME;
+        dl->AddRect(wp, ImVec2(wp.x + ws.x, wp.y + ws.y), col::FRAME_OUT);
+        dl->AddRect(ImVec2(wp.x + f, wp.y + f), ImVec2(wp.x + ws.x - f, wp.y + ws.y - f),
+                    col::FRAME_IN, 0.0f, 0, 2.0f * f);
+        dl->AddRect(ImVec2(wp.x + 2 * f, wp.y + 2 * f),
+                    ImVec2(wp.x + ws.x - 2 * f, wp.y + ws.y - 2 * f), col::FRAME_OUT);
 
-        ImGui::SetCursorScreenPos(ImVec2(win_pos.x + 6 * geo::SCALE, win_pos.y + 8 * geo::SCALE));
-        ImGui::BeginGroup();
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 4 * geo::SCALE));
-        struct Entry { Icon icon; const char* tip; };
-        static const Entry entries[] = {
-            { Icon::Aim,      "Rage" },
-            { Icon::Visuals,  "Visuals" },
-            { Icon::Misc,     "Misc" },
-            { Icon::Settings, "Settings" },
-            { Icon::Skins,    "Skins" },
-            { Icon::Profile,  "Player" },
-            { Icon::Lua,      "Lua" },
-        };
-        for (int i = 0; i < IM_ARRAYSIZE(entries); ++i)
+        // --- радужная полоса под рамкой: 2px, во всю ширину, поверх рамки ---
         {
+            const float y0 = wp.y + 1 * f;
+            const float y1 = y0 + geo::RAINBOW_H;
+            const int segs = 128;
+            const float x0 = wp.x, x1 = wp.x + ws.x;
+            for (int i = 0; i < segs; ++i)
+            {
+                const float t0 = (float)i / segs, t1 = (float)(i + 1) / segs;
+                // (91,151,215) -> (204,213,66), как на референсе
+                auto lerp = [](int a, int b, float t) { return (int)(a + (b - a) * t); };
+                const ImU32 c = IM_COL32(lerp(91, 204, t0), lerp(151, 213, t0),
+                                            lerp(215, 66, t0), 255);
+                dl->AddRectFilled(ImVec2(x0 + (x1 - x0) * t0, y0),
+                                  ImVec2(x0 + (x1 - x0) * t1 + 1, y1), c);
+            }
+        }
+
+        // --- сайдбар ---
+        const float sb_w = geo::SIDEBAR_W;
+        // вертикальная граница сайдбара
+        dl->AddLine(ImVec2(wp.x + sb_w, wp.y + 9 * f), ImVec2(wp.x + sb_w, wp.y + ws.y),
+                    col::SEPARATOR);
+
+        const float icon_step = geo::ICON_STEP;
+        float iy = wp.y + 30 * K;
+        static const Icon icons[] = {
+            Icon::Headshot, Icon::NoSpread, Icon::Crosshair, Icon::SunMoon,
+            Icon::Gears, Icon::Knife, Icon::Player, Icon::Floppy
+        };
+        for (int i = 0; i < IM_ARRAYSIZE(icons); ++i)
+        {
+            ImGui::SetCursorScreenPos(ImVec2(wp.x + (sb_w - icon_step) * 0.5f, iy));
             char id[16];
             snprintf(id, sizeof(id), "##sb%d", i);
-            if (SidebarButton(id, entries[i].icon, s.active_tab == i, entries[i].tip))
-                s.active_tab = i;
+            if (SidebarButton(id, icons[i], s.active_tab == i, icon_step))
+                s.active_tab = (i < 5) ? i : s.active_tab;
+            iy += icon_step;
         }
-        ImGui::PopStyleVar();
-        ImGui::EndGroup();
 
-        // подпись внизу сайдбара
-        dl->AddText(ImVec2(win_pos.x + 10 * geo::SCALE, win_pos.y + win_size.y - 24 * geo::SCALE),
-                    col::TEXT_ACTIVE, active_name(s.active_tab));
+        // подпись активной вкладки внизу
+        {
+            const char* nm = active_name(s.active_tab);
+            const ImVec2 ts = ImGui::CalcTextSize(nm);
+            dl->AddRectFilled(ImVec2(wp.x + 1, wp.y + ws.y - 34 * K),
+                              ImVec2(wp.x + sb_w, wp.y + ws.y - 1), col::ACTIVE_TAB);
+            dl->AddText(ImVec2(wp.x + (sb_w - ts.x) * 0.5f, wp.y + ws.y - 22 * K),
+                        IM_COL32(240, 240, 240, 255), nm);
+        }
 
-        // --- заголовок окна ---
-        ImVec2 head_min(win_pos.x + sb_w, win_pos.y);
-        ImVec2 head_max(win_pos.x + win_size.x, win_pos.y + geo::HEADER_H);
-        dl->AddRectFilled(head_min, head_max, col::BG);
-        dl->AddLine(ImVec2(head_min.x, head_max.y), ImVec2(head_max.x, head_max.y), col::SEPARATOR);
-        dl->AddText(ImVec2(head_min.x + 12 * geo::SCALE, win_pos.y + 7 * geo::SCALE),
-                    col::TEXT_ACTIVE, "counter-strike 1.6");
-        dl->AddText(ImVec2(head_min.x + 118 * geo::SCALE, win_pos.y + 7 * geo::SCALE),
-                    col::TEXT_DIM, "// gamesense");
+        // --- колонки ---
+        const float col_h = ws.y - geo::WIN_PAD_TOP - 8 * K;
+        ImVec2 cpos(wp.x + geo::WIN_PAD_L, wp.y + geo::WIN_PAD_TOP);
+        ImGui::SetCursorScreenPos(cpos);
 
-        // кнопка закрытия
-        ImGui::SetCursorScreenPos(ImVec2(head_max.x - 24 * geo::SCALE, win_pos.y + 7 * geo::SCALE));
-        if (ImGui::InvisibleButton("##close", ImVec2(14 * geo::SCALE, 14 * geo::SCALE)))
-            s.menu_open = false;
-        if (ImGui::IsItemHovered())
-            dl->AddRectFilled(ImVec2(head_max.x - 26 * geo::SCALE, win_pos.y + 5 * geo::SCALE),
-                              ImVec2(head_max.x - 8 * geo::SCALE, win_pos.y + 23 * geo::SCALE),
-                              IM_COL32(60, 30, 30, 255));
-        DrawIcon(dl, Icon::Close, ImVec2(head_max.x - 17 * geo::SCALE, win_pos.y + 14 * geo::SCALE),
-                 col::TEXT_DIM, 4.5f * geo::SCALE);
-
-        // --- контент ---
-        ImVec2 content_pos(head_min.x + geo::PAD, head_max.y + geo::PAD);
-        ImGui::SetCursorScreenPos(content_pos);
-        ImVec2 avail(win_size.x - sb_w - geo::PAD * 2,
-                     win_size.y - geo::HEADER_H - geo::PAD * 2);
-
-        ImGui::BeginChild("##content", avail, ImGuiChildFlags_None);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 3 * K));
         switch (s.active_tab)
         {
-        case 0: TabRage(s, avail); break;
-        case 1: TabVisuals(s, avail); break;
-        case 2: TabMisc(s, avail); break;
-        case 3: TabSettings(s, avail); break;
-        case 4: TabSkins(s, avail); break;
-        default: TabRage(s, avail); break;
+        case 0: TabRage(s, geo::COL_W, col_h); break;
+        case 1: TabVisuals(s, geo::COL_W, col_h); break;
+        case 2: TabMisc(s, geo::COL_W, col_h); break;
+        case 3: TabSettings(s, geo::COL_W, col_h); break;
+        case 4: TabSkins(s, geo::COL_W, col_h); break;
+        default: TabRage(s, geo::COL_W, col_h); break;
         }
         ImGui::PopStyleVar();
-        ImGui::EndChild();
 
         ImGui::End();
     }
@@ -455,8 +364,9 @@ namespace gui
         case 2: return "Misc";
         case 3: return "Settings";
         case 4: return "Skins";
-        case 5: return "Player";
-        case 6: return "Lua";
+        case 5: return "Knife";
+        case 6: return "Player";
+        case 7: return "Configs";
         default: return "Rage";
         }
     }

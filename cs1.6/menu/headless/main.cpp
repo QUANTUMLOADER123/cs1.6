@@ -134,12 +134,12 @@ int main(int argc, char** argv)
     io.BackendFlags = 0;
 
     // масштаб UI: меню 820x560 должно занимать ~78% высоты кадра
-    const float ui_scale = (1080.0f * 0.80f) / 560.0f;
+    const float ui_scale = 1080.0f / 617.0f;   // окно = высота кадра
     gui::geo::SetScale(ui_scale);
     gui::Apply();
 
     ImFontConfig cfg;
-    cfg.SizePixels = gui::geo::FONT_SIZE;
+    cfg.SizePixels = gui::geo::TEXT_SIZE;
     cfg.OversampleH = 1;
     cfg.OversampleV = 1;
     cfg.PixelSnapH = true;
