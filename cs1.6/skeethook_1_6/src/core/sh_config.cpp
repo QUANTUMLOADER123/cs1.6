@@ -62,6 +62,7 @@ void sh_config_defaults(void)
     g_cfg.antiaim.yaw_jitter = 25.0f;
     g_cfg.antiaim.desync = (qbool)1;
     g_cfg.antiaim.desync_amount = 58.0f;
+    g_cfg.antiaim.desync_ticks = 2.0f;
     g_cfg.antiaim.roll = 0.0f;
     g_cfg.antiaim.fake_lag = (qbool)0;
     g_cfg.antiaim.fake_lag_ticks = 6;

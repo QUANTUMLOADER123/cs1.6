@@ -218,6 +218,9 @@ void sh_antiaim_run(sh_usercmd_t *cmd)
 
     vec3_t old_angles = cmd->viewangles;
 
+    old_angles.x = 0.0f;
+    old_angles.z = 0.0f;
+
     sh_antiaim_apply_pitch(cmd, time);
     sh_antiaim_apply_yaw(cmd, time);
 
@@ -231,8 +234,15 @@ void sh_antiaim_run(sh_usercmd_t *cmd)
         if (amount > 90.0f)
             amount = 90.0f;
 
+        i32 ticks = (i32)(time / 0.015f);
+        i32 period = (i32)g_cfg.antiaim.desync_ticks;
+
+        if (period < 1)
+            period = 1;
+
+        g_desync_flip = ((ticks / period) & 1) ? 1 : 0;
+
         cmd->viewangles.y += (g_desync_flip) ? amount : -amount;
-        g_desync_flip = !g_desync_flip;
     }
 
     if (g_cfg.antiaim.fake_duck && g_pmove && g_pmove->onground != -1)

@@ -51,6 +51,7 @@ typedef struct sh_antiaim_cfg
     f32 yaw_base;
     f32 yaw_jitter;
     qbool desync;
+    f32 desync_ticks;
     f32 desync_amount;
     qbool fake_duck;
     qbool micro_move;

@@ -311,6 +311,10 @@ static void sh_menu_draw_antiaim(f32 x, f32 y)
     cy += row + 6.0f * s;
 
     sh_menu_slider(x, cy, colw, "amount", &g_cfg.antiaim.desync_amount, 0.0f, 90.0f, "%.0f");
+
+    cy += row + 6.0f * s;
+
+    sh_menu_slider(x, cy, colw, "ticks", &g_cfg.antiaim.desync_ticks, 1.0f, 8.0f, "%.0f");
     cy += row + 8.0f * s;
 
     sh_menu_section("extras", x, cy);
