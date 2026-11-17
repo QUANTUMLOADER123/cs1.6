@@ -198,11 +198,25 @@ void sh_visuals_apply_nightmode(void)
         g_saved_flashblend = sh_get_cvar("gl_flashblend");
     }
 
-    g_engfuncs->pfnCvar_SetValue("gl_monolights", (wr + wg + wb) / 3.0f);
-    g_engfuncs->pfnCvar_SetValue("gl_overbright", (lr + lg + lb) / 3.0f);
-    g_engfuncs->pfnCvar_SetValue("gl_fog", (f32)(g_cfg.visuals.world_color ? 1 : 0));
-    g_engfuncs->pfnCvar_SetValue("gl_lightholes", sr);
-    g_engfuncs->pfnCvar_SetValue("gl_flashblend", sg);
+    if (g_cfg.visuals.world_color)
+    {
+        f32 avg = (wr + wg + wb) / 3.0f;
+        g_engfuncs->pfnCvar_SetValue("gl_monolights", avg);
+        g_engfuncs->pfnCvar_SetValue("gl_fog", 1.0f);
+        g_engfuncs->pfnCvar_SetValue("gl_lightholes", 0.0f);
+    }
+
+    if (g_cfg.visuals.sky_color)
+    {
+        f32 avg = (sr + sg + sb) / 3.0f;
+        g_engfuncs->pfnCvar_SetValue("gl_overbright", avg);
+    }
+
+    if (g_cfg.visuals.light_color)
+    {
+        f32 avg = (lr + lg + lb) / 3.0f;
+        g_engfuncs->pfnCvar_SetValue("gl_flashblend", (avg > 0.5f) ? 1.0f : 0.0f);
+    }
 }
 
 void sh_visuals_restore(void)

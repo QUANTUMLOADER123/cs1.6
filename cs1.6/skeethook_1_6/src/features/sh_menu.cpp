@@ -382,6 +382,14 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_checkbox(x + colw, cy, "no flash", &g_cfg.misc.no_flash);
     cy += row;
 
+    if (g_cfg.visuals.nightmode)
+    {
+        sh_menu_checkbox(x, cy, "world", &g_cfg.visuals.world_color);
+        sh_menu_checkbox(x + 100.0f * s, cy, "sky", &g_cfg.visuals.sky_color);
+        sh_menu_checkbox(x + 180.0f * s, cy, "lighting", &g_cfg.visuals.light_color);
+        cy += row;
+    }
+
     sh_menu_checkbox(x, cy, "skybox change", &g_cfg.visuals.skybox_change);
     cy += row;
 
@@ -545,7 +553,7 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 330.0f, 400.0f, 360.0f, 330.0f, 330.0f };
+    static const f32 tab_h[6] = { 330.0f, 330.0f, 440.0f, 390.0f, 330.0f, 330.0f };
 
     f32 w = 560.0f * s;
     f32 h = tab_h[g_tab] * s;
