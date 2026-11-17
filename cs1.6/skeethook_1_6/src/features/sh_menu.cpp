@@ -422,6 +422,9 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
     sh_menu_checkbox(x + colw, cy, "hitboxes 3d", &g_cfg.visuals.hitboxes);
     cy += row;
 
+    sh_menu_checkbox(x, cy, "hitbox visibility", &g_cfg.visuals.hitbox_vis_check);
+    cy += row;
+
     {
         static const char *items[16];
         static char names[16][32];

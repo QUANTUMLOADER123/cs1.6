@@ -364,6 +364,30 @@ static void sh_draw_hitboxes(const sh_player_t *p)
         if (snap->bbox[b].bone == 0 && g_cfg.visuals.col_hitbox_head.a > 0)
             c = g_cfg.visuals.col_hitbox_head;
 
+        if (g_cfg.visuals.hitbox_vis_check)
+        {
+            qbool seen = 0;
+
+            for (i32 k = 0; k < 8 && !seen; ++k)
+            {
+                if (!ok[k])
+                    continue;
+
+                f32 frac = 1.0f;
+
+                vec3_t eye = g_pmove ? g_pmove->origin : pts[k];
+                eye.z += g_pmove ? g_pmove->view_ofs.z : 0.0f;
+
+                if (!sh_trace_fraction(&eye, &pts[k], &frac) || frac > 0.97f)
+                    seen = 1;
+            }
+
+            if (!seen)
+                c = (col4_t)SH_COL_RGBA(110, 110, 110, 90);
+            else if (snap->bbox[b].bone == 0)
+                c = g_cfg.visuals.col_hitbox_head;
+        }
+
         for (i32 e = 0; e < 12; ++e)
         {
             i32 a0 = edges[e][0];

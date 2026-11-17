@@ -94,6 +94,7 @@ typedef struct sh_visuals_cfg
     qbool hitboxes;
     col4_t col_hitbox;
     col4_t col_hitbox_head;
+    qbool hitbox_vis_check;
     qbool model_changer;
     i32 model_index;
     col4_t col_chams_vis;
