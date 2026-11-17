@@ -6,7 +6,7 @@
 void sh_visuals_apply_nightmode(void);
 void sh_grenade_path_draw(void);
 void sh_visuals_restore(void);
-void sh_visuals_thirdperson(sh_usercmd_t *cmd);
+void sh_visuals_thirdperson_apply(sh_playermove_t *pm);
 void sh_visuals_tracer_add(const vec3_t *from, const vec3_t *to);
 void sh_visuals_impact_add(const vec3_t *pos, const vec3_t *normal);
 void sh_visuals_effects_tick(f32 frametime);

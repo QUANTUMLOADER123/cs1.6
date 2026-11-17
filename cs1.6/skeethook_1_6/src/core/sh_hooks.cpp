@@ -129,7 +129,6 @@ i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
 
     sh_movement_run(cmd);
 
-    sh_visuals_thirdperson(cmd);
 
     sh_fakelag_run(cmd);
 
@@ -200,6 +199,9 @@ i32 __cdecl sh_player_move_hook(sh_playermove_t *pmove, i32 server)
 
     if (pmove && g_cfg.misc.no_fall_damage)
         sh_fall_predict(pmove);
+
+    if (pmove)
+        sh_visuals_thirdperson_apply(pmove);
 
     return 0;
 }
