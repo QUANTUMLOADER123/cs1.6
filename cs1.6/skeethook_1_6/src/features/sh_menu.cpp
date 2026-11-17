@@ -383,6 +383,8 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
 
     sh_menu_slider(x, cy, colw, "glow amount", &g_cfg.visuals.glow_amount,
                    20.0f, 255.0f, "");
+
+    sh_menu_checkbox(x, cy, "xqz chams", &g_cfg.visuals.chams_xqz);
 }
 
 static void sh_menu_draw_misc(f32 x, f32 y)

@@ -429,25 +429,18 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
         ent->curstate.weaponanim = 0;
     }
 
-    if (g_cfg.visuals.chams || g_cfg.visuals.glow)
+    if (g_cfg.visuals.glow)
     {
-        if (g_cfg.visuals.glow)
-        {
-            f32 amt = g_cfg.visuals.glow_amount;
-            if (amt < 20.0f)
-                amt = 20.0f;
-            if (amt > 255.0f)
-                amt = 255.0f;
-            ent->curstate.renderamt = (i32)amt;
-            ent->curstate.renderfx = sh_renderfx_glowshell;
-            ent->curstate.rendermode = 0;
-        }
-        else
-        {
-            ent->curstate.rendermode = 0;
-            ent->curstate.renderamt = 255;
-            ent->curstate.renderfx = 0;
-        }
+        f32 amt = g_cfg.visuals.glow_amount;
+
+        if (amt < 20.0f)
+            amt = 20.0f;
+        if (amt > 255.0f)
+            amt = 255.0f;
+
+        ent->curstate.renderfx = sh_renderfx_glowshell;
+        ent->curstate.renderamt = (i32)amt;
+        ent->curstate.rendermode = sh_rendermode_normal;
 
         if (g_cfg.visuals.chams_team_color)
         {
@@ -457,15 +450,49 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
             {
                 sh_player_t *pl = sh_player_get(idx);
 
-                if (pl)
-                {
-                    if (pl->team == 1)
-                        ent->curstate.rendercolor = (sh_color24_t){ 255, 90, 90 };
-                    else if (pl->team == 2)
-                        ent->curstate.rendercolor = (sh_color24_t){ 90, 140, 255 };
-                }
+                if (pl && pl->team == 1)
+                    ent->curstate.rendercolor = (sh_color24_t){ 255, 90, 90 };
+                else if (pl && pl->team == 2)
+                    ent->curstate.rendercolor = (sh_color24_t){ 90, 140, 255 };
             }
         }
+    }
+    else if (g_cfg.visuals.chams)
+    {
+        sh_player_t *pl = 0;
+
+        if (ent->player > 0 && ent->player <= 32)
+            pl = sh_player_get(ent->player);
+
+        qbool visible = pl ? (pl->visible != 0) : 1;
+
+        col4_t col = g_cfg.visuals.col_chams_vis;
+
+        if (!visible)
+        {
+            if (!g_cfg.visuals.chams_xqz)
+            {
+                ent->curstate.rendermode = sh_rendermode_normal;
+                ent->curstate.renderamt = 255;
+                ent->curstate.renderfx = sh_renderfx_none;
+                return result;
+            }
+
+            col = g_cfg.visuals.col_chams_xqz;
+        }
+
+        if (g_cfg.visuals.chams_team_color && pl)
+        {
+            if (pl->team == 1)
+                col = (col4_t){ 255, 90, 90, col.a };
+            else if (pl->team == 2)
+                col = (col4_t){ 90, 140, 255, col.a };
+        }
+
+        ent->curstate.rendermode = sh_rendermode_transalpha;
+        ent->curstate.renderamt = col.a;
+        ent->curstate.renderfx = sh_renderfx_none;
+        ent->curstate.rendercolor = (sh_color24_t){ col.r, col.g, col.b };
     }
 
     return result;

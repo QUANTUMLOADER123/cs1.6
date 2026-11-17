@@ -80,6 +80,9 @@ typedef struct sh_visuals_cfg
     qbool snaplines;
     qbool chams;
     qbool chams_team_color;
+    qbool chams_xqz;
+    col4_t col_chams_vis;
+    col4_t col_chams_xqz;
     qbool glow;
     f32 glow_amount;
     qbool team_check;

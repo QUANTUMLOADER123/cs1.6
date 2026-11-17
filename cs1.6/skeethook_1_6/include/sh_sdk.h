@@ -13,6 +13,14 @@
 
 #define sh_ef_muzzleflash 2
 
+#define sh_rendermode_normal     0
+#define sh_rendermode_transcolor 1
+#define sh_rendermode_texture    2
+#define sh_rendermode_glow       3
+#define sh_rendermode_transalpha 4
+#define sh_rendermode_transadd   5
+#define sh_rendermode_worldglow  6
+
 #define sh_renderfx_none 0
 #define sh_renderfx_glowshell 19
 #define sh_renderfx_clampminscale 20
