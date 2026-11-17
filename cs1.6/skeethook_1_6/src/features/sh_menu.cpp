@@ -335,6 +335,9 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
                    200.0f, 8192.0f, "");
     cy += row + 6.0f * s;
 
+    sh_menu_slider(x, cy, colw, "text scale", &g_cfg.esp.text_scale, 0.5f, 2.5f, "x");
+    cy += row + 6.0f * s;
+
     sh_menu_section("models", x, cy);
     cy += 20.0f * s;
 

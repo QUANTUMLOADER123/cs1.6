@@ -92,7 +92,7 @@ void sh_antiaim_apply_pitch(sh_usercmd_t *cmd, f32 time)
 
 void sh_antiaim_apply_yaw(sh_usercmd_t *cmd, f32 time)
 {
-    f32 base = cmd->viewangles.y;
+    f32 base = cmd->viewangles.y + g_cfg.antiaim.yaw_base;
 
     switch (g_cfg.antiaim.yaw_mode)
     {
@@ -100,10 +100,10 @@ void sh_antiaim_apply_yaw(sh_usercmd_t *cmd, f32 time)
         cmd->viewangles.y = base + 180.0f;
         break;
     case sh_yaw_static_left:
-        cmd->viewangles.y = 90.0f;
+        cmd->viewangles.y = base + 90.0f;
         break;
     case sh_yaw_static_right:
-        cmd->viewangles.y = 270.0f;
+        cmd->viewangles.y = base + 270.0f;
         break;
     case sh_yaw_left:
         cmd->viewangles.y = base + 90.0f;
@@ -112,11 +112,18 @@ void sh_antiaim_apply_yaw(sh_usercmd_t *cmd, f32 time)
         cmd->viewangles.y = base + 270.0f;
         break;
     case sh_yaw_spin:
-        g_spin_accum += g_cfg.antiaim.spin_speed * g_cfg.antiaim.spin_speed;
+    {
+        f32 spd = g_cfg.antiaim.spin_speed;
+
+        if (spd <= 0.0f)
+            spd = 15.0f;
+
+        g_spin_accum += spd;
         cmd->viewangles.y = base + g_spin_accum;
         break;
+    }
     case sh_yaw_static:
-        cmd->viewangles.y = 0.0f;
+        cmd->viewangles.y = base;
         break;
     case sh_yaw_random:
     {

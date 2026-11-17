@@ -1,6 +1,7 @@
 #include "../../include/sh_render.h"
 #include "../../include/sh_sdk.h"
 #include "../../include/sh_font.h"
+#include "../../include/sh_config.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -222,11 +223,38 @@ void sh_text_pop(void)
         --g_text_depth;
 }
 
+static qbool g_esp_text;
+
+static f32 sh_text_scale(void)
+{
+    if (!g_esp_text)
+        return sh_scale();
+
+    f32 k = g_cfg.esp.text_scale;
+
+    if (k <= 0.0f)
+        k = 1.0f;
+    if (k > 3.0f)
+        k = 3.0f;
+
+    return sh_scale() * k;
+}
+
+void sh_text_esp_begin(void)
+{
+    g_esp_text = 1;
+}
+
+void sh_text_esp_end(void)
+{
+    g_esp_text = 0;
+}
+
 static void sh_text_v(f32 x, f32 y, col4_t col, const char *fmt, va_list ap)
 {
     char buf[512];
     vsnprintf(buf, sizeof(buf), fmt, ap);
-    sh_font_draw(x, y, sh_scale(), col, buf);
+    sh_font_draw(x, y, sh_text_scale(), col, buf);
 }
 
 void sh_text(f32 x, f32 y, col4_t col, const char *fmt, ...)
@@ -245,8 +273,8 @@ void sh_text_center(f32 cx, f32 y, col4_t col, const char *fmt, ...)
     vsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
-    f32 w = sh_font_width(buf, sh_scale());
-    sh_font_draw(cx - w * 0.5f, y, sh_scale(), col, buf);
+    f32 w = sh_font_width(buf, sh_text_scale());
+    sh_font_draw(cx - w * 0.5f, y, sh_text_scale(), col, buf);
 }
 
 void sh_text_shadow(f32 x, f32 y, col4_t col, const char *fmt, ...)

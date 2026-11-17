@@ -19,6 +19,9 @@ void sh_draw_triangle(vec2_t a, vec2_t b, vec2_t c, col4_t col);
 
 void sh_text_push(void);
 void sh_text_pop(void);
+void sh_text_esp_begin(void);
+void sh_text_esp_end(void);
+
 void sh_text(f32 x, f32 y, col4_t col, const char *fmt, ...);
 void sh_text_center(f32 cx, f32 y, col4_t col, const char *fmt, ...);
 f32 sh_text_width(const char *str);

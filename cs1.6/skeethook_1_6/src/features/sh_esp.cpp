@@ -1,6 +1,7 @@
 #include "../../include/sh_features.h"
 #include "../../include/sh_math.h"
 #include "../../include/sh_render.h"
+#include "../../include/sh_ballistics.h"
 
 #include <math.h>
 
@@ -232,6 +233,8 @@ void sh_esp_draw_player(const sh_player_t *p)
     if (!p || !p->ent)
         return;
 
+    sh_text_esp_begin();
+
     if (p->health <= 0)
         return;
 
@@ -281,6 +284,8 @@ void sh_esp_draw_player(const sh_player_t *p)
     sh_draw_head_dot(p, &box);
     sh_draw_skeleton(p, &box);
     sh_draw_snapline(p, &box);
+
+    sh_text_esp_end();
 }
 
 i32 sh_enemy_fire_count(void);
@@ -315,6 +320,8 @@ void sh_enemy_fire_draw(void)
 void sh_radar_draw(void);
 void sh_spectator_list_draw(void);
 
+void sh_crosshair_draw(void);
+
 void sh_esp_run(void)
 {
     if (!g_cfg.visuals.enabled)
@@ -331,6 +338,7 @@ void sh_esp_run(void)
     sh_radar_draw();
     sh_spectator_list_draw();
     sh_enemy_fire_draw();
+    sh_crosshair_draw();
 }
 
 i32 sh_enemy_fire_count(void);
@@ -430,4 +438,36 @@ void sh_spectator_list_draw(void)
         if (++n >= 4)
             break;
     }
+}
+
+void sh_crosshair_draw(void)
+{
+    if (!g_cfg.misc.crosshair || !g_pmove)
+        return;
+
+    f32 s = sh_scale();
+    f32 cx = (f32)sh_screen_width() * 0.5f;
+    f32 cy = (f32)sh_screen_height() * 0.5f;
+
+    f32 gap = 3.0f * s;
+    f32 len = 5.0f * s;
+
+    sh_player_t *local = sh_player_local();
+
+    if (local)
+    {
+        const sh_recoil_t *rec = sh_recoil_for(local->weapon_id);
+
+        if (rec)
+            gap += rec->up_base * s;
+    }
+
+    col4_t c = { 190, 235, 60, 200 };
+
+    sh_draw_line(cx - gap - len, cy, cx - gap, cy, 1.0f, c);
+    sh_draw_line(cx + gap, cy, cx + gap + len, cy, 1.0f, c);
+    sh_draw_line(cx, cy - gap - len, cx, cy - gap, 1.0f, c);
+    sh_draw_line(cx, cy + gap, cx, cy + gap + len, 1.0f, c);
+
+    sh_draw_rect(cx - 1.0f, cy - 1.0f, 2.0f, 2.0f, c);
 }
