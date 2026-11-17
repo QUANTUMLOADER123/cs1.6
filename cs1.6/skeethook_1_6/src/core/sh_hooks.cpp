@@ -225,6 +225,12 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent)
         return result;
     }
 
+    if (g_cfg.misc.hideshot && ent->index == g_local_player)
+    {
+        ent->curstate.effects &= ~2;
+        ent->curstate.weaponanim = 0;
+    }
+
     if (g_cfg.visuals.chams || g_cfg.visuals.glow)
     {
         if (g_cfg.visuals.glow)

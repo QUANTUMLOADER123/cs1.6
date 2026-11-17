@@ -106,6 +106,7 @@ void sh_config_defaults(void)
     g_cfg.misc.no_fall_damage = (qbool)0;
     g_cfg.misc.grenade_predict = (qbool)0;
     g_cfg.misc.enemy_fire_indicator = (qbool)1;
+    g_cfg.misc.hideshot = (qbool)0;
     g_cfg.misc.auto_pistol = (qbool)0;
     g_cfg.misc.knife_bot = (qbool)0;
     g_cfg.misc.fast_reload = (qbool)0;

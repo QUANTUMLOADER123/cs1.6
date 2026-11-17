@@ -124,6 +124,7 @@ typedef struct sh_misc_cfg
     qbool no_fall_damage;
     qbool grenade_predict;
     qbool enemy_fire_indicator;
+    qbool hideshot;
     qbool auto_pistol;
     qbool knife_bot;
     qbool fast_reload;
