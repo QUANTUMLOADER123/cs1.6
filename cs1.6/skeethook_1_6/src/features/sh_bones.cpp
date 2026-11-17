@@ -8,7 +8,7 @@
 
 static sh_studio_api_t *g_studio;
 static sh_bones_draw_orig_fn g_draw_orig;
-static sh_bone_snapshot_t g_bones[SH_MAX_ENTITIES];
+static sh_bone_snapshot_t g_bones[sh_max_bone_players];
 
 static const char *g_bone_names[sh_bone_count] = {
     "Bip01 Head",
@@ -65,7 +65,7 @@ void sh_bones_studio_set(sh_studio_api_t *api)
 
 void sh_bones_clear(void)
 {
-    for (i32 i = 0; i < SH_MAX_ENTITIES; ++i)
+    for (i32 i = 0; i < sh_max_bone_players; ++i)
     {
         g_bones[i].valid = 0;
         g_bones[i].count = 0;
@@ -179,7 +179,7 @@ void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
     if (!g_studio || !g_studio->studio_get_bone_transform)
         return;
 
-    if (index <= 0 || index >= SH_MAX_ENTITIES || !hdr)
+    if (index <= 0 || index >= sh_max_bone_players || !hdr)
         return;
 
     if (hdr->numbones <= 0 || hdr->boneindex <= 0)
@@ -221,7 +221,7 @@ void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
 
 const sh_bone_snapshot_t *sh_bones_get(i32 index)
 {
-    if (index <= 0 || index >= SH_MAX_ENTITIES)
+    if (index <= 0 || index >= sh_max_bone_players)
         return 0;
 
     if (!g_bones[index].valid)

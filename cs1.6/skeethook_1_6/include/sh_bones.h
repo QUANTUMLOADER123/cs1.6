@@ -4,6 +4,7 @@
 #include "sh_sdk.h"
 
 #define sh_max_bones 128
+#define sh_max_bone_players 33
 
 enum sh_bone_id
 {
