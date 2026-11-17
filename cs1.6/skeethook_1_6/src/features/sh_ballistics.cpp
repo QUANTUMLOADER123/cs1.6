@@ -82,6 +82,169 @@ void sh_spread_compute(i32 seed, f32 spread, vec2_t *out)
 
 const sh_recoil_t *sh_recoil_for(i32 weapon_id);
 
+static sh_accuracy_t g_accuracy;
+
+static const f32 g_wpn_accuracy_init[] =
+{
+    0.0f, 0.9f, 0.9f, 0.0f, 0.9f, 0.9f, 0.9f,
+    0.0f, 0.0f, 0.9f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 0.9f, 0.9f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.9f, 0.9f,
+    0.0f, 0.0f, 0.0f, 0.0f
+};
+
+void sh_spread_reset(void)
+{
+    g_accuracy.accuracy = 0.0f;
+    g_accuracy.shots = 0;
+    g_accuracy.weapon_id = 0;
+    g_accuracy.last_shot = 0.0f;
+}
+
+f32 sh_spread_accuracy(i32 weapon_id)
+{
+    if (weapon_id < 0 || weapon_id > 30)
+        return 0.0f;
+
+    return g_wpn_accuracy_init[weapon_id];
+}
+
+static void sh_accuracy_update(i32 weapon_id)
+{
+    f32 now = g_pmove ? g_pmove->time : 0.0f;
+
+    if (g_accuracy.weapon_id != weapon_id)
+    {
+        g_accuracy.weapon_id = weapon_id;
+        g_accuracy.accuracy = sh_spread_accuracy(weapon_id);
+        g_accuracy.shots = 0;
+    }
+
+    f32 cycle = 0.0f;
+    const sh_recoil_t *rec = sh_recoil_for(weapon_id);
+
+    if (rec && rec->factor > 0)
+        cycle = (f32)rec->factor * 0.01f;
+
+    if (now - g_accuracy.last_shot > cycle + 0.25f)
+        g_accuracy.shots = 0;
+
+    ++g_accuracy.shots;
+
+    f32 s = (f32)g_accuracy.shots;
+    f32 acc = (s * s * s) / 200.0f + 0.35f;
+
+    if (acc > 1.25f)
+        acc = 1.25f;
+
+    g_accuracy.accuracy = acc;
+    g_accuracy.last_shot = now;
+}
+
+void sh_spread_angle(i32 weapon_id, i32 seed, f32 *out_x, f32 *out_y)
+{
+    if (!out_x || !out_y)
+        return;
+
+    sh_accuracy_update(weapon_id);
+
+    f32 acc = g_accuracy.accuracy;
+    f32 spread = 0.0f;
+
+    qbool onground = 1;
+    f32 speed2d = 0.0f;
+    qbool ducking = 0;
+
+    if (g_pmove)
+    {
+        onground = (g_pmove->onground != -1) ? 1 : 0;
+        speed2d = sh_sqrt(g_pmove->velocity.x * g_pmove->velocity.x
+                        + g_pmove->velocity.y * g_pmove->velocity.y);
+        ducking = (g_pmove->usehull == 1) ? 1 : 0;
+    }
+
+    switch (weapon_id)
+    {
+    case 28:
+        if (!onground)
+            spread = 0.04f + 0.4f * acc;
+        else if (speed2d > 140.0f)
+            spread = 0.04f + 0.07f * acc;
+        else if (ducking)
+            spread = 0.0275f * acc;
+        else
+            spread = 0.0275f * acc;
+        break;
+
+    case 27:
+        if (!onground)
+            spread = 0.035f + 0.45f * acc;
+        else if (speed2d > 140.0f)
+            spread = 0.035f + 0.075f * acc;
+        else
+            spread = 0.02f * acc;
+        break;
+
+    case 22:
+        if (!onground)
+            spread = 0.04f + 0.4f * acc;
+        else if (speed2d > 140.0f)
+            spread = 0.04f + 0.07f * acc;
+        else
+            spread = 0.025f * acc;
+        break;
+
+    case 16:
+        if (!onground)
+            spread = 0.055f + 0.5f * acc;
+        else if (speed2d > 140.0f)
+            spread = 0.055f + 0.1f * acc;
+        else
+            spread = 0.035f * acc;
+        break;
+
+    case 17:
+    case 2:
+        if (!onground)
+            spread = 0.08f + 0.2f * acc;
+        else if (speed2d > 140.0f)
+            spread = 0.08f + 0.04f * acc;
+        else
+            spread = 0.04f * acc;
+        break;
+
+    case 26:
+        if (!onground)
+            spread = 0.06f + 0.35f * acc;
+        else if (speed2d > 140.0f)
+            spread = 0.06f + 0.06f * acc;
+        else
+            spread = 0.03f * acc;
+        break;
+
+    default:
+        spread = 0.03f * acc;
+        break;
+    }
+
+    vec2_t sp;
+    sh_spread_compute(seed, spread, &sp);
+
+    *out_x = sp.x;
+    *out_y = sp.y;
+}
+
+void sh_spread_trace_dir(const vec3_t *forward, const vec3_t *right,
+                         const vec3_t *up, f32 sx, f32 sy, vec3_t *out)
+{
+    if (!forward || !right || !up || !out)
+        return;
+
+    out->x = forward->x + sx * right->x + sy * up->x;
+    out->y = forward->y + sx * right->y + sy * up->y;
+    out->z = forward->z + sx * right->z + sy * up->z;
+}
+
 void sh_spread_compensate(vec3_t *viewangles)
 {
     if (!viewangles)

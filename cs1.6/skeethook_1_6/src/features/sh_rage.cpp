@@ -27,10 +27,35 @@ static qbool sh_rage_trace(void *user, const vec3_t *start, const vec3_t *end, s
     out->char_texture = 0;
     out->entity = -1;
 
-    if (!sh_trace_line(start, end, 0))
+    f32 frac = 1.0f;
+
+    if (sh_trace_fraction(start, end, &frac))
     {
-        out->fraction = 0.0f;
+        out->fraction = frac;
         out->entity = 0;
+
+        out->end.x = start->x + (end->x - start->x) * frac;
+        out->end.y = start->y + (end->y - start->y) * frac;
+        out->end.z = start->z + (end->z - start->z) * frac;
+
+        out->normal.x = start->x - out->end.x;
+        out->normal.y = start->y - out->end.y;
+        out->normal.z = start->z - out->end.z;
+
+        f32 len = sh_sqrt(out->normal.x * out->normal.x
+                        + out->normal.y * out->normal.y
+                        + out->normal.z * out->normal.z);
+
+        if (len > 0.001f)
+        {
+            out->normal.x /= len;
+            out->normal.y /= len;
+            out->normal.z /= len;
+        }
+        else
+        {
+            out->normal = (vec3_t){ 0.0f, 0.0f, 1.0f };
+        }
     }
 
     return 1;
@@ -262,27 +287,62 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
         if (g_cfg.visuals.tracer)
         {
             vec3_t from = eye;
-            vec3_t to = r->target.aim_point;
+            vec3_t dir = d;
 
-            const sh_recoil_t *rec = sh_recoil_for(local->weapon_id);
+            sh_normalize(&dir);
 
-            if (rec && rec->up_base > 0.0f)
+            f32 sx = 0.0f, sy = 0.0f;
+            i32 seed = (i32)((g_pmove ? g_pmove->time : 0.0f) * 1000.0f);
+
+            sh_spread_angle(local->weapon_id, seed, &sx, &sy);
+
+            if (sx != 0.0f || sy != 0.0f)
             {
-                vec2_t sp;
-                i32 seed = (i32)(now * 1000.0f) ^ (i32)GetTickCount();
-                sh_spread_compute(seed, rec->up_base * 10.0f, &sp);
+                vec3_t right, up;
+                sh_angle_vectors(&cmd->viewangles, &dir, &right, &up);
 
-                to.x += sp.x;
-                to.y += sp.y;
+                vec3_t spread_dir;
+                sh_spread_trace_dir(&dir, &right, &up, sx, sy, &spread_dir);
+
+                dir = spread_dir;
             }
+
+            vec3_t to;
+            to.x = from.x + dir.x * 8192.0f;
+            to.y = from.y + dir.y * 8192.0f;
+            to.z = from.z + dir.z * 8192.0f;
+
+            vec3_t end;
+            qbool hit = sh_trace_line(&from, &to, &end);
+
+            if (hit)
+                to = end;
 
             sh_visuals_tracer_add(&from, &to);
         }
 
         if (g_cfg.visuals.impact)
         {
-            vec3_t norm = { 0.0f, 0.0f, 1.0f };
-            sh_visuals_impact_add(&r->target.aim_point, &norm);
+            vec3_t dir = d;
+            sh_normalize(&dir);
+
+            vec3_t to;
+            to.x = eye.x + dir.x * 8192.0f;
+            to.y = eye.y + dir.y * 8192.0f;
+            to.z = eye.z + dir.z * 8192.0f;
+
+            vec3_t end;
+
+            if (sh_trace_line(&eye, &to, &end))
+            {
+                vec3_t norm = { 0.0f, 0.0f, 1.0f };
+                norm.x = eye.x - end.x;
+                norm.y = eye.y - end.y;
+                norm.z = eye.z - end.z;
+                sh_normalize(&norm);
+
+                sh_visuals_impact_add(&end, &norm);
+            }
         }
 
         {

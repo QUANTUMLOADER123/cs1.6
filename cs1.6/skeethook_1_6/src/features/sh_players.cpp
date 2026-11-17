@@ -231,17 +231,42 @@ void sh_set_trace_fn(i32 (*fn)(vec3_t, vec3_t, i32, i32))
     g_trace_fn = fn;
 }
 
+qbool sh_trace_fraction(const vec3_t *start, const vec3_t *end,
+                        f32 *out_hit)
+{
+    if (!g_trace_fn || !g_pmove || !g_pmove->pm_player_trace)
+        return 0;
+
+    if (out_hit)
+        *out_hit = 1.0f;
+
+    sh_pmtrace_t tr = g_pmove->pm_player_trace((f32 *)start, (f32 *)end,
+                                              0, -1);
+
+    if (tr.fraction >= 1.0f && !tr.startsolid && !tr.allsolid)
+        return 0;
+
+    if (out_hit)
+        *out_hit = tr.fraction;
+
+    return 1;
+}
+
 qbool sh_trace_line(const vec3_t *start, const vec3_t *end, vec3_t *hitsh)
 {
-    if (!g_trace_fn)
-        return false;
+    f32 frac = 1.0f;
 
-    i32 hit = g_trace_fn(*start, *end, 0, -1);
-    if (!hit)
-        return true;
+    if (!sh_trace_fraction(start, end, &frac))
+        return 0;
+
     if (hitsh)
-        *hitsh = *end;
-    return false;
+    {
+        hitsh->x = start->x + (end->x - start->x) * frac;
+        hitsh->y = start->y + (end->y - start->y) * frac;
+        hitsh->z = start->z + (end->z - start->z) * frac;
+    }
+
+    return 1;
 }
 
 void sh_msg_enemy_fire(i32 index);
