@@ -107,30 +107,26 @@ namespace gui
         ColCtx a = BeginCol(geo::COL_X_A, "A");
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Enable aimbot", &s.aimbot);
-        CheckboxAbs(a.pos, a.y, "Silent aim", &s.silent, 10 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Auto fire", &s.auto_fire, 10 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Auto wall", &s.auto_wall, 10 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Auto scope", &s.auto_scope, 10 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Double tap", &s.double_tap, 10 * geo::SCALE);
+        CheckboxAbs(a.pos, a.y, "Silent aim", &s.silent);
+        CheckboxAbs(a.pos, a.y, "Auto fire", &s.auto_fire);
+        CheckboxAbs(a.pos, a.y, "Auto wall", &s.auto_wall);
+        CheckboxAbs(a.pos, a.y, "Auto scope", &s.auto_scope);
+        CheckboxAbs(a.pos, a.y, "Double tap", &s.double_tap);
 
-        ColTo(a, 159);
+        ColTo(a, 165);
         LabelAbs(a.pos, a.y, "Hitbox");
-        ColTo(a, 174);
         ComboAbs(a.pos, a.y, "##hitbox", &s.hitbox, hitboxes, IM_ARRAYSIZE(hitboxes));
 
-        ColTo(a, 204);
+        ColTo(a, 210);
         LabelAbs(a.pos, a.y, "Target selection");
-        ColTo(a, 219);
         ComboAbs(a.pos, a.y, "##target", &s.target, targets, IM_ARRAYSIZE(targets));
 
-        ColTo(a, 249);
+        ColTo(a, 255);
         LabelAbs(a.pos, a.y, "FOV");
-        ColTo(a, 264);
         SliderAbs(a.pos, a.y, "##fov", &s.fov, 0.0f, 180.0f, "%.0f");
 
-        ColTo(a, 294);
+        ColTo(a, 300);
         LabelAbs(a.pos, a.y, "Smooth");
-        ColTo(a, 309);
         SliderAbs(a.pos, a.y, "##smooth", &s.smooth, 1.0f, 30.0f, "%.1f");
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
@@ -148,15 +144,13 @@ namespace gui
         ColCtx a = BeginCol(geo::COL_X_A, "A");
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Enable anti-aim", &s.aa_enable);
-        CheckboxAbs(a.pos, a.y, "Jitter", &s.aa_jitter, 10 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Desync", &s.aa_desync, 10 * geo::SCALE);
-        ColTo(a, 123);
+        CheckboxAbs(a.pos, a.y, "Jitter", &s.aa_jitter);
+        CheckboxAbs(a.pos, a.y, "Desync", &s.aa_desync);
+        ColTo(a, 128);
         LabelAbs(a.pos, a.y, "Pitch");
-        ColTo(a, 138);
         ComboAbs(a.pos, a.y, "##aa_pitch", &s.aa_pitch, pitches, IM_ARRAYSIZE(pitches));
-        ColTo(a, 174);
+        ColTo(a, 179);
         LabelAbs(a.pos, a.y, "Yaw base");
-        ColTo(a, 189);
         ComboAbs(a.pos, a.y, "##aa_yaw", &s.aa_yaw, yaws, IM_ARRAYSIZE(yaws));
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
@@ -172,21 +166,20 @@ namespace gui
         ColCtx a = BeginCol(geo::COL_X_A, "A");
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Master switch", &s.esp);
-        CheckboxAbs(a.pos, a.y, "Box", &s.box, 8 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Name", &s.name, 8 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Health", &s.health, 8 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Weapon", &s.weapon, 8 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Skeleton", &s.skeleton, 8 * geo::SCALE);
-        ColTo(a, 159);
+        CheckboxAbs(a.pos, a.y, "Box", &s.box);
+        CheckboxAbs(a.pos, a.y, "Name", &s.name);
+        CheckboxAbs(a.pos, a.y, "Health", &s.health);
+        CheckboxAbs(a.pos, a.y, "Weapon", &s.weapon);
+        CheckboxAbs(a.pos, a.y, "Skeleton", &s.skeleton);
+        ColTo(a, 164);
         LabelAbs(a.pos, a.y, "Box style");
-        ColTo(a, 174);
         ComboAbs(a.pos, a.y, "##esp_style", &s.esp_style, styles, IM_ARRAYSIZE(styles));
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
         ColTo(b, 51);
         CheckboxAbs(b.pos, b.y, "Chams", &s.chams);
-        CheckboxAbs(b.pos, b.y, "Glow", &s.glow, 8 * geo::SCALE);
-        CheckboxAbs(b.pos, b.y, "Radar", &s.radar, 8 * geo::SCALE);
+        CheckboxAbs(b.pos, b.y, "Glow", &s.glow);
+        CheckboxAbs(b.pos, b.y, "Radar", &s.radar);
         ColTo(b, 105);
         LabelAbs(b.pos, b.y, "Thirdperson");
         ColTo(b, 123);
@@ -200,9 +193,9 @@ namespace gui
         ColCtx a = BeginCol(geo::COL_X_A, "A");
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Bunnyhop", &s.bhop);
-        CheckboxAbs(a.pos, a.y, "Auto strafe", &s.auto_strafe, 8 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Edge jump", &s.edge_jump, 8 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Auto peek", &s.auto_peek, 8 * geo::SCALE);
+        CheckboxAbs(a.pos, a.y, "Auto strafe", &s.auto_strafe);
+        CheckboxAbs(a.pos, a.y, "Edge jump", &s.edge_jump);
+        CheckboxAbs(a.pos, a.y, "Auto peek", &s.auto_peek);
         ColTo(a, 123);
         LabelAbs(a.pos, a.y, "Fake lag");
         ColTo(a, 141);
@@ -211,8 +204,8 @@ namespace gui
         ColCtx b = BeginCol(geo::COL_X_B, "B");
         ColTo(b, 51);
         CheckboxAbs(b.pos, b.y, "Watermark", &s.watermark);
-        CheckboxAbs(b.pos, b.y, "Debug console", &s.debug_console, 8 * geo::SCALE);
-        CheckboxAbs(b.pos, b.y, "Save on exit", &s.save_on_exit, 8 * geo::SCALE);
+        CheckboxAbs(b.pos, b.y, "Debug console", &s.debug_console);
+        CheckboxAbs(b.pos, b.y, "Save on exit", &s.save_on_exit);
     }
 
     inline void TabSettings(Settings& s)
@@ -222,11 +215,10 @@ namespace gui
         ColCtx a = BeginCol(geo::COL_X_A, "A");
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Watermark", &s.watermark);
-        CheckboxAbs(a.pos, a.y, "Debug console", &s.debug_console, 8 * geo::SCALE);
-        CheckboxAbs(a.pos, a.y, "Save on exit", &s.save_on_exit, 8 * geo::SCALE);
-        ColTo(a, 105);
+        CheckboxAbs(a.pos, a.y, "Debug console", &s.debug_console);
+        CheckboxAbs(a.pos, a.y, "Save on exit", &s.save_on_exit);
+        ColTo(a, 110);
         LabelAbs(a.pos, a.y, "Accent");
-        ColTo(a, 120);
         ComboAbs(a.pos, a.y, "##accent", &s.accent, accents, IM_ARRAYSIZE(accents));
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
@@ -247,19 +239,17 @@ namespace gui
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Replace weapon models", &s.replace_weapon_models);
         CheckboxAbs(a.pos, a.y, "Replace player models", &s.replace_player_models);
-        ColTo(a, 87);
+        ColTo(a, 86);
         LabelAbs(a.pos, a.y, "T model");
-        ColTo(a, 89);
         ComboAbs(a.pos, a.y, "##tmodel", &s.t_model, models, IM_ARRAYSIZE(models));
-        ColTo(a, 127);
+        ColTo(a, 126);
         LabelAbs(a.pos, a.y, "CT model");
-        ColTo(a, 129);
         ComboAbs(a.pos, a.y, "##ctmodel", &s.ct_model, models, IM_ARRAYSIZE(models));
         ColTo(a, 169);
         CheckboxAbs(a.pos, a.y, "Replace localplayer model", &s.replace_localplayer_model);
         // В референсе это поле идёт почти вплотную к чекбоксу (бордер 184,
         // градиент 185..202), а не через 18px как предыдущие пары.
-        ColTo(a, 173);
+        ColTo(a, 170);
         ComboAbs(a.pos, a.y, "##localmodel", &s.local_model, models, IM_ARRAYSIZE(models));
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
@@ -274,7 +264,7 @@ namespace gui
         ColCtx a = BeginCol(geo::COL_X_A, "A");
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Prioritize in aimbot", &s.priority);
-        CheckboxAbs(a.pos, a.y, "Mark as friend", &s.friend_mark, 8 * geo::SCALE);
+        CheckboxAbs(a.pos, a.y, "Mark as friend", &s.friend_mark);
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
         ColTo(b, 51);
@@ -286,7 +276,7 @@ namespace gui
         ColCtx a = BeginCol(geo::COL_X_A, "A");
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Autorun scripts", &s.lua_autorun);
-        CheckboxAbs(a.pos, a.y, "Show errors", &s.show_errors, 8 * geo::SCALE);
+        CheckboxAbs(a.pos, a.y, "Show errors", &s.show_errors);
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
         CheckboxAbs(b.pos, b.y, "Allow internet access", &s.save_on_exit);

@@ -178,13 +178,14 @@ namespace gui
     // ------------------------------------------------------------------
     // Простая подпись (заголовок группы). Высота 14px как у чекбокса.
     // ------------------------------------------------------------------
+    // Подпись НЕ двигает курсор: в референсе подпись и её поле занимают одну
+    // "строку" (подпись сверху, поле снизу), следующую задаёт ColTo.
     inline void LabelAbs(ImVec2 col_pos, float& row_y, const char* text)
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
         const ImVec2 p(col_pos.x + (geo::LABEL_X - 1 - geo::COL_X_A) * geo::SCALE,
-                       col_pos.y + row_y * geo::SCALE - 2 * geo::SCALE);
+                       col_pos.y + row_y * geo::SCALE - 1 * geo::SCALE);
         DrawTextSpaced(dl, p, col::TEXT, text, geo::TEXT_SIZE, 0.5f * geo::SCALE);
-        row_y += 18.0f;
     }
 
     // ------------------------------------------------------------------
@@ -196,8 +197,8 @@ namespace gui
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
         // ink-top текста поля -> верх поля ровно +12px (референс: текст 89, поле 101)
-        const float y = col_pos.y + row_y * geo::SCALE + 12.0f * geo::SCALE;
-        const float fh = 18.0f * geo::SCALE;   // 101..118 (бордер сверху + 17 градиента + бордер снизу)
+        const float y = col_pos.y + row_y * geo::SCALE + 14.0f * geo::SCALE;
+        const float fh = 20.0f * geo::SCALE;   // бордер 1px + 18px градиента + бордер 1px
         const float w = 181.0f * geo::SCALE;   // x 153..333
         const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
         const ImVec2 q(p.x + w, p.y + fh);
@@ -214,21 +215,18 @@ namespace gui
         }
         else
         {
-            // оригинал: 1px #0C0C0C сверху, затем 31,31,32,32,32,33,33,33,34,34,34,34,
-            // 35,35,35,36,36 и 1px #0C0C0C снизу
-            // Ступени выравниваем по ЦЕЛЫМ пикселям (иначе растеризатор
-            // интерполирует края и вместо 31..36 получается лесенка вниз).
-            static const int ramp[17] = {31,31,32,32,32,33,33,33,34,34,34,34,35,35,35,36,36};
-            const float hh = (q.y - p.y) / 17.0f;
-            for (int i = 0; i < 17; ++i)
-            {
-                const int v = ramp[i];
-                const float y0 = ImFloor(p.y) + ImFloor(hh * i);
-                const float y1 = ImFloor(p.y) + ImFloor(hh * (i + 1));
-                if (y1 > y0)
-                    dl->AddRectFilled(ImVec2(ImFloor(p.x), y0), ImVec2(ImFloor(q.x), y1),
-                                      IM_COL32(v, v, v, 255));
-            }
+            const float px = ImFloor(p.x), pw = ImFloor(q.x) - px;
+            // бордеры поля: 1px #0C0C0C сверху и снизу (REF: y=100 и y=119)
+            dl->AddRectFilled(ImVec2(px, ImFloor(p.y)), ImVec2(px + pw, ImFloor(p.y) + 1),
+                              col::CHECK_BORDER);
+            dl->AddRectFilled(ImVec2(px, ImFloor(p.y) + 19), ImVec2(px + pw, ImFloor(p.y) + 20),
+                              col::CHECK_BORDER);
+            // 18 ступеней градиента — снято с референса y=101..118
+            static const int ramp[18] = {31,31,32,32,32,32,33,33,33,34,34,34,34,35,35,35,36,36};
+            for (int i = 0; i < 18; ++i)
+                dl->AddRectFilled(ImVec2(px, ImFloor(p.y) + 1 + i),
+                                  ImVec2(px + pw, ImFloor(p.y) + 2 + i),
+                                  IM_COL32(ramp[i], ramp[i], ramp[i], 255));
         }
 
         const ImVec2 ts = ImGui::CalcTextSize(items[*current]);
@@ -264,7 +262,7 @@ namespace gui
         ImGui::PopStyleColor();
         ImGui::PopStyleVar();
 
-        row_y += 18.0f;
+        // (курсор НЕ двигаем: строку задаёт ColTo у вызывающего кода)
         return changed;
     }
 
@@ -275,46 +273,71 @@ namespace gui
                           float lo, float hi, const char* fmt)
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
-        // ink-top текста поля -> верх поля ровно +12px (референс: текст 89, поле 101)
-        const float y = col_pos.y + row_y * geo::SCALE + 12.0f * geo::SCALE;
-        const float fh = 18.0f * geo::SCALE;   // 101..118 (бордер сверху + 17 градиента + бордер снизу)
+        // та же привязка, что у дропдауна: бордер поля = row_y + 14
+        const float y = col_pos.y + row_y * geo::SCALE + 14.0f * geo::SCALE;
+        const float fh = 20.0f * geo::SCALE;   // бордер 1px + 18px + бордер 1px
         const float w = 181.0f * geo::SCALE;   // x 153..333
         const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
         const ImVec2 q(p.x + w, p.y + fh);
 
+        // плашка поля — как у дропдауна
+        VGradient(dl, p, q, col::FIELD_TOP, col::FIELD_BOT);
+        const float px = ImFloor(p.x), pw = ImFloor(q.x) - px;
+        dl->AddRectFilled(ImVec2(px, ImFloor(p.y)), ImVec2(px + pw, ImFloor(p.y) + 1),
+                          col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2(px, ImFloor(p.y) + 19), ImVec2(px + pw, ImFloor(p.y) + 20),
+                          col::CHECK_BORDER);
+
         ImGui::SetCursorScreenPos(p);
         ImGui::InvisibleButton(id, ImVec2(w, fh));
         const bool active = ImGui::IsItemActive();
+        const float t = std::clamp((*v - lo) / (hi - lo), 0.0f, 1.0f);
 
-        VGradient(dl, p, q, col::FIELD_TOP, col::FIELD_BOT);
-
-        const float t = (*v - lo) / (hi - lo);
-        const float gx = p.x + 3 * geo::SCALE + (w - 6 * geo::SCALE) * std::clamp(t, 0.0f, 1.0f);
-        dl->AddRectFilled(ImVec2(gx - 2.5f * geo::SCALE, p.y + 2 * geo::SCALE),
-                          ImVec2(gx + 2.5f * geo::SCALE, q.y - 2 * geo::SCALE),
-                          active ? IM_COL32(171, 216, 47, 255) : col::ACCENT);
+        // ЗАЛИВКА трека градиентом #99C427 -> #699404 (как в gamesense),
+        // строго внутри бордеров: x 154..332, y 101..118.
+        const int fx0 = (int)px + 1;
+        const int fy0 = (int)ImFloor(p.y) + 1;
+        const int fw = (int)pw - 2;
+        const int fill_w = (int)std::floor(fw * t + 0.5f);
+        for (int i = 0; i < 18; ++i)
+        {
+            const float u = (float)i / 17.0f;
+            const int r = (int)(0x99 + (0x69 - 0x99) * u);
+            const int g = (int)(0xC4 + (0x94 - 0xC4) * u);
+            const int b = (int)(0x27 + (0x04 - 0x27) * u);
+            if (fill_w > 0)
+                dl->AddRectFilled(ImVec2((float)fx0, (float)(fy0 + i)),
+                                  ImVec2((float)(fx0 + fill_w), (float)(fy0 + i + 1)),
+                                  IM_COL32(r, g, b, 255));
+        }
 
         char buf[64];
         snprintf(buf, sizeof(buf), fmt, *v);
-        const ImVec2 ts = ImGui::CalcTextSize(buf);
-        dl->AddText(ImVec2(q.x - ts.x - 6 * geo::SCALE, p.y + (fh - ts.y) * 0.5f),
-                    col::TEXT, buf);
+        {
+            ImFontBaked* bk = ImGui::GetFont()->GetFontBaked(geo::TEXT_SIZE);
+            const float glyph_h = bk ? bk->Size : geo::TEXT_SIZE;
+            const float ty = ImFloor(p.y) + ImFloor((fh - glyph_h) * 0.5f) + 1.0f;
+            float tw = 0.0f;
+            if (bk)
+                for (const char* c = buf; *c; ++c) tw += bk->GetCharAdvance((ImWchar)*c);
+            // подложка под числом — только если заливка до него доходит
+            if (fill_w > (int)(pw - tw - 16))
+                dl->AddRectFilled(ImVec2(px + pw - tw - 13, ImFloor(p.y) + 1),
+                                  ImVec2(px + pw - 7, ImFloor(p.y) + 19), col::FIELD_BOT);
+            DrawTextSpaced(dl, ImVec2(ImFloor(px + pw - tw - 11), ty),
+                           col::TEXT, buf, geo::TEXT_SIZE, 0.5f * geo::SCALE);
+        }
 
         bool changed = false;
         if (active)
         {
             const float mx = ImGui::GetIO().MousePos.x;
-            float nt = (mx - p.x - 3 * geo::SCALE) / (w - 6 * geo::SCALE);
-            nt = std::clamp(nt, 0.0f, 1.0f);
+            const float nt = std::clamp((mx - p.x) / w, 0.0f, 1.0f);
             const float nv = lo + (hi - lo) * nt;
-            if (nv != *v)
-            {
-                *v = nv;
-                changed = true;
-            }
+            if (nv != *v) { *v = nv; changed = true; }
         }
 
-        row_y += 18.0f;
+        // (курсор НЕ двигаем: строку задаёт ColTo у вызывающего кода)
         return changed;
     }
 
