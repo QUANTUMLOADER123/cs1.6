@@ -443,6 +443,32 @@ typedef struct sh_client_data_s
 
 typedef char sh_client_data_size_check[(sizeof(sh_client_data_t) == 0x1DC) ? 1 : -1];
 
+
+typedef struct sh_studio_api_s
+{
+    void *mem_calloc;
+    void *cache_check;
+    void *load_cache_file;
+    void *mod_for_name;
+    void *mod_extradata;
+    void *get_model_by_index;
+    void *get_current_entity;
+    void *player_info;
+    void *get_player_state;
+    void *get_view_entity;
+    void *get_times;
+    void *get_cvar;
+    void *get_view_info;
+    void *get_chrome_sprite;
+    void *get_model_counters;
+    void *get_alias_scale;
+    f32 ****(*studio_get_bone_transform)(void);
+    f32 ****(*studio_get_light_transform)(void);
+    f32 ***(*studio_get_alias_transform)(void);
+    f32 ***(*studio_get_rotation_matrix)(void);
+    void (*studio_setup_model)(i32 bodypart, void **ppbodypart, void **ppsubmodel);
+} sh_studio_api_t;
+
 typedef struct sh_weapon_data_s
 {
     i32 weapon_id;

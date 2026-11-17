@@ -6,6 +6,7 @@
 #include "../../include/sh_scanner.h"
 #include "../../include/sh_font.h"
 #include "../../include/sh_movement.h"
+#include "../../include/sh_bones.h"
 
 void sh_players_track_anim(void);
 #include "../../include/sh_ballistics.h"
@@ -16,6 +17,7 @@ void sh_players_track_anim(void);
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
 #include "../../include/sh_movement.h"
+#include "../../include/sh_bones.h"
 
 void sh_players_track_anim(void);
 
@@ -32,6 +34,25 @@ typedef i32(__cdecl *hud_redraw_fn)(f32 time, i32 intermission);
 typedef i32(__cdecl *player_move_fn)(sh_playermove_t *pmove, i32 server);
 typedef i32(__cdecl *hook_user_msg_fn)(const char *name, i32 size);
 typedef i32(__cdecl *add_entity_fn)(i32 type, sh_cl_entity_t *ent);
+
+typedef i32(__cdecl *studio_iface_fn)(i32 version, void **ppinterface,
+                                     sh_studio_api_t *pstudio);
+
+static studio_iface_fn g_studio_iface_orig;
+
+i32 __cdecl sh_studio_iface_hook(i32 version, void **ppinterface,
+                                 sh_studio_api_t *pstudio)
+{
+    i32 r = 0;
+
+    if (g_studio_iface_orig)
+        r = g_studio_iface_orig(version, ppinterface, pstudio);
+
+    if (pstudio)
+        sh_bones_studio_set(pstudio);
+
+    return r;
+}
 
 sh_weapon_data_t g_weapon_data[sh_max_weapons];
 
@@ -238,6 +259,9 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent)
     if (!ent)
         return result;
 
+    if (type == 0 && ent->player > 0 && ent->player <= 32)
+        sh_bones_capture(ent->player);
+
     if (type != 0)
     {
         if (g_cfg.misc.no_smoke && ent->curstate.renderfx == 20)
@@ -328,6 +352,14 @@ qbool sh_hooks_install(void)
         if (MH_CreateHook(hud_redraw, (void *)sh_hud_redraw_hook,
                           (void **)&g_hud_redraw_orig) == MH_OK)
             MH_EnableHook(hud_redraw);
+    }
+
+    void *studio = sh_find_export_body("client.dll", "HUD_GetStudioModelInterface");
+    if (studio)
+    {
+        if (MH_CreateHook(studio, (void *)sh_studio_iface_hook,
+                          (void **)&g_studio_iface_orig) == MH_OK)
+            MH_EnableHook(studio);
     }
 
     void *txfer = sh_find_export_body("client.dll", "HUD_TxferPredictionData");

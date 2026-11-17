@@ -2,6 +2,7 @@
 #include "../../include/sh_math.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_ballistics.h"
+#include "../../include/sh_bones.h"
 
 #include <math.h>
 
@@ -203,6 +204,44 @@ static void sh_draw_skeleton(const sh_player_t *p, const sh_box_t *b)
         { 1, 5 }, { 5, 6 }, { 6, 7 },
         { 1, 8 }, { 8, 9 }, { 9, 10 }
     };
+
+    const sh_bone_snapshot_t *snap = sh_bones_get(p->index);
+
+    if (snap)
+    {
+        static const i32 links[][2] = {
+            { sh_bone_head, sh_bone_neck },
+            { sh_bone_neck, sh_bone_spine1 },
+            { sh_bone_spine1, sh_bone_spine },
+            { sh_bone_spine, sh_bone_pelvis },
+            { sh_bone_spine1, sh_bone_l_upperarm },
+            { sh_bone_l_upperarm, sh_bone_l_forearm },
+            { sh_bone_l_forearm, sh_bone_l_hand },
+            { sh_bone_spine1, sh_bone_r_upperarm },
+            { sh_bone_r_upperarm, sh_bone_r_forearm },
+            { sh_bone_r_forearm, sh_bone_r_hand },
+            { sh_bone_pelvis, sh_bone_l_thigh },
+            { sh_bone_l_thigh, sh_bone_l_calf },
+            { sh_bone_l_calf, sh_bone_l_foot },
+            { sh_bone_pelvis, sh_bone_r_thigh },
+            { sh_bone_r_thigh, sh_bone_r_calf },
+            { sh_bone_r_calf, sh_bone_r_foot }
+        };
+
+        for (u32 i = 0; i < sh_countof(links); ++i)
+        {
+            vec2_t a, bb;
+
+            if (!sh_bones_world_to_screen(snap, links[i][0], &a))
+                continue;
+            if (!sh_bones_world_to_screen(snap, links[i][1], &bb))
+                continue;
+
+            sh_draw_line(a.x, a.y, bb.x, bb.y, 1.0f, c);
+        }
+
+        return;
+    }
 
     f32 h = b->bottom - b->top;
     f32 w = b->right - b->left;
