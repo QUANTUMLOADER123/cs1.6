@@ -5,6 +5,7 @@
 static qbool g_tex_applied;
 static f32 g_saved_picmip;
 static f32 g_saved_detail;
+static f32 g_saved_lightmap;
 
 static f32 sh_cvar_get(const char *name)
 {
@@ -36,16 +37,19 @@ void sh_worldfx_tick(void)
         {
             g_saved_picmip = sh_cvar_get("gl_picmip");
             g_saved_detail = sh_cvar_get("r_detailtextures");
+            g_saved_lightmap = sh_cvar_get("r_lightmap");
             g_tex_applied = 1;
         }
 
         sh_cvar_set("gl_picmip", 2.0f);
         sh_cvar_set("r_detailtextures", 0.0f);
+        sh_cvar_set("r_lightmap", 1.0f);
     }
     else if (g_tex_applied)
     {
         sh_cvar_set("gl_picmip", g_saved_picmip);
         sh_cvar_set("r_detailtextures", g_saved_detail);
+        sh_cvar_set("r_lightmap", g_saved_lightmap);
         g_tex_applied = 0;
     }
 }
