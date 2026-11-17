@@ -399,20 +399,71 @@ typedef struct sh_hud_player_info_s
 
 typedef struct sh_client_data_s
 {
-    qbool fov;
     vec3_t origin;
-    vec3_t viewangles;
     vec3_t velocity;
     i32 viewmodel;
-    i32 health;
-    i32 weapons;
+    vec3_t punchangle;
     i32 flags;
-    i32 maxspeed;
-    f32 nextprimaryattack;
-    f32 nextattack;
+    i32 waterlevel;
+    i32 watertype;
+    vec3_t view_ofs;
+    f32 health;
+    i32 in_duck;
+    i32 weapons;
+    i32 time_step_sound;
+    i32 duck_time;
+    i32 swim_time;
+    i32 waterjumptime;
+    f32 maxspeed;
+    f32 fov;
     i32 weaponanim;
-    u8 m_flNextAttack;
+    i32 weapon_id;
+    i32 ammo_shells;
+    i32 ammo_nails;
+    i32 ammo_cells;
+    i32 ammo_rockets;
+    f32 next_attack;
+    i32 tfstate;
+    i32 pushmsec;
+    i32 deadflag;
+    char physinfo[256];
+    i32 iuser1;
+    i32 iuser2;
+    i32 iuser3;
+    i32 iuser4;
+    f32 fuser1;
+    f32 fuser2;
+    f32 fuser3;
+    f32 fuser4;
+    vec3_t vuser1;
+    vec3_t vuser2;
+    vec3_t vuser3;
+    vec3_t vuser4;
 } sh_client_data_t;
+
+typedef char sh_client_data_size_check[(sizeof(sh_client_data_t) == 0x1DC) ? 1 : -1];
+
+typedef struct sh_weapon_data_s
+{
+    i32 weapon_id;
+    i32 clip;
+    f32 next_primary_attack;
+    f32 next_secondary_attack;
+    f32 idle_time;
+    i32 in_reload;
+    i32 in_special_reload;
+    f32 next_reload;
+    f32 pump_time;
+    f32 reload_time;
+    f32 aimed_damage;
+    f32 next_aim_bonus;
+    i32 in_zoom;
+    i32 weapon_state;
+    i32 iuser1;
+} sh_weapon_data_t;
+
+typedef char sh_weapon_data_size_check[(sizeof(sh_weapon_data_t) == 0x3C) ? 1 : -1];
+
 
 typedef struct sh_globalvars_s
 {

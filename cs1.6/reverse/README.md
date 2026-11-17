@@ -17,6 +17,7 @@
 | [`08-events.md`](08-events.md) | `event_api_t`, `efx_api_t`, скрипты `.sc`, трассеры |
 | [`09-chams.md`](09-chams.md) | `CStudioModelRenderer`, 128 костей, чеймы, хитбоксы |
 | [`10-anticheat.md`](10-anticheat.md) | что реально видит VAC, границы SDK |
+| [`11-clientdata.md`](11-clientdata.md) | `clientdata_t` 476 Б, `weapon_data_t` 60 Б, конвейер кадра |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,
