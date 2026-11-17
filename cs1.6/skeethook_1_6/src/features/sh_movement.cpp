@@ -61,20 +61,31 @@ void sh_autostrafe(sh_usercmd_t *cmd, sh_playermove_t *pm)
         return;
 
     f32 wish_speed = sh_sqrt(fm * fm + sm * sm);
-    f32 wish_yaw = sh_atan2_deg(sm, fm);
-    f32 wish_dir = cmd->viewangles.y + wish_yaw;
-    f32 vel_yaw = sh_atan2_deg(vy, vx);
+
+    if (wish_speed < 1.0f)
+        return;
 
     f32 omega = sh_strafe_omega(wish_speed);
-    f32 d = sh_angle_delta(wish_dir, vel_yaw);
 
-    if (d > 0.0f)
-        omega = -omega;
+    f32 vel_yaw = sh_atan2_deg(vy, vx);
 
-    f32 target = vel_yaw + omega;
+    f32 fx = sh_cos_deg(cmd->viewangles.y);
+    f32 fy = sh_sin_deg(cmd->viewangles.y);
 
-    cmd->forwardmove = sh_cos_deg(target) * sh_max_move;
-    cmd->sidemove = sh_sin_deg(target) * sh_max_move;
+    f32 d_right = fy * (vx / speed) - fx * (vy / speed);
+    (void)fx;
+    (void)fy;
+
+    f32 target_yaw = vel_yaw + omega;
+
+    if (d_right < 0.0f)
+        target_yaw = vel_yaw - omega;
+
+    f32 f = sh_cos_deg(target_yaw - cmd->viewangles.y);
+    f32 r = sh_sin_deg(target_yaw - cmd->viewangles.y);
+
+    cmd->forwardmove = f * sh_max_move;
+    cmd->sidemove = -r * sh_max_move;
 }
 
 void sh_quick_stop(sh_usercmd_t *cmd, sh_playermove_t *pm)
