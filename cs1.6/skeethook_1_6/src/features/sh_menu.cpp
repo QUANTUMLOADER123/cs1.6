@@ -232,7 +232,10 @@ static void sh_menu_draw_rage(f32 x, f32 y)
     sh_menu_section("target", x, cy);
     cy += 20.0f * s;
 
+    static const char *g_mp_items[] = { "off", "center", "corners" };
+
     sh_menu_combo(x, cy, colw, "hitbox", &g_cfg.aimbot.hitbox, g_hitbox_items, 6);
+    sh_menu_combo(x + colw, cy, colw, "multipoint", &g_cfg.aimbot.multipoint, g_mp_items, 3);
     cy += row;
 
     sh_menu_combo(x, cy, colw, "priority", &g_cfg.aimbot.priority, g_priority_items, 4);

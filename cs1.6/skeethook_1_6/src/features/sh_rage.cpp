@@ -169,6 +169,67 @@ void sh_rage_scan(sh_rage_result_t *out)
             }
         }
 
+        if (g_cfg.aimbot.multipoint > 0)
+        {
+            const sh_bone_snapshot_t *snap = sh_bones_get(p->index);
+
+            if (snap && snap->valid)
+            {
+                i32 want_bone = -1;
+
+                if (g_cfg.aimbot.hitbox == 1)
+                    want_bone = sh_bone_head;
+                else if (g_cfg.aimbot.hitbox == 3)
+                    want_bone = sh_bone_pelvis;
+                else
+                    want_bone = sh_bone_spine3;
+
+                f32 best_pt_d = 1.0e10f;
+                vec3_t best_pt = center;
+
+                for (i32 b = 0; b < snap->bbox_count; ++b)
+                {
+                    if (snap->map[want_bone] != snap->bbox[b].bone)
+                        continue;
+
+                    vec3_t pts[8];
+
+                    if (!sh_bones_bbox_corners(snap, b, pts))
+                        break;
+
+                    i32 total = (g_cfg.aimbot.multipoint >= 2) ? 8 : 1;
+
+                    for (i32 k = 0; k < total; ++k)
+                    {
+                        vec3_t pt = pts[k];
+
+                        if (total == 1)
+                        {
+                            pt.x = (pts[0].x + pts[7].x) * 0.5f;
+                            pt.y = (pts[0].y + pts[7].y) * 0.5f;
+                            pt.z = (pts[0].z + pts[7].z) * 0.5f;
+                        }
+
+                        f32 dx = pt.x - eye.x;
+                        f32 dy = pt.y - eye.y;
+                        f32 dz = pt.z - eye.z;
+
+                        f32 dd = dx * dx + dy * dy + dz * dz;
+
+                        if (dd < best_pt_d)
+                        {
+                            best_pt_d = dd;
+                            best_pt = pt;
+                        }
+                    }
+
+                    break;
+                }
+
+                center = best_pt;
+            }
+        }
+
         vec3_t d = center;
 
         d.x -= eye.x;
