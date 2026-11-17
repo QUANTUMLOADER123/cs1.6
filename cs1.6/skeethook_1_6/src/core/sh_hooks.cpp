@@ -206,8 +206,19 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent)
     if (g_add_entity_orig)
         result = g_add_entity_orig(type, ent);
 
-    if (!ent || type != 0)
+    if (!ent)
         return result;
+
+    if (type != 0)
+    {
+        if (g_cfg.misc.no_smoke && ent->curstate.renderfx == 20)
+            return 0;
+
+        if (g_cfg.misc.no_flash && ent->curstate.renderfx == 19)
+            return 0;
+
+        return result;
+    }
 
     if (g_cfg.visuals.chams || g_cfg.visuals.glow)
     {

@@ -12,6 +12,8 @@ i32  sh_local_weapon_id(void);
 
 extern i32 g_shots_fired;
 
+void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm);
+
 void sh_autostrafe(sh_usercmd_t *cmd, sh_playermove_t *pm);
 void sh_quick_stop(sh_usercmd_t *cmd, sh_playermove_t *pm);
 void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm);

@@ -157,6 +157,26 @@ i32 sh_local_weapon_id(void)
     return local->curstate.weaponmodel;
 }
 
+void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm)
+{
+    if (!g_cfg.movement.super_toss || !cmd || !pm)
+        return;
+
+    if (pm->onground != -1)
+        return;
+
+    if (!(cmd->buttons & 1))
+        return;
+
+    f32 power = g_cfg.movement.super_toss_power / 100.0f;
+
+    if (pm->velocity.z < 0.0f)
+        cmd->buttons |= 2;
+
+    if (power > 0.0f && pm->velocity.z > 0.0f)
+        cmd->forwardmove += power * 40.0f;
+}
+
 void sh_movement_run(sh_usercmd_t *cmd)
 {
     sh_playermove_t *pm = g_pmove;
@@ -171,6 +191,7 @@ void sh_movement_run(sh_usercmd_t *cmd)
 
     sh_bhop(cmd, pm);
     sh_auto_jump_hold(cmd, pm);
+    sh_super_toss(cmd, pm);
 
     if (cmd->buttons & 1)
         sh_shots_on_attack();
