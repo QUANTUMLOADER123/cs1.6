@@ -202,8 +202,15 @@ void sh_visuals_apply_nightmode(void)
 
     if (g_cfg.visuals.world_color)
     {
-        f32 avg = (wr + wg + wb) / 3.0f;
-        g_engfuncs->pfnCvar_SetValue("gl_monolights", avg);
+        f32 lum = wr * 0.299f + wg * 0.587f + wb * 0.114f;
+        f32 mono = 1.0f - lum;
+
+        if (mono < 0.0f)
+            mono = 0.0f;
+        if (mono > 1.0f)
+            mono = 1.0f;
+
+        g_engfuncs->pfnCvar_SetValue("gl_monolights", mono);
         g_engfuncs->pfnCvar_SetValue("gl_fog", 1.0f);
         g_engfuncs->pfnCvar_SetValue("gl_lightholes", 0.0f);
     }
