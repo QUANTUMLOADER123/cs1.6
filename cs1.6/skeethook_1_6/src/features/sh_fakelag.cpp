@@ -80,29 +80,63 @@ void sh_fakelag_run(sh_usercmd_t *cmd)
     if (!g_next_send_va)
         return;
 
-    g_next_send_time = *(volatile f32 *)g_next_send_va;
+    f32 read = *(volatile f32 *)g_next_send_va;
+
+    if (!(read == read))
+        return;
+
+    if (read < 0.0f || read > 1.0e7f)
+        return;
+
+    g_next_send_time = read;
 
     f32 now = g_pmove ? g_pmove->time : 0.0f;
 
-    if (g_next_send_time > now + 1.0f)
+    if (now <= 0.0f)
         return;
 
-    if (!sh_fakelag_should_choke())
+    if (now - g_next_send_time > 5.0f)
+        return;
+
+    i32 limit = g_cfg.antiaim.fake_lag_ticks;
+
+    if (limit <= 0)
+        return;
+
+    if (limit > sh_fakelag_max_choke)
+        limit = sh_fakelag_max_choke;
+
+    static i32 g_last_tick = -1;
+    i32 tick = (i32)(now / 0.015f);
+
+    if (tick == g_last_tick)
+        return;
+
+    g_last_tick = tick;
+
+    if (g_choke_counter < limit)
     {
-        g_choke_counter = 0;
+        ++g_choke_counter;
+
+        f32 base = g_next_send_time;
+
+        if (base < now)
+            base = now;
+
+        *(volatile f32 *)g_next_send_va = base + 0.015f;
+
         return;
     }
 
-    f32 cmdrate = 100.0f;
+    if (g_choke_counter >= limit)
+    {
+        g_choke_counter = 0;
 
-    if (g_cfg.antiaim.fake_lag_ticks > 0)
-        cmdrate = 100.0f / (f32)g_cfg.antiaim.fake_lag_ticks;
+        f32 base = g_next_send_time;
 
-    if (cmdrate < 5.0f)
-        cmdrate = 5.0f;
+        if (base < now)
+            base = now;
 
-    f32 interval = 1.0f / cmdrate;
-
-    if (interval > 0.0f && interval < 1.0f)
-        *(volatile f32 *)g_next_send_va = now + interval;
+        *(volatile f32 *)g_next_send_va = base;
+    }
 }
