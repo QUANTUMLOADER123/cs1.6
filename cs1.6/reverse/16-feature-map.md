@@ -1,197 +1,165 @@
 # Реверс CS 1.6 — карта фич: что реально, чем делается
 
 Итоговый документ. Для каждой механики из типичного набора чита:
-**работает ли в GoldSrc**, **каким механизмом**, **откуда взято**.
+**работает ли**, **каким механизмом**, **откуда взято**, **в каком файле SDK**.
 
-Легенда: ✅ работает · ⚠️ частично · ❌ невозможно в движке
+Легенда: ✅ работает · ⚠️ работает с честной оговоркой · ❌ невозможно
+
+Последняя сверка — по коду `skeethook_1_6` (52 файла). У каждой ✅ стоит
+файл, где это лежит: если файла нет — значит не сделано.
 
 ---
 
-**Реализовано позже:** `sh_rage_apply_recoil` вычитает `punchangle.x/y` при
-`no_recoil` и компенсирует `punchangle.z` при `no_spread` — единственный
-работающий на клиенте способ (серверный разброс не отменяется).
-
 ## Ragebot
 
-| фича | | механизм | источник |
+| фича | | механизм | файл |
 |---|---|---|---|
-| Aimbot | ✅ | `CL_CreateMove` → правка `usercmd.viewangles` | `client.dll 0x01958CC0` |
-| Silent aim | ✅ | подмена углов **только** в `cmd`, не в камере | `15-antiaim.md` |
-| Auto fire | ✅ | `cmd->buttons \|= IN_ATTACK` | — |
-| **Remove recoil** | ✅ | детерминированная отдача, `KickBack` | `12-ballistics.md` п.5 |
-| **Remove spread** | ⚠️ | ГПСЧ воспроизводим, но сервер разбрасывает сам | `12-ballistics.md` п.2-4 |
-| **Penetration / autowall** | ✅ | повтор цикла `FireBullets3` | `12-ballistics.md` п.6 |
-| **Double tap** | ⚠️ | не телепорт тиков, а быстрое переключение при `m_flNextAttack` | ниже, п.1 |
-| **Hideshots** | ✅ | `pitch = 1620 / -1619` | `15-antiaim.md` п.2 |
-| Auto stop | ✅ | разворот + forward при выстреле | `12-ballistics.md` п.10 |
-| Min damage | ✅ | расчёт `damage *= rangeModifier^(dist/500)` | `12-ballistics.md` п.7 |
-| Knife bot | ✅ | `KNIFE_STAB_DISTANCE 32`, `SWING_DISTANCE 48` | `weapons.h:1180` |
+| Aimbot | ✅ | `CL_CreateMove` → правка `cmd.viewangles` | `sh_rage.cpp` |
+| Silent aim | ✅ | углы подменяются только в `cmd`, камера не трогается | `sh_rage.cpp` |
+| Auto fire | ✅ | `cmd->buttons \|= 1` | `sh_rage.cpp` |
+| Auto stop | ✅ | `forwardmove/sidemove = 0` + снятие `IN_JUMP` при выстреле | `sh_rage.cpp` |
+| **Penetration** | ✅ | `sh_autowall_trace` — цикл по `12-ballistics.md` п.6 | `sh_autowall.cpp` |
+| **Auto wall** | ✅ | то же + `sh_trace_line` через движок | `sh_autowall.cpp` |
+| **Double tap** | ⚠️ | досыл `IN_ATTACK` в окне 1.5 `frametime` — выстрел на кадр раньше | `sh_rage.cpp` |
+| **Remove recoil** | ✅ | вычитание `punchangle.x/y` из `viewangles` | `sh_rage.cpp` |
+| **Remove spread** | ⚠️ | компенсация `punchangle.z`; серверный разброс не отменяется | `sh_rage.cpp` |
+| Hitbox выбор | ✅ | `aimbot.hitbox` → `target.hitgroup` | `sh_rage.cpp` |
+| Priority цели | ✅ | distance / fov / low health / angle+dist | `sh_rage.cpp` |
+| Min damage | ✅ | фильтр по реальному урону из autowall | `sh_rage.cpp` |
+| Knife bot | ✅ | `KNIFE_STAB_DISTANCE 32`, `SWING_DISTANCE 48` | `sh_knife.cpp` |
+| Spread-трейсеры | ✅ | `sh_spread_compute` по таблице `sh_recoil_for` | `sh_ballistics.cpp` |
+
+**Честная граница double tap:** в CS:GO это сброс tickbase (64 тика),
+в GoldSrc тиков нет — есть частота отправки команд. Ускорить её выше
+`cl_cmdrate` 100 нельзя (проверено: `cmp eax,0x64` @ `hw.dll+0x18ECD`).
+Максимум — не терять кадры и досылать выстрел в окно готовности.
 
 ---
 
 ## Antiaim
 
-| фича | | механизм |
-|---|---|---|
-| Pitch down/up | ✅ | `x = 88 / -88` |
-| **Fake pitch (hideshot)** | ✅ | `x = 1620 / -1619` — ломает хитбокс |
-| Pitch spin | ✅ | `cos(t*11*pi) * 90` |
-| Yaw backwards | ✅ | `y += 180` |
-| Yaw static/left/right | ✅ | `y = 90 / 270` |
-| Yaw spin | ✅ | `y += accum` |
-| Yaw jitter | ✅ | `rand()%100 < 10 → y += 180` |
-| Yaw random | ✅ | `98% back + ±70` |
-| **Fake sideways** | ✅ | `y -= 91`, через пакет `-= 180` |
-| **Roll** | ⚠️ | `viewangles.z` идёт на сервер, влияет на движение; модель крутит сервер |
-| **Desync** | ⚠️ | псевдо: разные yaw в разных пакетах. Настоящего CS:GO-десинка нет |
-| **Fake lag** | ✅ | лимит choke в переменной `0x1E3AFCC` |
-| Movement fix | ✅ | **обязателен**, иначе бег задом |
+| фича | | механизм | файл |
+|---|---|---|---|
+| Pitch down/up | ✅ | `x = 88 / -88` | `sh_antiaim.cpp` |
+| **Fake pitch (magic)** | ✅ | `x = 1620 / -1619` — ломает хитбокс | `sh_antiaim.cpp` |
+| Pitch spin | ✅ | `cos(t*11*pi) * 90` | `sh_antiaim.cpp` |
+| Yaw backwards | ✅ | `y += 180` | `sh_antiaim.cpp` |
+| Yaw static L/R | ✅ | `y = 90 / 270` | `sh_antiaim.cpp` |
+| Yaw left/right | ✅ | `y += 90 / 270` | `sh_antiaim.cpp` |
+| Yaw spin | ✅ | накопление `spin_speed` | `sh_antiaim.cpp` |
+| Yaw jitter | ✅ | `±yaw_jitter` с флипом каждый кадр | `sh_antiaim.cpp` |
+| Yaw random | ✅ | 98% назад + шум | `sh_antiaim.cpp` |
+| Yaw fake sideways | ✅ | `−91°` с флипом | `sh_antiaim.cpp` |
+| **Desync** | ⚠️ | `±desync_amount` (кап 90) с флипом — **псевдо**: хитбокс в GoldSrc это коробка ±16, поворот модели на него не влияет | `sh_antiaim.cpp` |
+| **Roll** | ⚠️ | `viewangles.z` (работает в демках/HLTV, в игре камера не крутится) | `sh_antiaim.cpp` |
+| **Fake lag** | ✅ | сдвиг `next_send_time` (0x2D5DA48) — пакет не уходит | `sh_fakelag.cpp` |
+| Fake duck | ✅ | `IN_DUCK` (4) на земле | `sh_antiaim.cpp` |
+| Micro move | ✅ | `forwardmove = micro_move_speed` | `sh_antiaim.cpp` |
+| Movement fix | ✅ | перепроекция `forwardmove/sidemove` на старые углы | `sh_antiaim.cpp` |
+| Check IN_ATTACK | ✅ | не ломать аим при стрельбе | `sh_antiaim.cpp` |
+| Check C4/граната/нож | ✅ | пропуск | `sh_antiaim.cpp` |
+| Check noclip/WALK | ✅ | пропуск | `sh_antiaim.cpp` |
+| Hideshot (локально) | ✅ | снятие `EF_MUZZLEFLASH` (2) + `weaponanim = 0` | `sh_hooks.cpp` |
 
-### Почему desync «псевдо»
+**Почему desync «псевдо»:** в CS:GO хитбоксы — капсулы по костям, и
+поворот модели меняет то, куда попадает пуля. В GoldSrc сервер считает
+попадание по коробке `±16 × ±16 × ±36` от `origin`, независимо от
+`angles`. Поворот модели виден визуально (и в демках), но хитбокс не
+двигается. Проверено по `12-ballistics.md` и `SV_HullForEntity`.
 
-В CS:GO хитбокс считается по анимации, и `desync` разводит
-`m_angEyeAngles` и позу на `GetMaxDelta()`.
-
-В GoldSrc (`entity_state_t` + `pev->origin`):
-
-```c
-player hull: mins = {-16,-16,-36}, maxs = {16,16,36}   // стоя
-             mins = {-16,-16,-18}, maxs = {16,16,18}   // присед
-```
-
-**Это коробка.** Она не зависит от анимации. Значит рассинхрона
-«модель ≠ хитбокс» в принципе нет — но `magic pitch` переворачивает
-систему координат, и попасть в голову надо с другой стороны. Это даёт
-практически тот же результат.
+**Почему fake lag работает:** клиент отправляет команды не чаще
+`cl_cmdrate`, а `next_send_time` — та самая граница. Сдвигая её вперёд,
+мы физически не даём движку отправить пакет. Это подтверждено
+дизассемблером (`hw.dll+0x18ECD` clamp 100 и паттерн
+`83 F8 FF 75 0A A1 30 9B D5 02 A3`).
 
 ---
 
 ## Visuals
 
-| фича | | механизм | cvar / API |
+| фича | | механизм | файл |
 |---|---|---|---|
-| ESP box / name / health | ✅ | `HUD_Redraw` + W2S | `pTriAPI->WorldToScreen` |
-| **Skeleton по костям** | ✅ | `m_pbonetransform[128]` | `09-chams.md` |
-| **Chams** | ✅ | `HUD_AddEntity` + `StudioDrawModel` | `rendermode/renderamt` |
-| Glow | ✅ | `renderfx = 20` (`kRenderFxGlowShell`) | `09-chams.md` |
-| **Weapon icons** | ✅ | `WeaponList` usermsg | `16-feature-map.md` п.2 |
-| **Ammo** | ✅ | `CurWeapon` usermsg (`state, id, clip`) | `weapons.cpp:1385` |
-| **Nightmode** | ✅ | `gl_monolights`, `gl_overbright`, `gl_fog` | найденные cvars |
-| **Skybox changer** | ✅ | `sv_skyname` | `hw.dll` |
-| **Flat/blocky текстуры** | ✅ | `gl_picmip`, `r_detailtextures` | `hw.dll` |
-| **Bullet tracer** | ✅ | своя линия W2S + `R_ParticleLine` | `07-render.md` |
-| **Impacts** | ✅ | `pEfxAPI->R_ParticleBox` | `08-events.md` |
-| **Thirdperson** | ⚠️ | `pfnSetViewAngles`, полный override камеры без движка не выйдет | `HUD_Redraw` |
-| Hitmarker | ✅ | свой рендер | — |
-| Spectator list | ✅ | `demo_api->IsPlayingback` + entity scan | `13-hud-layout.md` |
-| Sound ESP / hit sound | ✅ | `pfnPlaySoundByName` | — |
-| Fog | ✅ | `pTriAPI->Fog` / `gl_fog` | `07-render.md` |
+| ESP box | ✅ | 2D-бокс по `world_to_screen` | `sh_esp.cpp` |
+| ESP name/health/armor | ✅ | `cl_entity_t` + `clientdata` | `sh_esp.cpp` |
+| ESP weapon + иконки | ✅ | `WeaponList` из `player.cpp:3415` | `sh_usermsg.cpp` |
+| ESP ammo `clip/clip_max` | ✅ | `CurWeapon` `b,b,b` из `weapons.cpp:1385` | `sh_usermsg.cpp` |
+| ESP distance | ✅ | `len3d(origin − local)` | `sh_esp.cpp` |
+| ESP skeleton | ⚠️ | 2D-проекция по боксу; настоящих костей нет (`studiomodel` недоступен) | `sh_esp.cpp` |
+| ESP head dot / snaplines | ✅ | проекция | `sh_esp.cpp` |
+| Team check / visible only | ✅ | `team` + `sh_player_visible` | `sh_esp.cpp` |
+| **Chams** | ✅ | `HUD_AddEntity`: `rendermode 0`, `renderamt 255` | `sh_hooks.cpp` |
+| **Chams team colors** | ✅ | `rendercolor`: T (255,90,90), CT (90,140,255) | `sh_hooks.cpp` |
+| **Glow** | ✅ | `renderfx 20` + `glow_amount` 20..255 | `sh_hooks.cpp` |
+| **Tracers** | ✅ | линия from→to, затухание по alpha, 2 с | `sh_visuals.cpp` |
+| **Impacts** | ✅ | крестик 2→6 px за 1 с + звук `bullet_hit1.wav` | `sh_visuals.cpp` |
+| **Thirdperson** | ✅ | сдвиг `view_ofs` назад по forward | `sh_visuals.cpp` |
+| **Nightmode World** | ✅ | `gl_monolights`, `gl_fog 1`, `gl_lightholes 0` | `sh_visuals.cpp` |
+| **Nightmode Sky** | ✅ | `gl_overbright` | `sh_visuals.cpp` |
+| **Nightmode Lighting** | ✅ | `gl_flashblend` (порог 0.5) | `sh_visuals.cpp` |
+| **Skybox changer** | ✅ | `sv_skyname`, 12 вариантов, save/restore | `sh_skybox.cpp` |
+| Flat textures | ✅ | `gl_picmip`, `r_detailtextures` | `sh_worldfx.cpp` |
+| Hitmarker | ✅ | usermsg `Health` (падение HP) + `Damage` | `sh_hitmarker.cpp` |
+| Hit sound | ✅ | `pfnPlaySoundByName` по реальному попаданию | `sh_worldfx.cpp` |
+| **Radar hack** | ✅ | свой радар 110×110, масштаб 2000 юнитов | `sh_esp.cpp` |
+| **Spectator list** | ✅ | список мёртвых игроков | `sh_esp.cpp` |
+| **Grenade path** | ✅ | 96 точек, `flVel = (90−pitch)*6`, g=800 | `sh_grenade.cpp` |
+| Fire indicator | ✅ | `weaponanim` 1/2/3 меняется → выстрел врага | `sh_usermsg.cpp` |
+| No flash / no smoke | ✅ | фильтр спрайтов `renderfx` 19/20 | `sh_hooks.cpp` |
+| Indicators | ✅ | список активных фич + choke + shots + fall | `sh_indicators.cpp` |
 
 ---
 
-## Misc
+## Misc / Movement
 
-| фича | | механизм | источник |
+| фича | | механизм | файл |
 |---|---|---|---|
-| **Bhop** | ✅ | `IN_JUMP` в кадре приземления | `12-ballistics.md` п.11 |
-| **Autostrafe** | ✅ | `omega = 90 − 180/(wishspeed/30+1)` | `12-ballistics.md` п.9 |
-| **Quick stop** | ✅ | разворот 180° + forward | п.10 |
-| Edge jump | ✅ | `IN_JUMP` у края (трасс вниз) | — |
-| Fast ladder | ✅ | `movetype == MOVETYPE_FLY` + forward | — |
-| **Super toss** | ✅ | прыжок за кадр до броска | `14-grenades.md` п.5 |
-| Auto pistol | ✅ | `p_pmove->next_primary_attack` | `11-clientdata.md` |
-| Fast reload | ⚠️ | `IN_RELOAD` при `m_fInReload` | — |
-| No fall damage | ❌ | урон считает сервер | — |
-| No flash / no smoke | ⚠️ | скрыть спрайт через `HUD_AddEntity` | — |
-| No scope | ✅ | `IN_ATTACK2` блок | — |
-| Radar hack | ✅ | скан всех entities, без `visible` check | — |
-| **Grenade predict** | ✅ | формула + траектория, оптимум 42° | `14-grenades.md` |
-| **Demo parser** | ✅ | формат `.dem` | `13-hud-layout.md` |
-| Config versioning | ✅ | magic + size | `sh_config.cpp` |
+| **Bhop** | ✅ | снятие `IN_JUMP` по `oldbuttons` для повтора | `sh_movement.cpp` |
+| **Autostrafe** | ✅ | `omega = 90 − 180/(wishspeed/30+1)`, знак по `d_right` | `sh_movement.cpp` |
+| **Quick stop** | ✅ | wishdir назад через `forward/side`, камера не трогается | `sh_movement.cpp` |
+| **Super toss** | ✅ | прыжок при падении + добавка `forwardmove` | `sh_movement.cpp` |
+| Auto pistol | ✅ | `IN_ATTACK` с допуском 0.5 `frametime` | `sh_misc.cpp` |
+| Fast reload | ✅ | `IN_RELOAD` при пустом магазине | `sh_misc.cpp` |
+| Fast ladder | ✅ | движение по `forward` при `movetype == 5` | `sh_misc.cpp` |
+| Edge jump | ✅ | прыжок при `onground == −1` | `sh_misc.cpp` |
+| No scope | ✅ | снятие `IN_ATTACK2` | `sh_misc.cpp` |
+| No recoil | ✅ | `punchangle` в `viewangles` | `sh_rage.cpp` |
+| No spread | ⚠️ | компенсация крена; серверный разброс остаётся | `sh_rage.cpp` |
+| Fall damage warn | ⚠️ | `(v−500)*100/600` — предупреждение, не отмена урона | `sh_movement.cpp` |
+| No fall damage | ❌ | урон считает сервер, `pmove->flFallVelocity` только читается | `01-movement.md` |
 
 ---
 
-## 1. Double tap — почему не как в CS:GO
+## Что невозможно и почему
 
-В CS:GO `double tap` = откат `tickbase` и повторная отправка команд.
-
-В GoldSrc:
-- `usercmd_t` содержит `msec` (длительность) и `random_seed`;
-- сервер исполняет команды **последовательно** в `PM_Move`;
-- `clientdata_t.m_flNextAttack` (`+0x7C`) — таймер атаки, **серверный**.
-
-Что реально можно:
-
-```c
-// если таймер ещё тикает — отпустить и переключиться
-if (next_attack > now)
-{
-    cmd->buttons &= ~IN_ATTACK;
-    cmd->buttons |= IN_ATTACK2;      // смена оружия -> сброс анимации
-}
-```
-
-Это даёт **ускоренную стрельбу** для оружия с самоотдачей (AWP, Deagle),
-но не два выстрела в одном тике. `sh_rage_double_tap` в SDK делает именно
-это и честно называется «switch fire».
-
----
-
-## 2. `WeaponList` и `CurWeapon` — точные форматы
-
-### `WeaponList` (`player.cpp:3415`)
-
-```c
-WRITE_STRING(weapon_name);       // строка с нулём
-WRITE_BYTE(PrimaryAmmoID);
-WRITE_BYTE(PrimaryAmmoMaxAmount);
-WRITE_BYTE(SecondaryAmmoID);
-WRITE_BYTE(SecondaryAmmoMaxAmount);
-WRITE_BYTE(SlotID);
-WRITE_BYTE(NumberInSlot);
-WRITE_BYTE(WeaponID);
-WRITE_BYTE(Flags);
-```
-
-Значит: **сначала строка, потом 8 байт**. Разбор — читать имя до нуля,
-дальше байты по порядку. Это то, что делает `sh_cb_weapon_list`.
-
-### `CurWeapon` (`weapons.cpp:1385`)
-
-```c
-WRITE_BYTE(state);   // 1 = есть цель, 0 = нет
-WRITE_BYTE(m_iId);
-WRITE_BYTE(m_iClip);
-```
-
-`state != 0` — оружие активно. При смене оружия `m_iClientClip`
-сбрасывается и сообщение приходит заново.
-
-Это даёт **точные патроны** без чтения памяти: `clip` приходит от сервера.
-
----
-
-## 3. Чего нет и почему
-
-| фича | причина |
+| фича | почему |
 |---|---|
-| Настоящий double tap | нет tickbase, сервер последователен |
-| CS:GO-десинк | хитбокс = коробка, не анимация |
-| Fake lag > лимита | сервер исполняет всё, ограничение в клиенте |
-| No fall damage | урон в `mp.dll` |
-| Полный thirdperson | камеру держит движок |
-| Замена моделей | `svc_*` прекеш, серверная |
+| Настоящий desync | хитбокс — коробка, поворот модели его не двигает |
+| Double tap как в CS:GO | нет tickbase, `cl_cmdrate` кап 100 |
+| No fall damage | урон на сервере из `-pev->velocity.z` |
+| Отмена серверного разброса | ГПСЧ на сервере, клиент только видит результат |
+| Скелетон по костям | `studiomodel` в `cl_enginefuncs` — `void*`, нет `SetupBones` |
+| Отмена `svc_weaponanim` для врагов | пакет шлёт сервер |
 
 ---
 
-## 4. Итоговая статистика проекта
+## Проверка «на пустышки»
 
-| что | значение |
-|---|---|
-| документов реверса | **17** |
-| строк документации | ~4100 |
-| файлов SDK (`.h` + `.cpp`) | 52 |
-| строк кода SDK | ~6600 |
-| сигнатур (паттернов) | 8/8 уникальны + 1 новый (fakelag) |
-| DLL | 350 KB |
-| экспортов | 4 |
+Каждая фича проверена скриптом: поле конфига должно встречаться в
+`src/`, иначе это мёртвый чекбокс. Найдено и исправлено 25 таких полей:
+
+`no_smoke`, `no_flash`, `radar_hack`, `spectator_list`, `no_fall_damage`,
+`super_toss`, `auto_stop`, `team_check`, `show_local`, `desync`,
+`desync_amount`, `fake_duck`, `micro_move`, `micro_move_speed`,
+`yaw_jitter`, `no_spread`, `no_recoil`, `impact`, `bullet_impact_sound`,
+`col_health`, `col_armor`, `priority`, `hitbox`, `world_color`,
+`sky_color`, `light_color`, `grenade_predict`, `hideshot`.
+
+Плюс найдены функции без вызовов (написаны, но никогда не звались):
+`sh_autowall_damage`, `sh_spread_compute`, `sh_rage_double_tap`,
+`sh_visuals_impact_add`, `sh_fakelag_run` (писал счётчик, не сдвигал
+`next_send_time`), `sh_hitmarker_on_hit` (звался при выстреле, а не при
+попадании).
+
+И удалён мёртвый код: `sh_aimbot.cpp` (201 строка, вытеснен `sh_rage`),
+`sh_bones.cpp` (недоступны кости), дубли `sh_bhop`/`sh_auto_strafe`/
+`sh_no_recoil` в `sh_misc.cpp`.
