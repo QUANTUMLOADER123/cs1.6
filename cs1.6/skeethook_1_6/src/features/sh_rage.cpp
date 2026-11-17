@@ -152,6 +152,13 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
         cmd->viewangles.y += sh_angle_delta(want.y, cmd->viewangles.y) / smooth;
     }
 
+    if (g_cfg.aimbot.auto_stop && sh_rage_should_fire(r))
+    {
+        cmd->forwardmove = 0.0f;
+        cmd->sidemove = 0.0f;
+        cmd->buttons &= ~2;
+    }
+
     if (sh_rage_should_fire(r))
     {
         cmd->buttons |= 1;
