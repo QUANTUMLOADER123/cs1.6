@@ -82,6 +82,27 @@ void sh_fakelag_run(sh_usercmd_t *cmd)
 
     g_next_send_time = *(volatile f32 *)g_next_send_va;
 
+    f32 now = g_pmove ? g_pmove->time : 0.0f;
+
+    if (g_next_send_time > now + 1.0f)
+        return;
+
     if (!sh_fakelag_should_choke())
+    {
         g_choke_counter = 0;
+        return;
+    }
+
+    f32 cmdrate = 100.0f;
+
+    if (g_cfg.antiaim.fake_lag_ticks > 0)
+        cmdrate = 100.0f / (f32)g_cfg.antiaim.fake_lag_ticks;
+
+    if (cmdrate < 5.0f)
+        cmdrate = 5.0f;
+
+    f32 interval = 1.0f / cmdrate;
+
+    if (interval > 0.0f && interval < 1.0f)
+        *(volatile f32 *)g_next_send_va = now + interval;
 }
