@@ -30,3 +30,4 @@ f32 sh_sin(f32 rad);
 f32 sh_cos(f32 rad);
 f32 sh_atan(f32 v);
 f32 sh_atan2(f32 y, f32 x);
+f32 sh_acos(f32 v);

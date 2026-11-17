@@ -38,6 +38,9 @@ typedef struct sh_aimbot_cfg
     i32 priority;
     f32 min_damage;
     i32 key;
+    qbool double_tap;
+    qbool penetration;
+    qbool auto_stop;
 } sh_aimbot_cfg;
 
 typedef struct sh_antiaim_cfg

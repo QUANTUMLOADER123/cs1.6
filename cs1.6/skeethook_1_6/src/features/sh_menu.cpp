@@ -201,7 +201,7 @@ static void sh_menu_draw_rage(f32 x, f32 y)
     sh_menu_checkbox(x + colw, cy, "auto wall", &g_cfg.aimbot.auto_wall);
     cy += row;
 
-    sh_menu_checkbox(x, cy, "visible check", &g_cfg.aimbot.visible_check);
+    sh_menu_checkbox(x, cy, "penetration", &g_cfg.aimbot.penetration);
     cy += row + 6.0f * s;
 
     sh_menu_slider(x, cy, colw, "fov", &g_cfg.aimbot.fov, 1.0f, 180.0f, "");

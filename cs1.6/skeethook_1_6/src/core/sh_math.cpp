@@ -276,3 +276,22 @@ f32 sh_atan2(f32 y, f32 x)
 
     return (x < 0.0f) ? (a + ((y >= 0.0f) ? sh_pi : -sh_pi)) : a;
 }
+
+f32 sh_acos(f32 v)
+{
+    if (v >= 1.0f)
+        return 0.0f;
+    if (v <= -1.0f)
+        return sh_pi;
+
+    f32 ax = (v < 0.0f) ? -v : v;
+    f32 r = sh_sqrt(1.0f - ax);
+
+    f32 a = -0.0187293f;
+    a = a * ax + 0.0742610f;
+    a = a * ax - 0.2121144f;
+    a = a * ax + 1.5707288f;
+    a = a * r;
+
+    return (v < 0.0f) ? (sh_pi - a) : a;
+}
