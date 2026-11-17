@@ -154,6 +154,8 @@ typedef struct sh_misc_cfg
     qbool no_scope;
     qbool crosshair;
     qbool radar_hack;
+    qbool radar_rotate;
+    qbool radar_height;
 } sh_misc_cfg;
 
 typedef struct sh_movement_cfg

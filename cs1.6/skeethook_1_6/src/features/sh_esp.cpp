@@ -850,6 +850,21 @@ void sh_radar_draw(void)
         f32 dx = p->origin.x - local->origin.x;
         f32 dy = p->origin.y - local->origin.y;
 
+        f32 dz = p->origin.z - local->origin.z;
+
+        if (g_cfg.misc.radar_rotate && g_pmove)
+        {
+            f32 ry = g_pmove->angles.y * 0.01745329f;
+            f32 cs = sh_cos(ry);
+            f32 sn = sh_sin(ry);
+
+            f32 rx = dx * sn - dy * cs;
+            f32 ryl = dx * cs + dy * sn;
+
+            dx = rx;
+            dy = ryl;
+        }
+
         f32 px = center_x + dx * scale;
         f32 py = center_y - dy * scale;
 
@@ -862,6 +877,14 @@ void sh_radar_draw(void)
                               : (col4_t){ 255, 90, 90, 255 };
 
         sh_draw_rect(px - 1.5f, py - 1.5f, 3.0f, 3.0f, c);
+
+        if (g_cfg.misc.radar_height)
+        {
+            if (dz > 64.0f)
+                sh_draw_line(px - 2.0f, py - 3.5f, px + 2.0f, py - 3.5f, 1.0f, c);
+            else if (dz < -64.0f)
+                sh_draw_line(px - 2.0f, py + 3.5f, px + 2.0f, py + 3.5f, 1.0f, c);
+        }
     }
 }
 
