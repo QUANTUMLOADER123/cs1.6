@@ -5,6 +5,9 @@
 #include "../../include/sh_sdk.h"
 #include "../../include/sh_scanner.h"
 #include "../../include/sh_font.h"
+#include "../../include/sh_movement.h"
+#include "../../include/sh_ballistics.h"
+#include "../../include/sh_visuals.h"
 
 
 #include <windows.h>
@@ -109,6 +112,10 @@ i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
     if (g_cfg.antiaim.enabled)
         sh_antiaim_run(cmd);
 
+    sh_movement_run(cmd);
+
+    sh_visuals_thirdperson(cmd);
+
     sh_misc_run(cmd);
 
     return result;
@@ -145,8 +152,12 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 
     sh_render_begin(w, h);
 
+    sh_visuals_effects_tick(time);
+
     if (g_cfg.visuals.enabled)
         sh_esp_run();
+
+    sh_visuals_effects_draw();
 
     sh_menu_draw();
 

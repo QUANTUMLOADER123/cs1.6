@@ -152,12 +152,6 @@ void sh_misc_run(sh_usercmd_t *cmd)
     if (!cmd)
         return;
 
-    if (g_cfg.misc.bhop)
-        sh_bhop(cmd);
-
-    if (g_cfg.misc.auto_strafe)
-        sh_auto_strafe(cmd);
-
     if (g_cfg.misc.edge_jump)
         sh_edge_jump(cmd);
 
@@ -166,9 +160,6 @@ void sh_misc_run(sh_usercmd_t *cmd)
 
     if (g_cfg.misc.auto_pistol)
         sh_auto_pistol(cmd);
-
-    if (g_cfg.misc.no_recoil)
-        sh_no_recoil(cmd);
 
     if (g_cfg.misc.fast_reload)
         sh_fast_reload(cmd);

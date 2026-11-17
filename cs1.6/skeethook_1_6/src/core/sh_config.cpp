@@ -27,6 +27,25 @@ void sh_config_defaults(void)
     g_cfg.aimbot.min_damage = 25.0f;
     g_cfg.aimbot.key = 0;
 
+    g_cfg.movement.autostrafe = (qbool)1;
+    g_cfg.movement.quick_stop = (qbool)0;
+    g_cfg.movement.bhop = (qbool)1;
+    g_cfg.movement.auto_jump = (qbool)1;
+    g_cfg.movement.super_toss = (qbool)0;
+    g_cfg.movement.super_toss_power = 50.0f;
+
+    g_cfg.visuals.nightmode = (qbool)0;
+    g_cfg.visuals.col_world = (col4_t){ 30, 35, 40, 255 };
+    g_cfg.visuals.col_sky = (col4_t){ 15, 20, 30, 255 };
+    g_cfg.visuals.col_light = (col4_t){ 180, 180, 180, 255 };
+    g_cfg.visuals.tracer = (qbool)0;
+    g_cfg.visuals.col_tracer = (col4_t){ 255, 80, 80, 200 };
+    g_cfg.visuals.impact = (qbool)0;
+    g_cfg.visuals.col_impact = (col4_t){ 255, 255, 255, 200 };
+    g_cfg.visuals.thirdperson = (qbool)0;
+    g_cfg.visuals.thirdperson_dist = 150.0f;
+    g_cfg.visuals.spectator_list = (qbool)0;
+
     g_cfg.antiaim.enabled = (qbool)0;
     g_cfg.antiaim.pitch_mode = 0;
     g_cfg.antiaim.yaw_mode = 0;

@@ -203,3 +203,76 @@ qbool sh_world_to_screen(const vec3_t *origin, vec2_t *out)
     out->y = (1.0f - ny) * 0.5f * (f32)sh;
     return true;
 }
+
+f32 sh_sqrt(f32 v)
+{
+    if (v <= 0.0f)
+        return 0.0f;
+
+    f32 x = v;
+    f32 y = 1.0f;
+
+    for (i32 i = 0; i < 24; ++i)
+        y = (y + x / y) * 0.5f;
+
+    return y;
+}
+
+f32 sh_sin(f32 rad)
+{
+    while (rad > sh_pi)  rad -= 2.0f * sh_pi;
+    while (rad < -sh_pi) rad += 2.0f * sh_pi;
+
+    f32 t = rad;
+    f32 s = rad;
+    f32 t2 = rad * rad;
+
+    for (i32 i = 1; i < 9; ++i)
+    {
+        t *= -t2 / ((f32)(2 * i) * (f32)(2 * i + 1));
+        s += t;
+    }
+
+    return s;
+}
+
+f32 sh_cos(f32 rad)
+{
+    return sh_sin(rad + sh_pi * 0.5f);
+}
+
+f32 sh_atan(f32 v)
+{
+    f32 ax = (v < 0.0f) ? -v : v;
+    f32 s = 0.0f;
+    f32 x = v;
+
+    if (ax > 1.0f)
+    {
+        x = 1.0f / v;
+        s = (v > 0.0f) ? (sh_pi * 0.5f) : (-sh_pi * 0.5f);
+    }
+
+    f32 x2 = x * x;
+    f32 t = x;
+    f32 r = 0.0f;
+
+    for (i32 i = 1; i < 40; i += 2)
+    {
+        f32 term = t / (f32)i;
+        r += ((i / 2) % 2 == 0) ? term : -term;
+        t *= x2;
+    }
+
+    return (ax > 1.0f) ? (s - r) : r;
+}
+
+f32 sh_atan2(f32 y, f32 x)
+{
+    if (x == 0.0f)
+        return (y > 0.0f) ? (sh_pi * 0.5f) : ((y < 0.0f) ? (-sh_pi * 0.5f) : 0.0f);
+
+    f32 a = sh_atan(y / x);
+
+    return (x < 0.0f) ? (a + ((y >= 0.0f) ? sh_pi : -sh_pi)) : a;
+}

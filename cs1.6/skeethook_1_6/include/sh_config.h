@@ -85,6 +85,22 @@ typedef struct sh_visuals_cfg
     col4_t col_armor;
     col4_t col_weapon;
     col4_t col_skeleton;
+    qbool nightmode;
+    qbool skybox_change;
+    i32 skybox_index;
+    qbool world_color;
+    col4_t col_world;
+    qbool sky_color;
+    col4_t col_sky;
+    qbool light_color;
+    col4_t col_light;
+    qbool tracer;
+    col4_t col_tracer;
+    qbool impact;
+    col4_t col_impact;
+    qbool thirdperson;
+    f32 thirdperson_dist;
+    qbool spectator_list;
 } sh_visuals_cfg;
 
 typedef struct sh_misc_cfg
@@ -109,6 +125,16 @@ typedef struct sh_misc_cfg
     qbool spectator_list;
 } sh_misc_cfg;
 
+typedef struct sh_movement_cfg
+{
+    qbool autostrafe;
+    qbool quick_stop;
+    qbool bhop;
+    qbool auto_jump;
+    qbool super_toss;
+    f32 super_toss_power;
+} sh_movement_cfg;
+
 typedef struct sh_esp_shared
 {
     qbool enemy_only;
@@ -125,6 +151,7 @@ typedef struct sh_config
     sh_antiaim_cfg antiaim;
     sh_visuals_cfg visuals;
     sh_misc_cfg misc;
+    sh_movement_cfg movement;
     sh_esp_shared esp;
 } sh_config;
 

@@ -1,4 +1,5 @@
 #include "../../include/sh_config.h"
+#include "../../include/sh_movement.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_types.h"
 #include "../../include/sh_sdk.h"
@@ -12,7 +13,7 @@ static i32 g_visible;
 static i32 g_selected;
 
 static const char *g_tabs[] = {
-    "rage", "antiaim", "visuals", "misc", "settings"
+    "rage", "antiaim", "visuals", "misc", "movement", "settings"
 };
 
 static void sh_menu_toggle(void)
@@ -174,10 +175,6 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_section("movement", x, y);
 
     f32 cy = y + 20.0f * s;
-    sh_menu_checkbox(x, cy, "bunny hop", &g_cfg.misc.bhop);
-    sh_menu_checkbox(x + colw, cy, "auto strafe", &g_cfg.misc.auto_strafe);
-    cy += row;
-
     sh_menu_checkbox(x, cy, "edge jump", &g_cfg.misc.edge_jump);
     sh_menu_checkbox(x + colw, cy, "fast ladder", &g_cfg.misc.fast_ladder);
     cy += row;
@@ -206,6 +203,46 @@ static void sh_menu_draw_misc(f32 x, f32 y)
 
     sh_menu_checkbox(x, cy, "no scope", &g_cfg.misc.no_scope);
     sh_menu_checkbox(x + colw, cy, "crosshair", &g_cfg.misc.crosshair);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "radar hack", &g_cfg.misc.radar_hack);
+    sh_menu_checkbox(x + colw, cy, "spectator list", &g_cfg.visuals.spectator_list);
+}
+
+static f32 g_movement_shots_dbg;
+
+static void sh_menu_draw_movement(f32 x, f32 y)
+{
+    f32 s = sh_scale();
+    f32 row = 20.0f * s;
+    f32 colw = 210.0f * s;
+
+    sh_menu_section("strafe", x, y);
+
+    f32 cy = y + 20.0f * s;
+    sh_menu_checkbox(x, cy, "auto strafe", &g_cfg.movement.autostrafe);
+    sh_menu_checkbox(x + colw, cy, "quick stop", &g_cfg.movement.quick_stop);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "bunny hop", &g_cfg.movement.bhop);
+    sh_menu_checkbox(x + colw, cy, "auto jump", &g_cfg.movement.auto_jump);
+    cy += row + 8.0f * s;
+
+    sh_menu_section("grenade", x, cy);
+    cy += 20.0f * s;
+
+    sh_menu_checkbox(x, cy, "super toss", &g_cfg.movement.super_toss);
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "toss power", &g_cfg.movement.super_toss_power, 0.0f, 100.0f, "%.0f");
+    cy += row + 8.0f * s;
+
+    sh_menu_section("info", x, cy);
+    cy += 20.0f * s;
+
+    g_movement_shots_dbg = (f32)sh_shots_count();
+
+    sh_menu_slider(x, cy, colw, "shots", &g_movement_shots_dbg, 0.0f, 40.0f, "%.0f");
 }
 
 static void sh_menu_draw_settings(f32 x, f32 y)
@@ -294,6 +331,7 @@ void sh_menu_draw(void)
     case 1: sh_menu_draw_antiaim(cx, cy); break;
     case 2: sh_menu_draw_visuals(cx, cy); break;
     case 3: sh_menu_draw_misc(cx, cy); break;
+    case 4: sh_menu_draw_movement(cx, cy); break;
     default: sh_menu_draw_settings(cx, cy); break;
     }
 }

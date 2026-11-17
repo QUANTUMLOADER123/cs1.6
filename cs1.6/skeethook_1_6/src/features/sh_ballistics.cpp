@@ -1,0 +1,172 @@
+#include "../../include/sh_ballistics.h"
+#include "../../include/sh_math.h"
+#include "../../include/sh_sdk.h"
+
+static const u32 g_seed_table[256] =
+{
+    28985u, 27138u, 26457u, 9451u, 17764u, 10909u, 28790u, 8716u, 6361u, 4853u, 17798u, 21977u,
+    19643u, 20662u, 10834u, 20103u, 27067u, 28634u, 18623u, 25849u, 8576u, 26234u, 23887u, 18228u,
+    32587u, 4836u, 3306u, 1811u, 3035u, 24559u, 18399u, 315u, 26766u, 907u, 24102u, 12370u,
+    9674u, 2972u, 10472u, 16492u, 22683u, 11529u, 27968u, 30406u, 13213u, 2319u, 23620u, 16823u,
+    10013u, 23772u, 21567u, 1251u, 19579u, 20313u, 18241u, 30130u, 8402u, 20807u, 27354u, 7169u,
+    21211u, 17293u, 5410u, 19223u, 10255u, 22480u, 27388u, 9946u, 15628u, 24389u, 17308u, 2370u,
+    9530u, 31683u, 25927u, 23567u, 11694u, 26397u, 32602u, 15031u, 18255u, 17582u, 1422u, 28835u,
+    23607u, 12597u, 20602u, 10138u, 5212u, 1252u, 10074u, 23166u, 19823u, 31667u, 5902u, 24630u,
+    18948u, 14330u, 14950u, 8939u, 23540u, 21311u, 22428u, 22391u, 3583u, 29004u, 30498u, 18714u,
+    4278u, 2437u, 22430u, 3439u, 28313u, 23161u, 25396u, 13471u, 19324u, 15287u, 2563u, 18901u,
+    13103u, 16867u, 9714u, 14322u, 15197u, 26889u, 19372u, 26241u, 31925u, 14640u, 11497u, 8941u,
+    10056u, 6451u, 28656u, 10737u, 13874u, 17356u, 8281u, 25937u, 1661u, 4850u, 7448u, 12744u,
+    21826u, 5477u, 10167u, 16705u, 26897u, 8839u, 30947u, 27978u, 27283u, 24685u, 32298u, 3525u,
+    12398u, 28726u, 9475u, 10208u, 617u, 13467u, 22287u, 2376u, 6097u, 26312u, 2974u, 9114u,
+    21787u, 28010u, 4725u, 15387u, 3274u, 10762u, 31695u, 17320u, 18324u, 12441u, 16801u, 27376u,
+    22464u, 7500u, 5666u, 18144u, 15314u, 31914u, 31627u, 6495u, 5226u, 31203u, 2331u, 4668u,
+    12650u, 18275u, 351u, 7268u, 31319u, 30119u, 7600u, 2905u, 13826u, 11343u, 13053u, 15583u,
+    30055u, 31093u, 5067u, 761u, 9685u, 11070u, 21369u, 27155u, 3663u, 26542u, 20169u, 12161u,
+    15411u, 30401u, 7580u, 31784u, 8985u, 29367u, 20989u, 14203u, 29694u, 21167u, 10337u, 1706u,
+    28578u, 887u, 3373u, 19477u, 14382u, 675u, 7033u, 15111u, 26138u, 12252u, 30996u, 21409u,
+    25678u, 18555u, 13256u, 23316u, 22407u, 16727u, 991u, 9236u, 5373u, 29402u, 6117u, 15241u,
+    27715u, 19291u, 19888u, 19847u
+};
+
+static u32 g_gl_seed;
+
+static void sh_u_srand(u32 seed)
+{
+    g_gl_seed = g_seed_table[seed & 0xFF];
+}
+
+static u32 sh_u_random(void)
+{
+    g_gl_seed *= 69069u;
+    g_gl_seed += g_seed_table[g_gl_seed & 0xFF] + 1u;
+    return g_gl_seed & 0xFFFFFFFu;
+}
+
+static u32 sh_float_bits(f32 v)
+{
+    union { f32 f; u32 u; } c;
+    c.f = v;
+    return c.u;
+}
+
+f32 sh_shared_random_float(u32 seed, f32 low, f32 high)
+{
+    u32 range = (u32)(high - low);
+
+    sh_u_srand(seed + sh_float_bits(low) + sh_float_bits(high));
+
+    sh_u_random();
+    sh_u_random();
+
+    if (range)
+    {
+        i32 tensixrand = sh_u_random() & 0xFFFF;
+        f32 offset = (f32)tensixrand / 65536.0f;
+        return low + offset * (f32)range;
+    }
+
+    return low;
+}
+
+void sh_spread_compute(i32 seed, f32 spread, vec2_t *out)
+{
+    f32 x = sh_shared_random_float((u32)seed, -0.5f, 0.5f)
+          + sh_shared_random_float((u32)seed + 1u, -0.5f, 0.5f);
+    f32 y = sh_shared_random_float((u32)seed + 2u, -0.5f, 0.5f)
+          + sh_shared_random_float((u32)seed + 3u, -0.5f, 0.5f);
+
+    out->x = x * spread;
+    out->y = y * spread;
+}
+
+static const sh_recoil_t g_recoil[] =
+{
+    { 0,  1.5f,  0.45f,  0.225f, 0.05f,  6.5f,  2.5f,  7 },
+    { 0,  1.0f,  0.45f,  0.200f, 0.05f,  5.0f,  2.5f,  7 },
+    { 0,  0.9f,  0.475f, 0.180f, 0.0475f,4.5f,  2.375f,8 },
+    { 0,  1.8f,  0.65f,  0.360f, 0.13f,  9.0f,  6.5f,  5 },
+    { 0,  2.0f,  0.0f,   0.400f, 0.0f,  10.0f,  0.0f,  4 }
+};
+
+const sh_recoil_t *sh_recoil_for(i32 weapon_id)
+{
+    if (weapon_id == 7 || weapon_id == 8 || weapon_id == 13 || weapon_id == 15)
+        return &g_recoil[4];
+
+    if (weapon_id == 17)
+        return &g_recoil[3];
+
+    if (weapon_id == 5 || weapon_id == 10 || weapon_id == 16)
+        return &g_recoil[2];
+
+    if (weapon_id == 4 || weapon_id == 11 || weapon_id == 12 || weapon_id == 14)
+        return &g_recoil[1];
+
+    return &g_recoil[0];
+}
+
+void sh_recoil_apply(i32 shots, const sh_recoil_t *r, vec2_t *punch)
+{
+    if (!r || !punch)
+        return;
+
+    f32 up = r->up_base + r->up_mod * (f32)shots;
+    f32 lateral = r->lateral_base + r->lateral_mod * (f32)shots;
+
+    punch->x -= up;
+    punch->y += lateral;
+}
+
+void sh_recoil_compensate(vec3_t *viewangles, i32 weapon_id, i32 shots)
+{
+    const sh_recoil_t *r = sh_recoil_for(weapon_id);
+    vec2_t punch = { 0.0f, 0.0f };
+
+    sh_recoil_apply(shots, r, &punch);
+
+    viewangles->x -= punch.x;
+    viewangles->y -= punch.y;
+    viewangles->z = 0.0f;
+}
+
+f32 sh_penetration_modifier(i32 char_texture)
+{
+    switch (char_texture)
+    {
+    case 67:
+        return 0.15f;
+    case 84:
+        return 0.25f;
+    case 71:
+        return 0.50f;
+    case 86:
+        return 0.50f;
+    case 88:
+        return 0.65f;
+    case 80:
+        return 0.40f;
+    default:
+        return 1.0f;
+    }
+}
+
+f32 sh_penetration_damage_modifier(i32 char_texture)
+{
+    switch (char_texture)
+    {
+    case 67:
+        return 0.2f;
+    case 71:
+        return 0.4f;
+    case 86:
+        return 0.45f;
+    case 88:
+        return 0.3f;
+    case 80:
+        return 0.45f;
+    case 87:
+        return 0.6f;
+    default:
+        return 0.5f;
+    }
+}
