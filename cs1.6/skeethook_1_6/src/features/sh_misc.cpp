@@ -39,36 +39,6 @@ static void sh_bhop(sh_usercmd_t *cmd)
     g_jump_held = !g_jump_held;
 }
 
-static void sh_auto_strafe(sh_usercmd_t *cmd)
-{
-    if (!g_pmove)
-        return;
-
-    if (g_pmove->flags & sh_fl_onground)
-        return;
-
-    f32 speed = sh_len2d(&g_pmove->velocity);
-    if (speed < 5.0f)
-        return;
-
-    vec3_t fwd;
-    sh_angle_vectors(&cmd->viewangles, &fwd, 0, 0);
-
-    f32 wish_speed = fwd.x * cmd->forwardmove + fwd.y * cmd->sidemove;
-    if (wish_speed == 0.0f)
-    {
-        cmd->forwardmove = 400.0f;
-        cmd->sidemove = 0.0f;
-        return;
-    }
-
-    f32 accel_dir = atan2f(fwd.y, fwd.x);
-    accel_dir += (f32)sh_pi * 0.5f;
-
-    f32 move = (wish_speed > 0.0f) ? 400.0f : -400.0f;
-    cmd->forwardmove = cosf(accel_dir) * move;
-    cmd->sidemove = sinf(accel_dir) * move;
-}
 
 static void sh_edge_jump(sh_usercmd_t *cmd)
 {
@@ -130,15 +100,6 @@ static void sh_auto_pistol(sh_usercmd_t *cmd)
     cmd->buttons |= sh_in_attack;
 }
 
-static void sh_no_recoil(sh_usercmd_t *cmd)
-{
-    if (!g_pmove)
-        return;
-
-    cmd->viewangles.x -= g_pmove->punchangle.x;
-    cmd->viewangles.y -= g_pmove->punchangle.y;
-    cmd->viewangles.z -= g_pmove->punchangle.z;
-}
 
 static void sh_fast_reload(sh_usercmd_t *cmd)
 {
