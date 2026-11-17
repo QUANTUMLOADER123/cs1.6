@@ -12,6 +12,71 @@ static const char *g_weapon_names[] = {
     "m249", "m3", "m4a1", "tmp", "g3sg1", "flashbang", "deagle",
     "sg552", "ak47", "knife"};
 
+static i32 sh_weapon_from_model(i32 model_index)
+{
+    if (model_index <= 0)
+        return 0;
+
+    if (!g_studio_api || !g_studio_api->get_model_by_index)
+        return 0;
+
+    sh_model_t *m = g_studio_api->get_model_by_index(model_index);
+
+    if (!m || !m->name[0])
+        return 0;
+
+    const char *base = m->name;
+    const char *p = m->name;
+
+    while (*p)
+    {
+        if (*p == '/' || *p == '\\')
+            base = p + 1;
+
+        ++p;
+    }
+
+    if (base[0] == 'w' && base[1] == '_')
+        base += 2;
+    else if (base[0] == 'v' && base[1] == '_')
+        base += 2;
+
+    static const char *names[] = {
+        0, "p228", "glock", "scout", "hegrenade", "xm1014", "c4",
+        "mac10", "aug", "smokegrenade", "elite", "fiveseven", "ump45",
+        "sg550", "galil", "famas", "usp", "glock18", "awp", "mp5navy",
+        "m249", "m3", "m4a1", "tmp", "g3sg1", "flashbang", "deagle",
+        "sg552", "ak47", "knife", "p90"
+    };
+
+    for (i32 i = 1; i < (i32)sh_countof(names); ++i)
+    {
+        const char *want = names[i];
+
+        if (!want)
+            continue;
+
+        i32 j = 0;
+
+        for (; j < 32; ++j)
+        {
+            char a = base[j];
+            char b = want[j];
+
+            if (a >= 'A' && a <= 'Z') a = (char)(a + 32);
+            if (b >= 'A' && b <= 'Z') b = (char)(b + 32);
+
+            if (a != b)
+                break;
+
+            if (!a)
+                return i;
+        }
+    }
+
+    return 0;
+}
+
 static const char *sh_weapon_name_from_id(i32 id)
 {
     if (id < 0 || id >= (i32)sh_countof(g_weapon_names))
@@ -56,7 +121,7 @@ static void sh_player_fill(sh_player_t *p, i32 index)
     p->maxs = ent->curstate.maxs;
     p->health = ent->curstate.health;
     p->armor = 0;
-    p->weapon_id = ent->curstate.weaponmodel;
+    p->weapon_id = sh_weapon_from_model(ent->curstate.weaponmodel);
 
     if (g_engfuncs && g_engfuncs->pfnGetPlayerInfo)
         g_engfuncs->pfnGetPlayerInfo(index, &p->info);
@@ -92,7 +157,7 @@ void sh_players_collect(void)
     if (!g_get_entity)
         return;
 
-    for (i32 i = 0; i < SH_MAX_ENTITIES; ++i)
+    for (i32 i = 0; i < 33; ++i)
     {
         g_players[i].ent = 0;
         g_players[i].index = i;

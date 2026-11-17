@@ -6,7 +6,7 @@
 #include <windows.h>
 #include "../ext/minhook/include/MinHook.h"
 
-static sh_studio_api_t *g_studio;
+sh_studio_api_t *g_studio_api;
 static sh_bones_draw_orig_fn g_draw_orig;
 static sh_bone_snapshot_t g_bones[sh_max_bone_players];
 
@@ -60,7 +60,7 @@ static qbool sh_name_eq(const char *a, const char *b)
 
 void sh_bones_studio_set(sh_studio_api_t *api)
 {
-    g_studio = api;
+    g_studio_api = api;
 }
 
 void sh_bones_clear(void)
@@ -132,10 +132,10 @@ static void sh_bones_build_map(sh_bone_snapshot_t *snap,
 
 const sh_studio_header_t *sh_bones_current_header(void)
 {
-    if (!g_studio || !g_studio->get_current_entity || !g_studio->mod_extradata)
+    if (!g_studio_api || !g_studio_api->get_current_entity || !g_studio_api->mod_extradata)
         return 0;
 
-    sh_cl_entity_t *ent = g_studio->get_current_entity();
+    sh_cl_entity_t *ent = g_studio_api->get_current_entity();
 
     if (!ent)
         return 0;
@@ -145,7 +145,7 @@ const sh_studio_header_t *sh_bones_current_header(void)
     if (!model)
         return 0;
 
-    return (const sh_studio_header_t *)g_studio->mod_extradata(model);
+    return (const sh_studio_header_t *)g_studio_api->mod_extradata(model);
 }
 
 static i32 sh_bones_fill(sh_bone_snapshot_t *snap, void ***raw, i32 n)
@@ -176,7 +176,7 @@ static i32 sh_bones_fill(sh_bone_snapshot_t *snap, void ***raw, i32 n)
 
 void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
 {
-    if (!g_studio || !g_studio->studio_get_bone_transform)
+    if (!g_studio_api || !g_studio_api->studio_get_bone_transform)
         return;
 
     if (index <= 0 || index >= sh_max_bone_players || !hdr)
@@ -185,7 +185,7 @@ void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
     if (hdr->numbones <= 0 || hdr->boneindex <= 0)
         return;
 
-    void ***raw = (void ***)g_studio->studio_get_bone_transform();
+    void ***raw = (void ***)g_studio_api->studio_get_bone_transform();
 
     if (!raw)
         return;

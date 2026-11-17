@@ -502,6 +502,19 @@ typedef char sh_client_data_size_check[(sizeof(sh_client_data_t) == 0x1DC) ? 1 :
 
 
 
+typedef struct sh_model_s
+{
+    char name[64];
+    i32 needload;
+    i32 type;
+    i32 numframes;
+    i32 synctype;
+    i32 flags;
+    vec3_t mins;
+    vec3_t maxs;
+    f32 radius;
+} sh_model_t;
+
 typedef struct sh_studio_bone_s
 {
     char name[32];
@@ -562,7 +575,7 @@ typedef struct sh_studio_api_s
     void *load_cache_file;
     void *mod_for_name;
     void *(*mod_extradata)(void *mod);
-    void *get_model_by_index;
+    sh_model_t *(*get_model_by_index)(i32 index);
     sh_cl_entity_t *(*get_current_entity)(void);
     void *player_info;
     void *get_player_state;
@@ -762,6 +775,7 @@ extern sh_engfuncs_t *g_engfuncs;
 extern sh_triapi_t *g_tri_api;
 extern sh_engfuncs_t *g_engfuncs;
 extern sh_playermove_t *g_pmove;
+extern sh_studio_api_t *g_studio_api;
 extern sh_globalvars_t *g_globals;
 extern void **g_entity_list;
 extern sh_cl_entity_t *(*g_get_entity)(i32 index);
