@@ -173,10 +173,34 @@ static void *sh_find_export_body(const char *module, const char *name)
     return p;
 }
 
+static i32 __cdecl sh_trace_wrapper(vec3_t start, vec3_t end, i32 flags,
+                                   i32 ignore_pe)
+{
+    if (!g_pmove || !g_pmove->pm_player_trace)
+        return 0;
+
+    sh_pmtrace_t tr = g_pmove->pm_player_trace((f32 *)&start, (f32 *)&end,
+                                               flags, ignore_pe);
+
+    if (tr.fraction >= 1.0f && !tr.startsolid && !tr.allsolid)
+        return 0;
+
+    if (tr.ent > 0)
+        return tr.hitgroup > 0 ? tr.hitgroup : 1;
+
+    return 0;
+}
+
 static void sh_engine_trace_setup(void)
 {
-    if (!g_pmove || g_pmove->numphysent <= 0)
+    if (!g_pmove)
         return;
+
+    if (!g_pmove->pm_player_trace)
+        return;
+
+    if (!g_trace_fn)
+        sh_set_trace_fn(sh_trace_wrapper);
 }
 
 static qbool sh_is_ready(void)
@@ -294,6 +318,8 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 i32 __cdecl sh_player_move_hook(sh_playermove_t *pmove, i32 server)
 {
     g_pmove = pmove;
+
+    sh_engine_trace_setup();
 
     if (g_player_move_orig)
         g_player_move_orig(pmove, server);

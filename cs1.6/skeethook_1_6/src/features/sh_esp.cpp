@@ -19,7 +19,7 @@ typedef struct sh_box_s
 static qbool sh_make_box(const sh_player_t *p, sh_box_t *box)
 {
     vec3_t top = p->origin;
-    top.z += (p->ent->curstate.eflags & sh_fl_ducking) ? 54.0f : 72.0f;
+    top.z += (p->ent->curstate.usehull == 1) ? 54.0f : 72.0f;
 
     vec3_t bottom = p->origin;
     bottom.z -= 12.0f;
@@ -372,10 +372,10 @@ void sh_esp_run(void)
     if (!g_cfg.visuals.enabled)
         return;
 
-    i32 count = sh_players_count();
-    for (i32 i = 0; i < count; ++i)
+    for (i32 i = 1; i <= 32; ++i)
     {
         sh_player_t *p = sh_player_get(i);
+
         if (p)
             sh_esp_draw_player(p);
     }

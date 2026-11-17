@@ -76,7 +76,7 @@ static void sh_player_fill(sh_player_t *p, i32 index)
     p->distance = sh_len3d(&delta);
 
     p->head = p->origin;
-    p->head.z += sh_eye_height(ent->curstate.eflags);
+    p->head.z += (ent->curstate.usehull == 1) ? 12.0f : 28.0f;
     p->visible = false;
 }
 
@@ -94,23 +94,36 @@ void sh_players_collect(void)
 
     for (i32 i = 0; i < SH_MAX_ENTITIES; ++i)
     {
-        if (g_player_count >= SH_MAX_ENTITIES)
-            break;
+        g_players[i].ent = 0;
+        g_players[i].index = i;
+        g_players[i].health = 0;
+        g_players[i].visible = 0;
+    }
 
+    g_player_count = 0;
+
+    for (i32 i = 1; i <= 32; ++i)
+    {
         sh_cl_entity_t *ent = sh_get_entity(i);
+
         if (!ent || !ent->player)
             continue;
+
         if (i == g_local_index)
             continue;
 
-        sh_player_t *p = &g_players[g_player_count];
+        sh_player_t *p = &g_players[i];
         sh_player_fill(p, i);
+
         if (p->ent)
             ++g_player_count;
     }
 
-    for (i32 i = 0; i < g_player_count; ++i)
-        g_players[i].visible = sh_player_visible(&g_players[i]);
+    for (i32 i = 1; i <= 32; ++i)
+    {
+        if (g_players[i].ent)
+            g_players[i].visible = sh_player_visible(&g_players[i]);
+    }
 }
 
 i32 sh_players_count(void)
@@ -120,14 +133,31 @@ i32 sh_players_count(void)
 
 sh_player_t *sh_player_get(i32 index)
 {
-    if (index < 0 || index >= g_player_count)
+    if (index <= 0 || index >= SH_MAX_ENTITIES)
         return 0;
+
+    if (!g_players[index].ent)
+        return 0;
+
     return &g_players[index];
 }
 
 sh_player_t *sh_player_local(void)
 {
-    return 0;
+    if (!g_pmove)
+        return 0;
+
+    i32 idx = g_pmove->player_index;
+
+    if (idx <= 0 || idx >= SH_MAX_ENTITIES)
+        return 0;
+
+    if (g_players[idx].ent)
+        return &g_players[idx];
+
+    sh_player_fill(&g_players[idx], idx);
+
+    return g_players[idx].ent ? &g_players[idx] : 0;
 }
 
 
@@ -196,7 +226,8 @@ qbool sh_player_visible(const sh_player_t *p)
         return true;
 
     i32 hit = g_trace_fn(start, p->head, 0, -1);
-    return hit != 0;
+
+    return hit == 0;
 }
 
 #define sh_max_smokes 8

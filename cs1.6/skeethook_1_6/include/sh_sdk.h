@@ -6,10 +6,10 @@
 #define SH_MAX_MOVEENTS 64
 #define SH_MAX_PHYSINFO 512
 
-#define sh_fl_onground 0x200
-#define sh_fl_ducking 0x4
-#define sh_fl_waterjump 0x800
-#define sh_fl_frozen 0x4000
+#define sh_fl_onground (1 << 9)
+#define sh_fl_waterjump (1 << 11)
+#define sh_fl_frozen (1 << 12)
+#define sh_fl_ducking (1 << 14)
 
 #define sh_ef_muzzleflash 2
 
