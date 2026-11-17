@@ -45,9 +45,47 @@ static qbool sh_make_box(const sh_player_t *p, sh_box_t *box)
     return true;
 }
 
+static col4_t sh_esp_health_color(const sh_player_t *p)
+{
+    i32 hp = p->health;
+
+    if (hp < 0)
+        hp = 0;
+    if (hp > 100)
+        hp = 100;
+
+    u8 r, g;
+
+    if (hp > 50)
+    {
+        r = (u8)((100 - hp) * 5);
+        g = 255;
+    }
+    else
+    {
+        r = 255;
+        g = (u8)(hp * 5);
+    }
+
+    return (col4_t)SH_COL_RGBA(r, g, 40, 255);
+}
+
+static col4_t sh_esp_color(const sh_player_t *p)
+{
+    switch (g_cfg.visuals.esp_color_mode)
+    {
+    case 1:
+        return sh_esp_health_color(p);
+    case 2:
+        return p->visible ? g_cfg.visuals.col_visible : g_cfg.visuals.col_hidden;
+    default:
+        return p->visible ? g_cfg.visuals.col_visible : g_cfg.visuals.col_hidden;
+    }
+}
+
 static void sh_draw_box(const sh_player_t *p, const sh_box_t *b)
 {
-    col4_t c = p->visible ? g_cfg.visuals.col_visible : g_cfg.visuals.col_hidden;
+    col4_t c = sh_esp_color(p);
 
     if (g_cfg.visuals.box_outline)
     {
@@ -136,7 +174,7 @@ static void sh_draw_name(const sh_player_t *p, const sh_box_t *b)
         return;
 
     sh_text_center((b->left + b->right) * 0.5f, b->top - sh_text_height() - 3.0f,
-                   g_cfg.visuals.col_name, "%s", p->name[0] ? p->name : "player");
+                   sh_esp_color(p), "%s", p->name[0] ? p->name : "player");
 }
 
 static void sh_draw_weapon(const sh_player_t *p, const sh_box_t *b)

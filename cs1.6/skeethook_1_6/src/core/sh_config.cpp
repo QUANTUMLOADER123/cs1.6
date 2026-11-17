@@ -103,6 +103,7 @@ void sh_config_defaults(void)
     g_cfg.visuals.col_hitbox_head = (col4_t)SH_COL_RGBA(255, 80, 80, 200);
     g_cfg.visuals.hitbox_vis_check = (qbool)0;
     g_cfg.visuals.hitbox_scan = (qbool)0;
+    g_cfg.visuals.esp_color_mode = 0;
     g_cfg.visuals.model_changer = (qbool)0;
     g_cfg.visuals.model_index = 0;
     g_cfg.visuals.col_chams_vis = (col4_t)SH_COL_RGBA(120, 255, 120, 180);
