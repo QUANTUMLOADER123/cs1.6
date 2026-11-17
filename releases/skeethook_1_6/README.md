@@ -62,11 +62,13 @@ SDK + чит для CS 1.6. Все адреса — по сигнатурам, �
 ## Фичи
 
 **Ragebot** — enabled, silent, auto fire, auto wall, penetration,
-double tap, auto stop, visible check, smoke check, hitbox (6), priority (4),
+double tap, auto stop (+ duck), auto scope, visible check, smoke check,
+hitbox (6, влияет на точку прицела по высоте), priority (4),
 fov, smooth, min damage.
 
 **Antiaim** — pitch (7 режимов: down/up/fake down/fake up/spin/random/off),
-yaw (11: backwards/static L/R/left/right/spin/jitter/random/fake sideways),
+yaw (14: backwards/static L/R/left/right/spin/jitter/random/fake sideways/
+fake edge/at target/at target jitter),
 desync + amount, roll, fake lag + ticks, yaw base, jitter, fake duck,
 micro move + speed, movement fix.
 
@@ -76,7 +78,9 @@ visible only, show local, text scale, font), chams + team colors,
 glow + amount, tracers, impacts + звук, thirdperson + dist,
 nightmode (World | Sky | Lighting), skybox changer (12),
 flat textures, hitmarker, hit sound, radar, spectator list,
-grenade path, fire indicator, crosshair, hideshot, no flash, no smoke.
+grenade path, fire indicator, crosshair, hideshot, no flash, no smoke,
+model changer (14 моделей), sound esp, fake markers, wallbang info,
+position history, damage info (урон по цели с учётом хитбокса).
 
 **Misc / Movement** — bhop, auto strafe, quick stop, super toss,
 edge jump, fast ladder, auto pistol, fast reload, no recoil, no spread,
@@ -92,6 +96,9 @@ no scope, knife bot, fall damage warn, indicators.
 | no spread | серверный разброс не отменить, компенсируется только крен |
 | no fall damage | урон на сервере из `-pev->velocity.z`; есть только предупреждение |
 | скелетон | `studiomodel` недоступен, рисуется 2D-проекция по боксу |
+| fake edge | двигает yaw к ближайшей стене, но не телепортирует хитбокс |
+| at target | угол на ближайшего врага по `origin`, а не по хитбоксу головы |
+| wallbang info | считает проходимость по материалам, а не серверный урон |
 
 ## Соответствие реверсу
 
