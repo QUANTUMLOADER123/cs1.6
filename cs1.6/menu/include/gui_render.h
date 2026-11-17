@@ -8,6 +8,9 @@
 // Итог: полноценный PNG меню, без запуска игры и без видеокарты.
 #pragma once
 
+// guard-макрос: по нему gui_icons_init.h понимает, что доступен CPU-растеризатор
+#define GUI_RENDER_H 1
+
 #include "imgui.h"
 #include <algorithm>
 #include <cmath>
