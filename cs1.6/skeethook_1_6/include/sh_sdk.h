@@ -11,6 +11,13 @@
 #define sh_fl_waterjump 0x800
 #define sh_fl_frozen 0x4000
 
+#define sh_movetype_none 0
+#define sh_movetype_walk 3
+#define sh_movetype_step 4
+#define sh_movetype_fly 5
+#define sh_movetype_toss 6
+#define sh_movetype_noclip 8
+
 #define sh_in_attack 0x001
 #define sh_in_jump 0x002
 #define sh_in_duck 0x004

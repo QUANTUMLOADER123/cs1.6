@@ -54,7 +54,7 @@ static void sh_fast_ladder(sh_usercmd_t *cmd)
     if (!g_pmove)
         return;
 
-    if (g_pmove->movetype != 5)
+    if (g_pmove->movetype != sh_movetype_fly)
         return;
 
     vec3_t fwd;

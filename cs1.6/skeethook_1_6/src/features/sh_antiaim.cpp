@@ -42,10 +42,10 @@ qbool sh_antiaim_can_run(sh_usercmd_t *cmd)
     if (!g_pmove)
         return 0;
 
-    if (g_pmove->movetype == 5)
+    if (g_pmove->movetype == sh_movetype_fly)
         return 0;
 
-    if (g_pmove->movetype == 6 && g_pmove->onground != -1)
+    if (g_pmove->movetype == sh_movetype_toss && g_pmove->onground != -1)
         return 0;
 
     return 1;
