@@ -2,6 +2,7 @@
 #include "../../include/sh_math.h"
 #include "../../include/sh_config.h"
 #include "../../include/sh_ballistics.h"
+#include "../../include/sh_features.h"
 
 #define sh_air_accel_cap 30.0f
 #define sh_max_move 450.0f
@@ -210,7 +211,20 @@ void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (!g_cfg.movement.super_toss || !cmd || !pm)
         return;
 
-    if (!(cmd->buttons & sh_in_jump))
+    if (!(cmd->buttons & sh_in_attack2))
+        return;
+
+    if (!pm || pm->onground == -1)
+        return;
+
+    i32 wspn = 0;
+
+    sh_player_t *lp = sh_player_local();
+
+    if (lp)
+        wspn = lp->weapon_id;
+
+    if (wspn != 4 && wspn != 9 && wspn != 11 && wspn != 13 && wspn != 25)
         return;
 
     f32 pitch = cmd->viewangles.x;
@@ -285,9 +299,10 @@ void sh_movement_run(sh_usercmd_t *cmd)
 
     sh_tick_control(cmd);
 
+    sh_super_toss(cmd, pm);
+
     sh_bhop(cmd, pm);
     sh_auto_jump_hold(cmd, pm);
-    sh_super_toss(cmd, pm);
 
     if (cmd->buttons & sh_in_attack)
         sh_shots_on_attack();
