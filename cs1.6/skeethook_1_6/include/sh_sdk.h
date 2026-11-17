@@ -3,6 +3,8 @@
 #include "sh_types.h"
 
 #define SH_MAX_PHYSENTS 600
+#define SH_MAX_MOVEENTS 64
+#define SH_MAX_PHYSINFO 512
 
 #define sh_fl_onground 0x200
 #define sh_fl_ducking 0x4
@@ -201,17 +203,53 @@ typedef struct sh_playermove_s
     i32 numphysent;
     sh_physent_t physents[SH_MAX_PHYSENTS];
     i32 nummoveent;
-    sh_physent_t moveents[SH_MAX_PHYSENTS];
+    sh_physent_t moveents[SH_MAX_MOVEENTS];
     i32 numvisent;
     sh_physent_t visents[SH_MAX_PHYSENTS];
     sh_usercmd_t cmd;
     i32 numtouch;
     sh_pmtrace_t touchindex[SH_MAX_PHYSENTS];
-    char physinfo[512];
+    char physinfo[SH_MAX_PHYSINFO];
     sh_movevars_t *movevars;
     f32 player_mins[4][3];
     f32 player_maxs[4][3];
+
+    void *(*pm_info_value_for_key)(const char *s, const char *key);
+    void (*pm_particle)(f32 *origin, i32 color, f32 life, i32 zpos, i32 zvel);
+    i32 (*pm_test_player_position)(f32 *pos, sh_pmtrace_t *ptrace);
+    void *con_nprintf;
+    void *con_dprintf;
+    void *con_printf;
+    f64 (*sys_float_time)(void);
+    void (*pm_stuck_touch)(i32 hitent, sh_pmtrace_t *ptrace);
+    i32 (*pm_point_contents)(f32 *p, i32 *true_contents);
+    i32 (*pm_true_point_contents)(f32 *p);
+    i32 (*pm_hull_point_contents)(void *hull, i32 num, f32 *p);
+    sh_pmtrace_t (*pm_player_trace)(f32 *start, f32 *end, i32 flags,
+                                    i32 ignore_pe);
+    sh_pmtrace_t *(*pm_trace_line)(f32 *start, f32 *end, i32 flags,
+                                   i32 use_hull, i32 ignore_pe);
+    i32 (*random_long)(i32 low, i32 high);
+    f32 (*random_float)(f32 low, f32 high);
+    i32 (*pm_get_model_type)(void *mod);
+    void (*pm_get_model_bounds)(void *mod, f32 *mins, f32 *maxs);
+    void *(*pm_hull_for_bsp)(sh_physent_t *pe, f32 *offset);
+    f32 (*pm_trace_model)(sh_physent_t *pe, f32 *start, f32 *end, void *trace);
+    i32 (*com_file_size)(char *filename);
+    u8 *(*com_load_file)(const char *path, i32 use_hunk, i32 *length);
+    void (*com_free_file)(void *buffer);
+    char *(*memfgets)(u8 *mem_file, i32 file_size, i32 *pos, char *buffer,
+                      i32 buffer_size);
+    qbool run_funcs;
+    void (*pm_play_sound)(i32 channel, const char *sample, f32 volume,
+                          f32 attenuation, i32 flags, i32 pitch);
+    const char *(*pm_trace_texture)(i32 ground, f32 *start, f32 *end);
 } sh_playermove_t;
+
+typedef char sh_playermove_size_check[(sizeof(sh_playermove_t) == 0x4ED58) ? 1 : -1];
+#define SH_PM_OFF_MOVEVARS ((i32)((char*)&((sh_playermove_t*)0)->movevars - (char*)0))
+#define SH_PM_OFF_TRACETEX ((i32)((char*)&((sh_playermove_t*)0)->pm_trace_texture - (char*)0))
+#define SH_PM_SIZE ((i32)sizeof(sh_playermove_t))
 
 typedef struct sh_color24_s
 {
