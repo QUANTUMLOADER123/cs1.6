@@ -240,7 +240,9 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
         f32 now = g_pmove ? g_pmove->time : 0.0f;
         f32 npa = g_pmove ? g_pmove->next_primary_attack : 0.0f;
 
-        if (!g_cfg.aimbot.double_tap || sh_rage_double_tap(cmd, npa, now))
+        if (g_cfg.aimbot.double_tap)
+            sh_rage_double_tap(cmd, npa, now);
+        else
             cmd->buttons |= 1;
 
         if (g_cfg.visuals.tracer)
@@ -286,18 +288,11 @@ qbool sh_rage_double_tap(sh_usercmd_t *cmd, f32 next_attack_time, f32 now)
     if (frametime <= 0.0f)
         frametime = 0.01f;
 
-    f32 window = frametime * 1.5f;
-
-    if (next_attack_time > now + window)
-        return 0;
-
-    if (next_attack_time < now - frametime)
+    if (next_attack_time > now + frametime)
         return 0;
 
     if (!(cmd->buttons & 1))
-        return 0;
-
-    cmd->buttons |= 1;
+        cmd->buttons |= 1;
 
     g_last_attack_sent = now;
 
