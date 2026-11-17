@@ -83,15 +83,37 @@ static void sh_auto_pistol(sh_usercmd_t *cmd)
 }
 
 
+extern sh_weapon_data_t g_weapon_data[sh_max_weapons];
+
 static void sh_fast_reload(sh_usercmd_t *cmd)
 {
-    f32 ft = sh_frametime();
-    g_next_reload -= ft;
-    if (g_next_reload > 0.0f)
+    if (!g_pmove)
+        return;
+
+    sh_player_t *local = sh_player_local();
+
+    if (!local)
+        return;
+
+    i32 id = local->weapon_id;
+
+    if (id <= 0 || id >= sh_max_weapons)
+        return;
+
+    const sh_weapon_data_t *w = &g_weapon_data[id];
+
+    if (w->clip != 0)
+        return;
+
+    if (w->in_reload)
+        return;
+
+    f32 now = g_pmove->time;
+
+    if (w->next_primary_attack > now)
         return;
 
     cmd->buttons |= sh_in_reload;
-    g_next_reload = 0.1f;
 }
 
 void sh_misc_run(sh_usercmd_t *cmd)

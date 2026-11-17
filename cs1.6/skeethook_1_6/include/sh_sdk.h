@@ -460,9 +460,18 @@ typedef struct sh_weapon_data_s
     i32 in_zoom;
     i32 weapon_state;
     i32 iuser1;
+    i32 iuser2;
+    i32 iuser3;
+    i32 iuser4;
+    f32 fuser1;
+    f32 fuser2;
+    f32 fuser3;
+    f32 fuser4;
 } sh_weapon_data_t;
 
-typedef char sh_weapon_data_size_check[(sizeof(sh_weapon_data_t) == 0x3C) ? 1 : -1];
+#define sh_max_weapons 64
+
+typedef char sh_weapon_data_size_check[(sizeof(sh_weapon_data_t) == 0x58) ? 1 : -1];
 
 
 typedef struct sh_globalvars_s

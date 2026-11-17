@@ -33,6 +33,28 @@ typedef i32(__cdecl *player_move_fn)(sh_playermove_t *pmove, i32 server);
 typedef i32(__cdecl *hook_user_msg_fn)(const char *name, i32 size);
 typedef i32(__cdecl *add_entity_fn)(i32 type, sh_cl_entity_t *ent);
 
+sh_weapon_data_t g_weapon_data[sh_max_weapons];
+
+typedef void(__cdecl *txfer_pred_fn)(void *ps, const void *pps, void *pcd,
+                                     const void *ppcd, sh_weapon_data_t *wd,
+                                     const sh_weapon_data_t *pwd);
+
+static txfer_pred_fn g_txfer_pred_orig;
+
+void __cdecl sh_txfer_pred_hook(void *ps, const void *pps, void *pcd,
+                                const void *ppcd, sh_weapon_data_t *wd,
+                                const sh_weapon_data_t *pwd)
+{
+    if (g_txfer_pred_orig)
+        g_txfer_pred_orig(ps, pps, pcd, ppcd, wd, pwd);
+
+    if (wd)
+    {
+        for (i32 i = 0; i < sh_max_weapons; ++i)
+            g_weapon_data[i] = wd[i];
+    }
+}
+
 static create_move_fn g_create_move_orig;
 static hud_redraw_fn g_hud_redraw_orig;
 static player_move_fn g_player_move_orig;
@@ -306,6 +328,14 @@ qbool sh_hooks_install(void)
         if (MH_CreateHook(hud_redraw, (void *)sh_hud_redraw_hook,
                           (void **)&g_hud_redraw_orig) == MH_OK)
             MH_EnableHook(hud_redraw);
+    }
+
+    void *txfer = sh_find_export_body("client.dll", "HUD_TxferPredictionData");
+    if (txfer)
+    {
+        if (MH_CreateHook(txfer, (void *)sh_txfer_pred_hook,
+                          (void **)&g_txfer_pred_orig) == MH_OK)
+            MH_EnableHook(txfer);
     }
 
     void *add_entity = sh_find_export_body("client.dll", "HUD_AddEntity");
