@@ -227,6 +227,14 @@ const sh_bone_snapshot_t *sh_bones_get(i32 index)
     if (!g_bones[index].valid)
         return 0;
 
+    if (g_pmove)
+    {
+        f32 now = g_pmove->time;
+
+        if (now > g_bones[index].born && now - g_bones[index].born > 0.25f)
+            return 0;
+    }
+
     return &g_bones[index];
 }
 
