@@ -2,13 +2,13 @@
 
 SDK + чит для CS 1.6. Все адреса — по сигнатурам, без хардкода.
 
-**DLL:** `skeethook_1_6.dll` — 321 KB, 32-bit, PE32
-**SHA256:** `ae4e57262aff56f4f48f8abe3dd4a4433cfcdbc82937db5b12c6826d4975136f`
+**DLL:** `skeethook_1_6.dll` — 354 KB (363 008 байт), 32-bit, PE32
+**SHA256:** `b29a6b1d1e6c8cea0e7e0ab6bbee3ade72c426d415162f9ab72717a55eb8b117`
 
 ## Установка
 
 1. Инжектить `skeethook_1_6.dll` в `hl.exe` (32-bit), OpenGL-режим.
-2. `INSERT` — меню.
+2. `INSERT` — меню. Конфиг автосохраняется при закрытии.
 
 ## Экспорты
 
@@ -28,6 +28,9 @@ SDK + чит для CS 1.6. Все адреса — по сигнатурам, �
 | player_move_init | `0x01963120` | инициализация |
 | create_move | `0x01958CC0` | хук ввода |
 | hud_redraw | `0x01944A60` | хук рендера |
+| add_entity | `0x01945F10` | chams / glow / no-flash |
+| process_state | `0x01946010` | |
+| txfer_overrides | `0x01945FC0` | |
 
 ## Структуры
 
@@ -37,20 +40,59 @@ SDK + чит для CS 1.6. Все адреса — по сигнатурам, �
 | `sh_playermove_t` | `1508` | оффсеты полей из `HUD_PlayerMove` |
 | `sh_physent_t` | `0xE0` | код `i*7<<5` |
 | `sh_usercmd_t` | `0x34` | `rep stos ecx=0xD` |
+| `sh_cl_entity_t` | `2996` | RTTI + sizeof-assert |
+| `sh_clientdata_t` | `476` | из `cl_dll.h` |
+| `sh_entity_state_t` | `340` | из `entity_state.h` |
 
 ## Фичи
 
-**Aimbot** — fov, smooth, hitbox, autowall, silent, auto fire, visible check.
-**Antiaim** — pitch (down/up/fake/random), yaw (backward/spin/jitter/LBY), desync, fake duck, micro move.
-**Misc** — bhop, auto strafe, edge jump, fast ladder, no fall damage, auto pistol, fast reload, no recoil/spread/flash/smoke/scope.
-**ESP** — боксы (2 стиля), имя, HP, броня, оружие, дистанция, скелет, head dot, snaplines.
+**Ragebot** — enabled, silent, auto fire, auto wall, penetration,
+double tap, auto stop, visible check, smoke check, hitbox (6), priority (4),
+fov, smooth, min damage.
+
+**Antiaim** — pitch (7 режимов: down/up/fake down/fake up/spin/random/off),
+yaw (11: backwards/static L/R/left/right/spin/jitter/random/fake sideways),
+desync + amount, roll, fake lag + ticks, yaw base, jitter, fake duck,
+micro move + speed, movement fix.
+
+**Visuals** — ESP (box 2 стиля, name, health bar, armor, weapon,
+weapon icon, ammo, distance, skeleton, head dot, snaplines, team check,
+visible only, show local, text scale, font), chams + team colors,
+glow + amount, tracers, impacts + звук, thirdperson + dist,
+nightmode (World | Sky | Lighting), skybox changer (12),
+flat textures, hitmarker, hit sound, radar, spectator list,
+grenade path, fire indicator, crosshair, hideshot, no flash, no smoke.
+
+**Misc / Movement** — bhop, auto strafe, quick stop, super toss,
+edge jump, fast ladder, auto pistol, fast reload, no recoil, no spread,
+no scope, knife bot, fall damage warn, indicators.
+
+## Честные границы
+
+| фича | почему так |
+|---|---|
+| double tap | нет tickbase как в CS:GO; досыл `IN_ATTACK` в окне 1.5 frametime |
+| desync | хитбокс в GoldSrc — коробка ±16, поворот модели его не двигает |
+| roll | `viewangles.z` виден в демках/HLTV, камера не крутится |
+| no spread | серверный разброс не отменить, компенсируется только крен |
+| no fall damage | урон на сервере из `-pev->velocity.z`; есть только предупреждение |
+| скелетон | `studiomodel` недоступен, рисуется 2D-проекция по боксу |
 
 ## Соответствие реверсу
 
 Механики взяты из `cs1.6/reverse/`:
 
-- air-strafe: cap 30 из `PM_AirAccelerate` → `sh_auto_strafe`
-- bhop: фактор 1.2 / штраф 0.8 из `PM_PreventMegaBunnyJumping` → `sh_bhop`
-- edge friction 2.0 из `PM_Friction` → `sh_edge_jump`
-- MAX_CLIMB_SPEED 200 → `sh_fast_ladder`
-- range_modifier оружия → autowall в `sh_can_hit`
+- air-strafe: cap 30 из `PM_AirAccelerate`, `omega = 90 − 180/(w/30+1)` → `sh_autostrafe`
+- система координат: `right = (sin yaw, −cos yaw)` оттуда же → знак `sidemove`
+- bhop: снятие `IN_JUMP` по `oldbuttons` → `sh_bhop`
+- quick stop: `drop = friction * max(speed, 75) * frametime` из `PM_Friction`
+- attack creep: `GetNextAttackDelay` (`- flCreep`) → допуск 0.5 frametime
+- fake lag: `next_send_time` @ `0x2D5DA48`, clamp `cl_cmdrate` 100
+- magic pitch 1620/−1619: ломает хитбокс, подтверждено расчётом
+- гранаты: `flVel = (90−pitch)*6`, кап 750, g = 800, оптимум 42°
+- нож: `STAB_DISTANCE 32`, `SWING_DISTANCE 48`, `BACKSTAB 3x`
+- пробитие: 21/15/30/39/35/45/30/25 по материалам
+- 59 opcodes `svc_*` из `hw.dll` — основа парсера демок
+- `delta_description_t` обязателен до чтения потока сущностей
+
+Подробности — `cs1.6/reverse/` (21 документ) и `16-feature-map.md`.
