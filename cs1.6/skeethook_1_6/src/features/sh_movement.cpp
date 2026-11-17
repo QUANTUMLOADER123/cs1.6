@@ -201,3 +201,54 @@ void sh_movement_run(sh_usercmd_t *cmd)
     if (g_cfg.misc.no_recoil)
         sh_recoil_compensate(&cmd->viewangles, sh_local_weapon_id(), g_shots_fired);
 }
+
+static f32 g_fall_damage = 0.0f;
+static f32 g_fall_show_until = 0.0f;
+
+f32 sh_fall_damage_predicted(void)
+{
+    return g_fall_damage;
+}
+
+void sh_fall_predict(sh_playermove_t *pm)
+{
+    if (!pm)
+        return;
+
+    if (pm->onground == -1)
+    {
+        f32 v = pm->fall_velocity;
+
+        if (v > 500.0f)
+        {
+            g_fall_damage = (v - 500.0f) * (100.0f / 600.0f);
+
+            if (pm->waterlevel > 0 || pm->waterjumptime > 0.0f)
+                g_fall_damage = 0.0f;
+        }
+        else
+        {
+            g_fall_damage = 0.0f;
+        }
+
+        return;
+    }
+
+    if (g_fall_damage > 0.0f)
+        g_fall_show_until = pm->time + 2.0f;
+
+    g_fall_damage = 0.0f;
+}
+
+qbool sh_fall_warning(f32 *damage)
+{
+    if (g_fall_damage > 0.0f)
+    {
+        if (damage)
+            *damage = g_fall_damage;
+
+        return 1;
+    }
+
+    return 0;
+}

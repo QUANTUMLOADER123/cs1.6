@@ -60,4 +60,14 @@ void sh_indicators_draw(void)
         f32 st_y = 40.0f * s + (f32)n * lh + 11.0f * s;
         sh_text(x, st_y, (col4_t){ 120, 180, 255, 200 }, "shots %d", sh_shots_count());
     }
+
+    if (g_cfg.misc.no_fall_damage)
+    {
+        f32 dmg = 0.0f;
+        if (sh_fall_warning(&dmg))
+        {
+            f32 wy = 40.0f * s + (f32)n * lh + 22.0f * s;
+            sh_text(x, wy, (col4_t){ 255, 90, 90, 235 }, "fall -%.0f hp", dmg);
+        }
+    }
 }

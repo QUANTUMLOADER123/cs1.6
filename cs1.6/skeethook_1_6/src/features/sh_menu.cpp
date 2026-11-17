@@ -343,7 +343,7 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_checkbox(x + colw, cy, "fast ladder", &g_cfg.misc.fast_ladder);
     cy += row;
 
-    sh_menu_checkbox(x, cy, "no fall damage", &g_cfg.misc.no_fall_damage);
+    sh_menu_checkbox(x, cy, "fall damage warn", &g_cfg.misc.no_fall_damage);
     sh_menu_checkbox(x + colw, cy, "auto pistol", &g_cfg.misc.auto_pistol);
     cy += row + 8.0f * s;
 

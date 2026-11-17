@@ -13,6 +13,7 @@
 #include "../../include/sh_skybox.h"
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
+#include "../../include/sh_movement.h"
 
 void sh_indicators_draw(void);
 #include "../../include/sh_visuals.h"
@@ -190,11 +191,8 @@ i32 __cdecl sh_player_move_hook(sh_playermove_t *pmove, i32 server)
     if (g_player_move_orig)
         g_player_move_orig(pmove, server);
 
-    if (g_cfg.misc.no_fall_damage && pmove)
-    {
-        if (pmove->waterjumptime <= 0.0f)
-            pmove->fall_velocity = 0.0f;
-    }
+    if (pmove && g_cfg.misc.no_fall_damage)
+        sh_fall_predict(pmove);
 
     return 0;
 }

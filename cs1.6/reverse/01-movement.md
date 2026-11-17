@@ -224,3 +224,62 @@ for (i = 0; i < 3; i++) {
   `HUD_PlayerMove`, `HUD_PlayerMoveInit` уже найдены в
   `cs1.6/analysis/client/index.json`).
 - Затем: оружие (разброс, отдача), сеть (кодирование usercmd), рендер.
+
+
+---
+
+## Урон от падения (player.h:61-77, player.cpp:5394-5451)
+
+```c
+MAX_PLAYER_FATAL_FALL_SPEED     = 1100.0f
+MAX_PLAYER_SAFE_FALL_SPEED      =  500.0f
+DAMAGE_FOR_FALL_SPEED           = 100.0f / (1100.0f - 500.0f)   // 0.16666
+PLAYER_FALL_PUNCH_THRESHHOLD    =  250.0f
+```
+
+Урон считается от **вертикальной скорости при приземлении**
+(`m_flFallVelocity = -pev->velocity.z`, ставится в `player.cpp:4997`):
+
+```
+damage = (fall_velocity - 500.0f) * 0.16666
+```
+
+| скорость при приземлении | урон |
+|---:|---:|
+| 250 | 0 (только звук шагов) |
+| 500 | 0 |
+| 600 | 16 |
+| 800 | 50 |
+| 1100 | 100 — смерть |
+
+В `player.cpp:5394`:
+
+```c
+if ((pev->flags & FL_ONGROUND) && pev->health > 0
+    && m_flFallVelocity >= PLAYER_FALL_PUNCH_THRESHHOLD)
+{
+    if (pev->watertype != CONTENT_WATER)
+        if (m_flFallVelocity > MAX_PLAYER_SAFE_FALL_SPEED)
+        {
+            float flFallDamage = g_pGameRules->FlPlayerFallDamage(this);
+            ...
+            TakeDamage(pev, pev, flFallDamage, DMG_FALL);
+        }
+}
+```
+
+**Для SDK:** урон считает сервер, поэтому `no_fall_damage` на клиенте
+невозможен в принципе. Проверено отдельно: `pmove->flFallVelocity`
+в `pm_shared.cpp:2863` **только читается** для звука приземления
+(`PM_CheckFalling`, 2584) и отката камеры (`punchangle[2] = v * 0.013`).
+Запись в него из клиентского хука `HUD_PlayerMove` **ни на что не влияет** —
+серверная сторона в `player.cpp:4997` берёт `-pev->velocity.z` из своих
+данных.
+
+Поэтому в SDK чекбокс переименован в **`fall damage warn`**: он считает
+`(fall_velocity - 500) * 0.16666` и показывает `fall -N hp` на экране,
+пока игрок падает. Это честно и полезно; обещать нулевой урон нельзя.
+
+Это же объясняет, почему bhop «съедает» урон: при прыжке с зажатым
+`IN_JUMP` вертикальная скорость в момент касания близка к нулю, и
+`m_flFallVelocity` до 500 просто не доходит.
