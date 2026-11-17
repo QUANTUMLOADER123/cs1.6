@@ -1,6 +1,7 @@
 #include "../../include/sh_features.h"
 #include "../../include/sh_math.h"
 #include "../../include/sh_render.h"
+#include "../../include/sh_bones.h"
 
 #include <math.h>
 
@@ -174,7 +175,44 @@ static void sh_draw_skeleton(const sh_player_t *p, const sh_box_t *b)
     if (!g_cfg.visuals.skeleton)
         return;
 
-    static const i32 bones[][2] = {
+    col4_t c = p->visible ? g_cfg.visuals.col_skeleton : g_cfg.visuals.col_hidden;
+
+    const sh_bone_snapshot_t *snap = sh_bones_get(p->index);
+
+    if (snap)
+    {
+        static const i32 links[][2] = {
+            { sh_bone_head, sh_bone_neck },
+            { sh_bone_neck, sh_bone_spine1 },
+            { sh_bone_spine1, sh_bone_spine },
+            { sh_bone_spine, sh_bone_pelvis },
+            { sh_bone_spine1, sh_bone_l_upperarm },
+            { sh_bone_l_upperarm, sh_bone_l_forearm },
+            { sh_bone_l_forearm, sh_bone_l_hand },
+            { sh_bone_spine1, sh_bone_r_upperarm },
+            { sh_bone_r_upperarm, sh_bone_r_forearm },
+            { sh_bone_r_forearm, sh_bone_r_hand },
+            { sh_bone_pelvis, sh_bone_l_thigh },
+            { sh_bone_l_thigh, sh_bone_l_calf },
+            { sh_bone_l_calf, sh_bone_l_foot },
+            { sh_bone_pelvis, sh_bone_r_thigh },
+            { sh_bone_r_thigh, sh_bone_r_calf },
+            { sh_bone_r_calf, sh_bone_r_foot }
+        };
+
+        for (u32 i = 0; i < sh_countof(links); ++i)
+        {
+            vec2_t a, bb;
+            if (!sh_bones_world_to_screen(snap, links[i][0], &a))
+                continue;
+            if (!sh_bones_world_to_screen(snap, links[i][1], &bb))
+                continue;
+            sh_draw_line(a.x, a.y, bb.x, bb.y, 1.0f, c);
+        }
+        return;
+    }
+
+    static const i32 bones_fallback[][2] = {
         { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 4 },
         { 1, 5 }, { 5, 6 }, { 6, 7 },
         { 1, 8 }, { 8, 9 }, { 9, 10 }
@@ -197,12 +235,10 @@ static void sh_draw_skeleton(const sh_player_t *p, const sh_box_t *b)
     pts[9] = (vec2_t){ cx + w * 0.48f, b->top + h * 0.58f };
     pts[10] = (vec2_t){ cx + w * 0.50f, b->top + h * 0.80f };
 
-    col4_t c = p->visible ? g_cfg.visuals.col_skeleton : g_cfg.visuals.col_hidden;
-
-    for (u32 i = 0; i < sh_countof(bones); ++i)
+    for (u32 i = 0; i < sh_countof(bones_fallback); ++i)
     {
-        sh_draw_line(pts[bones[i][0]].x, pts[bones[i][0]].y,
-                     pts[bones[i][1]].x, pts[bones[i][1]].y, 1.0f, c);
+        sh_draw_line(pts[bones_fallback[i][0]].x, pts[bones_fallback[i][0]].y,
+                     pts[bones_fallback[i][1]].x, pts[bones_fallback[i][1]].y, 1.0f, c);
     }
 }
 

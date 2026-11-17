@@ -14,6 +14,9 @@
 | [`05-rules-server.md`](05-rules-server.md) | происхождение бинарников, RTTI 651 класс, `AddToFullPack`, правила, боты |
 | [`06-networking.md`](06-networking.md) | `entity_state_t` 340Б, `cl_entity_t` 2996Б, 150 user messages |
 | [`07-render.md`](07-render.md) | `triangleapi_t`, `WorldToScreen`, `BoxInPVS`, порядок кадра |
+| [`08-events.md`](08-events.md) | `event_api_t`, `efx_api_t`, скрипты `.sc`, трассеры |
+| [`09-chams.md`](09-chams.md) | `CStudioModelRenderer`, 128 костей, чеймы, хитбоксы |
+| [`10-anticheat.md`](10-anticheat.md) | что реально видит VAC, границы SDK |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,
