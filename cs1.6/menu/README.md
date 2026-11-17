@@ -1,129 +1,108 @@
-# CS 1.6 — меню gamesense (порт 1в1)
+# CS 1.6 — меню gamesense (порт 1:1)
 
-Точный порт интерфейса gamesense (skeet.cc). Все цвета, размеры и формы иконок
-сняты пиксельным анализом реального скриншота меню — не «на глаз».
+Пиксельный порт меню gamesense (skeet). Все цвета, размеры и иконки сняты
+сканерами с реального скриншота меню, а ассеты взяты **настоящие**, не нарисованы.
 
-Overlay-меню для теста kiero-хука. Две части:
+Две части:
 
-1. **headless-рендерер** — собирает меню и пишет PNG без окна и без GPU. Позволяет
-   проверять лейаут/стиль мгновенно, не запуская игру.
+1. **headless-рендерер** — собирает меню и пишет PNG без окна и без GPU.
+   Позволяет сверять лейаут с оригиналом попиксельно.
 2. **Windows-DLL** (`build/menu_test_x86.dll`) — 32-битный хук на `wglSwapBuffers`
-   через MinHook, рисует меню поверх любого OpenGL-приложения (в том числе CS 1.6).
-   `INSERT` — открыть/закрыть, `F12` — сохранить скриншот кадра в `menu_shot_N.png`.
+   через MinHook, рисует меню поверх любого OpenGL-приложения (включая CS 1.6).
+   `INSERT` — открыть/закрыть, `F12` — скриншот кадра в `menu_shot_N.png`.
 
-## Палитра (замерена с референса)
+## Настоящие ассеты
+
+| ассет | файл | источник |
+| --- | --- | --- |
+| спрайт иконок | `assets/tab_icons.png` (384×48, 8 плиток 48×48) | выгружен из репозитория gamesense-меню |
+| шрифт | `assets/Tahoma-Bold.ttf` (626 928 Б) | Tahoma Bold — шрифт меню skeet |
+
+Оба вшиваются в DLL скриптом `tools/embed_assets.py` → `include/gui_icons_data.h`
+и `include/gui_font_data.h` (генерируемые, в git не лежат).
+
+Порядок плиток в спрайте: `0` голова с прострелом · `1` прицел · `2` солнце/луна ·
+`3` шестерёнки · `4` нож · `5` игрок · `6` пистолет в круге · `7` дискета.
+Порядок вкладок меню: Rage, Anti-Aim, Visuals, Misc, Settings, Skins, Players, Lua.
+
+## Палитра (снята с референса)
 
 | роль | значение |
 | --- | --- |
 | фон окна | `#0C0C0C` |
-| колонки A/B | `#171717` |
-| бордер колонок | `#303030` |
-| рамка окна | `#3C3C3C` / `#282828` |
+| шахматный дизеринг | `#0C0C0C` / `#141414`, блок 2×2 |
+| тело колонок A/B | `#171717` |
+| рамка колонок | `#303030` |
+| рамка окна | `#3C3C3C` / `#282828` / `#282828` / `#282828` / `#3C3C3C` |
 | текст | `#CDCDCD` |
-| текст дим | `#5A5A5A` |
-| акцент (галка) | `#95C021` |
-| поле дропдауна | `#242424` |
-| незаполненный чекбокс | `#474747` |
-| радуга | `(91,151,215)` → `(204,213,66)`, 2px |
+| галка чекбокса | `#9CC728` → `#7AA506` (градиент по 6px) |
+| выключенный чекбокс | `#474747` |
+| поле дропдауна | `#1F1F1F` → `#242424` (градиент по 19px) |
+| шеврон дропдауна | `#989898` |
+| радуга | 2px под рамкой, `(136,119,211)` → `(204,226,54)` |
 
 ## Геометрия
 
 | элемент | значение |
 | --- | --- |
 | окно | 731×617 |
-| сайдбар | 88px |
-| иконка | 38×38, шаг 62px |
-| колонка | 290px, зазор 22px |
-| чекбокс | 6×6 |
-| текст | 9px |
-| поле дропдауна | высота 13px |
+| рамка окна | 1px + 3px + 1px |
+| радуга | y 7..8, во всю ширину |
+| сайдбар | 0..96, внутренняя рамка иконок до x=80 |
+| иконки | 34×34, x=25, шаг 65px, первая на y=34 |
+| подпись вкладки | Tahoma Bold 16px, ink y 557..572 |
+| колонка A | x 101..392 (рамка + 290 тела) |
+| колонка B | x 415..705 |
+| тело колонок | y 31..590 |
+| буква колонки | A/B, x +14 от рамки, на 4px выше тела |
+| чекбокс | 6×6, x 123..128, ink y 54..59 |
+| текст после чекбокса | x 143, ink y 52..61 |
+| шаг строк | 18px |
+| поле дропдауна | высота 19px, x 153..333, ink текста внутри на +11 |
+| отступ подписи → поля | 12px |
 
-## Скриншоты
-
-Все 1920×1080, отрендерены тем же кодом, что крутится в оверлее.
-
-| | |
-| --- | --- |
-| ![Rage](shots/rage.png) | ![Visuals](shots/visuals.png) |
-| ![Misc](shots/misc.png) | ![Settings](shots/settings.png) |
-
-![Skins](shots/skins.png)
-
-Прямые ссылки (открывать с телефона):
-
-- Rage — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/rage.png
-- Visuals — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/visuals.png
-- Misc — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/misc.png
-- Settings — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/settings.png
-- Skins — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/skins.png
-
-## Структура
+## Сверка с оригиналом
 
 ```
-menu/
-  include/
-    gui_theme.h     палитра + геометрия (масштабируется), ImGui-стиль
-    gui_widgets.h   кастомный чекбокс, combo, иконки сайдбара (векторные)
-    gui_menu.h      само меню: сайдбар, вкладки Rage/Visuals/Misc/Settings/Skins
-    gui_render.h    программный растеризатор ImDrawData: сканлайн, alpha, клип
-  headless/main.cpp headless-рендер в PNG + имитация кадра CS 1.6
-  hook/dllmain.cpp  Windows DLL: MinHook на wglSwapBuffers + OpenGL2 backend
-  backends/         imgui_impl_opengl2, imgui_impl_win32
-  third_party/      minhook
-  build_win.sh      сборка 32-бит DLL через zig
-  Makefile          сборка headless-рендерера (g++)
+оригинал 731×617  vs  порт 731×617
+средняя разница по пикселям: 3.8 / 255
+в пределах ±1/255:           81 %
 ```
+
+Скрипт сверки: `python3 tools/compare_reference.py` (см. корневой README).
 
 ## Сборка
 
-### headless (Linux, без GPU)
-
 ```bash
-make                 # соберёт бинарь menu.png
-./menu.png out.png 2 0          # 2x скейл, вкладка Rage
-./menu.png out.png 1 1          # 1x, Visuals
+# headless (Linux, без GPU)
+make
+./menu.png out.png 1 0      # 1 = нативный 1:1 (731x617)
+./menu.png out.png 2 5      # 2 = 1920x1080, вкладка Skins
+
+# Windows DLL (zig, без MSVC)
+git clone --depth 1 https://github.com/TsudaKageyu/minhook.git third_party/minhook
+python3 ../../tools/embed_assets.py
+./build_win.sh              # -> build/menu_test_x86.dll
 ```
 
-Аргументы: `<выход> [scale] [tab]`, где tab: 0 Rage, 1 Visuals, 2 Misc, 3 Settings, 4 Skins.
+## Как устроено
 
-Рендер полностью на CPU: ImGui собирает draw data, `gui_render.h` интерпретирует
-её (треугольники, scissor, альфа), глифы берутся из ImGui-атласа напрямую.
-Поэтому результат по пикселям совпадает с тем, что будет на экране.
+| файл | что |
+| --- | --- |
+| `include/gui_theme.h` | палитра и все метрики (единый источник правды) |
+| `include/gui_widgets.h` | чекбокс, подпись, дропдаун, слайдер, иконка, рамка колонки |
+| `include/gui_menu.h` | 8 вкладок, хром окна (рамка, радуга, дизеринг), сайдбар |
+| `include/gui_icons_init.h` | декод спрайта из памяти (stb_image) |
+| `include/gui_icons_gl.h` | загрузка спрайта в GL-текстуру (для DLL) |
+| `include/gui_render.h` | программный растеризатор (для headless) |
+| `headless/main.cpp` | сборка кадра в PNG |
+| `hook/dllmain.cpp` | хук `wglSwapBuffers` + ImGui OpenGL2 |
 
-### Windows DLL
+### Особенности ImGui 1.93
 
-```bash
-./build_win.sh       # -> build/menu_test_x86.dll
-```
-
-Собирается `zig cc -target x86-windows-gnu` — не нужен mingw или MSVC.
-
-## Как тестировать на 1.6
-
-1. Запусти CS 1.6 (рендер OpenGL).
-2. Инжектни `menu_test_x86.dll` любым инжектором (Process Hacker, Xenos, свой).
-3. `INSERT` — меню, `F12` — скриншот в рабочую папку игры.
-
-Хук ставится на `wglSwapBuffers` (opengl32), не на `SwapBuffers` (gdi32) — в 1.6
-вызов идёт именно туда.
-
-## Технические заметки
-
-**Почему MinHook напрямую, а не `kiero::bind`.** kiero отдаёт таблицу функций
-`opengl32.dll` (336 записей, `glViewport` = индекс 335), но `wglSwapBuffers`
-в этой таблице нет — он экспортируется отдельно. Поэтому MinHook ставит detour
-прямо на `GetProcAddress(opengl32, "wglSwapBuffers")`.
-
-**Скриншот внутри хука.** `glReadPixels` вызывается до отрисовки оверлея, поэтому
-в PNG попадает чистый кадр игры; меню рисуется после. Если нужен скриншот
-«меню поверх игры» — перенеси вызов `glReadPixels` после
-`ImGui_ImplOpenGL2_RenderDrawData()`.
-
-**Масштаб UI.** `gui::geo::SetScale()` пересчитывает всю геометрию, включая
-размер шрифта. Один и тот же код даёт 1× для реального оверлея и 2-3× для
-скриншота без мыла.
-
-**Открытый вопрос по 1.6.** Движок сам меняет матрицы/вьюпорт перед кадром.
-Если меню «уезжает» или рисуется мимо окна — нужно сохранять/восстанавливать
-`glPushAttrib(GL_ALL_ATTRIB_BITS)` и выставлять `glViewport(0,0,w,h)` +
-ортопроекцию перед `RenderDrawData()`.
+- Бэкенд обязан обрабатывать `ImDrawData::Textures` (`ImTextureStatus_WantCreate`):
+  в headless это делает `render::backend_update_textures()`, в DLL — сам
+  OpenGL2-бэкенд.
+- `ImTextureID` здесь `unsigned long long`, а не `void*`.
+- Дизеринг рисуется растеризатором напрямую в кадр: 60k прямоугольников
+  через `ImDrawList` упираются в лимит 16-битных индексов.

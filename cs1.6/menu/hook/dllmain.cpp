@@ -23,6 +23,13 @@
 #include "gui_widgets.h"
 #include "gui_menu.h"
 
+// --- оригинальный спрайт иконок gamesense + Tahoma Bold из памяти ---
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#include "gui_icons_init.h"
+#include "gui_icons_gl.h"
+#include "gui_font_data.h"
+
 // --- stb_image_write для скриншота ---
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -159,14 +166,21 @@ static bool init_imgui(HWND hwnd)
     if (!ImGui_ImplOpenGL2_Init())
         return false;
 
-    // Шрифт: берём системный Tahoma, у него хорошая кириллица и он есть везде.
+    // Шрифт: НАСТОЯЩИЙ Tahoma Bold из встроенного массива (тот же, что в gamesense).
     ImFontConfig cfg;
-    cfg.SizePixels = 14.0f;
-    cfg.OversampleH = 2;
-    cfg.OversampleV = 2;
+    cfg.FontDataOwnedByAtlas = false;
+    cfg.OversampleH = 1;
+    cfg.OversampleV = 1;
     cfg.PixelSnapH = true;
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 14.0f, &cfg,
-                                 io.Fonts->GetGlyphRangesCyrillic());
+    cfg.SizePixels = gui::geo::TEXT_SIZE;
+    if (!io.Fonts->AddFontFromMemoryTTF((void*)g_tahoma_bold, (int)g_tahoma_bold_size,
+                                        cfg.SizePixels, &cfg,
+                                        io.Fonts->GetGlyphRangesCyrillic()))
+        return false;
+
+    // ОРИГИНАЛЬНЫЙ спрайт иконок gamesense: декодируем PNG и грузим в GL
+    gui::InitIconAtlasCPU();
+    gui::InitIconAtlasGL();
 
     gui::geo::SetScale(1.0f);
     gui::Apply();
