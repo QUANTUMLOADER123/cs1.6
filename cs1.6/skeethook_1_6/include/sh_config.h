@@ -86,6 +86,7 @@ typedef struct sh_visuals_cfg
     qbool sound_esp;
     qbool draw_fakes;
     qbool penetration_info;
+    qbool draw_history;
     qbool model_changer;
     i32 model_index;
     col4_t col_chams_vis;

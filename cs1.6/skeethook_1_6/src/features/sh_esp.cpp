@@ -170,6 +170,46 @@ static void sh_draw_weapon(const sh_player_t *p, const sh_box_t *b)
     }
 }
 
+static void sh_draw_history(const sh_player_t *p)
+{
+    if (!g_cfg.visuals.draw_history)
+        return;
+
+    f32 alpha_step = 200.0f / (f32)sh_hist_max;
+    f32 fade = 200.0f;
+
+    for (i32 k = 1; k < sh_hist_max; ++k)
+    {
+        i32 a = (p->hist_head - k + sh_hist_max) % sh_hist_max;
+        i32 b = (p->hist_head - k - 1 + sh_hist_max) % sh_hist_max;
+
+        if (p->hist[a].time <= 0.0f || p->hist[b].time <= 0.0f)
+            continue;
+
+        vec3_t pa = p->hist[a].origin;
+        vec3_t pb = p->hist[b].origin;
+
+        pa.z += 36.0f;
+        pb.z += 36.0f;
+
+        vec2_t sa, sb;
+
+        if (!sh_world_to_screen(&pa, &sa))
+            continue;
+        if (!sh_world_to_screen(&pb, &sb))
+            continue;
+
+        col4_t c = SH_COL_RGBA(190, 190, 190, (u8)fade);
+
+        sh_draw_line(sa.x, sa.y, sb.x, sb.y, 1.0f, c);
+
+        fade -= alpha_step;
+
+        if (fade < 20.0f)
+            break;
+    }
+}
+
 static void sh_draw_fake_marker(const sh_player_t *p, const sh_box_t *b)
 {
     if (!g_cfg.visuals.draw_fakes)
@@ -348,6 +388,7 @@ void sh_esp_draw_player(const sh_player_t *p)
     sh_draw_name(p, &box);
     sh_draw_weapon(p, &box);
     sh_draw_distance(p, &box);
+    sh_draw_history(p);
     sh_draw_fake_marker(p, &box);
     sh_draw_head_dot(p, &box);
     sh_draw_skeleton(p, &box);

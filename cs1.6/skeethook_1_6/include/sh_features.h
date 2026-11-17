@@ -4,9 +4,19 @@
 #include "sh_config.h"
 #include "sh_sdk.h"
 
+#define sh_hist_max 12
+
+typedef struct sh_hist_point_s
+{
+    vec3_t origin;
+    f32 time;
+} sh_hist_point_t;
+
 typedef struct sh_player_s
 {
     void *fake_ent;
+    sh_hist_point_t hist[sh_hist_max];
+    i32 hist_head;
     sh_cl_entity_t *ent;
     i32 index;
     sh_hud_player_info_t info;

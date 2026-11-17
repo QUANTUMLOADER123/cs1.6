@@ -124,6 +124,15 @@ static void sh_player_fill(sh_player_t *p, i32 index)
     p->weapon_id = sh_weapon_from_model(ent->curstate.weaponmodel);
     p->fake_ent = 0;
 
+    {
+        i32 h = p->hist_head;
+
+        p->hist[h].origin = ent->origin;
+        p->hist[h].time = g_pmove ? g_pmove->time : 0.0f;
+
+        p->hist_head = (h + 1) % sh_hist_max;
+    }
+
     if (g_engfuncs && g_engfuncs->pfnGetPlayerInfo)
         g_engfuncs->pfnGetPlayerInfo(index, &p->info);
 
@@ -164,6 +173,10 @@ void sh_players_collect(void)
         g_players[i].index = i;
         g_players[i].health = 0;
         g_players[i].visible = 0;
+        g_players[i].hist_head = 0;
+
+        for (i32 k = 0; k < sh_hist_max; ++k)
+            g_players[i].hist[k].time = 0.0f;
     }
 
     g_player_count = 0;
