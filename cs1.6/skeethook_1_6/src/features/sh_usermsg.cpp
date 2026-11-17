@@ -1,4 +1,5 @@
 #include "../../include/sh_features.h"
+#include "../../include/sh_ballistics.h"
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
 #include "../../include/sh_sdk.h"
@@ -273,7 +274,18 @@ static i32 __cdecl sh_cb_damage(const char *name, i32 size, i32 read)
 
     if (dmg > 0.0f && dmg < 200.0f)
     {
-        sh_hitmarker_on_hit(0, (i32)dmg);
+        i32 is_head = 0;
+        sh_player_t *lp = sh_player_local();
+
+        if (lp)
+        {
+            const sh_weapon_ballistic_t *wb = sh_weapon_ballistic_for(lp->weapon_id);
+
+            if (wb && wb->damage > 0.0f && (f32)dmg >= wb->damage * 1.6f)
+                is_head = 1;
+        }
+
+        sh_hitmarker_on_hit(is_head, (i32)dmg);
         sh_worldfx_hit_sound_damage((i32)dmg);
         g_damage_done_time = t;
     }

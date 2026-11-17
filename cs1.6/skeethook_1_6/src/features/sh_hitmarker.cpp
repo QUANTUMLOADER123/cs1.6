@@ -48,6 +48,9 @@ i32 sh_hitmarker_count(void)
 
 void sh_hitmarker_draw(void)
 {
+    if (!g_cfg.visuals.hitmarker)
+        return;
+
     f32 cx = (f32)sh_screen_width() * 0.5f;
     f32 cy = (f32)sh_screen_height() * 0.5f;
 
@@ -75,5 +78,14 @@ void sh_hitmarker_draw(void)
         sh_draw_line(cx + gap, cy - gap, cx + gap + len, cy - gap - len, 1.5f, c);
         sh_draw_line(cx - gap - len, cy + gap + len, cx - gap, cy + gap, 1.5f, c);
         sh_draw_line(cx + gap, cy + gap, cx + gap + len, cy + gap + len, 1.5f, c);
+
+        if (g_cfg.visuals.hitmarker_damage && h->damage > 0)
+        {
+            col4_t tc = h->headshot
+                      ? (col4_t)SH_COL_RGBA(255, 120, 120, (u8)(255.0f * fade))
+                      : (col4_t)SH_COL_RGBA(230, 230, 230, (u8)(255.0f * fade));
+
+            sh_text_center(cx, cy + gap + len + 2.0f, tc, "%d", h->damage);
+        }
     }
 }
