@@ -1,6 +1,7 @@
 #include "../../include/sh_features.h"
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
+#include "../../include/sh_sdk.h"
 
 sh_msg_state_t g_msgs;
 
@@ -102,9 +103,62 @@ i32 sh_player_is_dead(i32 index)
     return (g_msgs.attrib[index] & 1) != 0;
 }
 
+typedef struct sh_fire_event_s
+{
+    i32 index;
+    vec3_t origin;
+    f32 time;
+    qbool active;
+} sh_fire_event_t;
+
+#define sh_max_fire_events 16
+
+static sh_fire_event_t g_fires[sh_max_fire_events];
+static i32 g_fire_cursor;
+
 void sh_msg_enemy_fire(i32 index)
 {
-    (void)index;
+    if (index <= 0 || index > 32)
+        return;
+
+    sh_player_t *p = sh_player_get(index);
+
+    if (!p || !p->ent)
+        return;
+
+    sh_fire_event_t *f = &g_fires[g_fire_cursor];
+
+    f->index = index;
+    f->origin = p->origin;
+    f->time = g_pmove ? g_pmove->time : 0.0f;
+    f->active = 1;
+
+    g_fire_cursor = (g_fire_cursor + 1) % sh_max_fire_events;
+}
+
+i32 sh_enemy_fire_count(void)
+{
+    i32 n = 0;
+
+    for (i32 i = 0; i < sh_max_fire_events; ++i)
+    {
+        if (g_fires[i].active)
+            ++n;
+    }
+
+    return n;
+}
+
+void sh_enemy_fire_tick(f32 now)
+{
+    for (i32 i = 0; i < sh_max_fire_events; ++i)
+    {
+        if (!g_fires[i].active)
+            continue;
+
+        if (now - g_fires[i].time > 0.8f)
+            g_fires[i].active = 0;
+    }
 }
 
 static u32 sh_str_len(const char *s, u32 max)

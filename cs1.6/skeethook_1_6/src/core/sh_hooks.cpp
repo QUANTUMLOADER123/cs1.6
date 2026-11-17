@@ -6,6 +6,8 @@
 #include "../../include/sh_scanner.h"
 #include "../../include/sh_font.h"
 #include "../../include/sh_movement.h"
+
+void sh_players_track_anim(void);
 #include "../../include/sh_ballistics.h"
 #include "../../include/sh_visuals.h"
 #include "../../include/sh_fakelag.h"
@@ -14,6 +16,8 @@
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
 #include "../../include/sh_movement.h"
+
+void sh_players_track_anim(void);
 
 void sh_indicators_draw(void);
 #include "../../include/sh_visuals.h"
@@ -115,6 +119,7 @@ i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
         return result;
 
     sh_players_collect();
+    sh_players_track_anim();
 
     sh_rage_run(cmd);
     sh_rage_apply_recoil(cmd);

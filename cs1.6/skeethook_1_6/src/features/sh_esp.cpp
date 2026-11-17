@@ -283,6 +283,35 @@ void sh_esp_draw_player(const sh_player_t *p)
     sh_draw_snapline(p, &box);
 }
 
+i32 sh_enemy_fire_count(void);
+void sh_enemy_fire_tick(f32 now);
+
+void sh_enemy_fire_draw(void)
+{
+    if (!g_cfg.misc.enemy_fire_indicator)
+        return;
+
+    f32 now = g_pmove ? g_pmove->time : 0.0f;
+    sh_enemy_fire_tick(now);
+
+    f32 s = sh_scale();
+    f32 cx = (f32)sh_screen_width() * 0.5f;
+    f32 cy = (f32)sh_screen_height() * 0.5f;
+
+    sh_player_t *local = sh_player_local();
+
+    if (!local)
+        return;
+
+    i32 n = sh_enemy_fire_count();
+
+    if (n <= 0)
+        return;
+
+    col4_t c = { 255, 140, 60, (u8)(120 + n * 20 > 255 ? 255 : 120 + n * 20) };
+    sh_text(cx - 20.0f * s, cy + 40.0f * s, c, "fire %d", n);
+}
+
 void sh_radar_draw(void);
 void sh_spectator_list_draw(void);
 
@@ -301,7 +330,12 @@ void sh_esp_run(void)
 
     sh_radar_draw();
     sh_spectator_list_draw();
+    sh_enemy_fire_draw();
 }
+
+i32 sh_enemy_fire_count(void);
+void sh_enemy_fire_tick(f32 now);
+
 
 void sh_radar_draw(void)
 {

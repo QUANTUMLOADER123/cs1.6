@@ -149,6 +149,35 @@ qbool sh_trace_line(const vec3_t *start, const vec3_t *end, vec3_t *hitsh)
     return false;
 }
 
+void sh_msg_enemy_fire(i32 index);
+
+static i32 g_last_anim[33];
+
+void sh_players_track_anim(void)
+{
+    for (i32 i = 1; i <= 32; ++i)
+    {
+        sh_player_t *p = sh_player_get(i);
+
+        if (!p || !p->ent)
+            continue;
+
+        i32 anim = p->ent->curstate.weaponanim;
+        i32 prev = g_last_anim[i];
+
+        g_last_anim[i] = anim;
+
+        if (prev == 0 || anim == prev)
+            continue;
+
+        if (anim == 1 || anim == 2 || anim == 3)
+        {
+            if (p->index != g_local_player)
+                sh_msg_enemy_fire(i);
+        }
+    }
+}
+
 qbool sh_player_visible(const sh_player_t *p)
 {
     if (!p || !g_pmove)
