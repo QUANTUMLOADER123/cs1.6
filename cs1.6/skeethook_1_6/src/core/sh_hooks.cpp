@@ -33,7 +33,8 @@ typedef i32(__cdecl *create_move_fn)(f32 frametime, sh_usercmd_t *cmd);
 typedef i32(__cdecl *hud_redraw_fn)(f32 time, i32 intermission);
 typedef i32(__cdecl *player_move_fn)(sh_playermove_t *pmove, i32 server);
 typedef i32(__cdecl *hook_user_msg_fn)(const char *name, i32 size);
-typedef i32(__cdecl *add_entity_fn)(i32 type, sh_cl_entity_t *ent);
+typedef i32(__cdecl *add_entity_fn)(i32 type, sh_cl_entity_t *ent,
+                                    const char *model_name);
 
 typedef void(__cdecl *txfer_override_fn)(sh_entity_state_t *state,
                                          const sh_client_data_t *client);
@@ -308,12 +309,33 @@ i32 __cdecl sh_player_move_hook(sh_playermove_t *pmove, i32 server)
     return 0;
 }
 
-i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent)
+i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
+                               const char *model_name)
 {
     i32 result = 0;
 
+    if (g_cfg.misc.no_smoke && model_name && type == 2)
+    {
+        const char *base = model_name;
+        const char *p = model_name;
+
+        while (*p)
+        {
+            if (*p == '/' || *p == '\\')
+                base = p + 1;
+
+            ++p;
+        }
+
+        if (base[0] == 's' || base[0] == 'S')
+            if (base[1] == 'm' || base[1] == 'M')
+                if (base[2] == 'o' || base[2] == 'O')
+                    if (base[3] == 'k' || base[3] == 'K')
+                        return 0;
+    }
+
     if (g_add_entity_orig)
-        result = g_add_entity_orig(type, ent);
+        result = g_add_entity_orig(type, ent, model_name);
 
     if (!ent)
         return result;

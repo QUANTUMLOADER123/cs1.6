@@ -684,3 +684,34 @@ void sh_sdk_resolve(void);
 qbool sh_sdk_ready(void);
 sh_cl_entity_t *sh_get_entity(i32 index);
 void sh_sdk_set_entity_fn(sh_cl_entity_t *(*fn)(i32));
+
+typedef struct sh_tempent_s
+{
+    i32 flags;
+    f32 die;
+    f32 frame_max;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 fade_speed;
+    f32 bounce_factor;
+    i32 hit_sound;
+    void *hit_callback;
+    void *callback;
+    struct sh_tempent_s *next;
+    i32 priority;
+    i16 client_index;
+    f32 tent_offset[3];
+    sh_cl_entity_t entity;
+} sh_tempent_t;
+
+typedef char sh_tempent_offset_check[
+    (((char *)&((sh_tempent_t *)0)->entity - (char *)0) == 0x44) ? 1 : -1];
+
+typedef void(__cdecl *sh_tempent_update_fn)(f64 frametime, f64 client_time,
+                                            f64 cl_gravity,
+                                            sh_tempent_t **ppfree,
+                                            sh_tempent_t **ppactive,
+                                            i32 (*add_visible)(sh_cl_entity_t *),
+                                            void (*play_sound)(sh_tempent_t *,
+                                                               f32));
