@@ -156,8 +156,17 @@ static void sh_draw_weapon(const sh_player_t *p, const sh_box_t *b)
     if (!g_cfg.visuals.weapon)
         return;
 
-    sh_text_center((b->left + b->right) * 0.5f, b->bottom + 3.0f,
-                   g_cfg.visuals.col_weapon, "%s", p->weapon_name);
+    if (sh_events_is_firing(p->index, 0.25f))
+    {
+        sh_text_center((b->left + b->right) * 0.5f, b->bottom + 3.0f,
+                       (col4_t)SH_COL_RGBA(255, 80, 80, 255), "%s*",
+                       p->weapon_name);
+    }
+    else
+    {
+        sh_text_center((b->left + b->right) * 0.5f, b->bottom + 3.0f,
+                       g_cfg.visuals.col_weapon, "%s", p->weapon_name);
+    }
 }
 
 static void sh_draw_distance(const sh_player_t *p, const sh_box_t *b)

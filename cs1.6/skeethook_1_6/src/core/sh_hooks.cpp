@@ -285,6 +285,8 @@ static void sh_first_init(void)
     sh_render_init();
     g_render_ready = sh_font_init();
     sh_icons_init();
+    sh_events_reset();
+    sh_spread_reset();
 }
 
 i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
