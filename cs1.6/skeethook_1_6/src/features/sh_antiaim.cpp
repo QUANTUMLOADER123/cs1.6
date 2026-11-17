@@ -183,6 +183,56 @@ void sh_antiaim_apply_yaw(sh_usercmd_t *cmd, f32 time)
 
         break;
     }
+    case sh_yaw_at_target:
+    case sh_yaw_at_target_jitter:
+    {
+        f32 tyaw = base + 180.0f;
+        sh_player_t *best_pl = 0;
+        f32 best = 8192.0f;
+        sh_player_t *local = sh_player_local();
+
+        if (g_pmove)
+        {
+            for (i32 i = 1; i <= 32; ++i)
+            {
+                sh_player_t *pl = sh_player_get(i);
+
+                if (!pl || !pl->ent || pl->health <= 0)
+                    continue;
+
+                if (pl == local)
+                    continue;
+
+                f32 dx = pl->origin.x - g_pmove->origin.x;
+                f32 dy = pl->origin.y - g_pmove->origin.y;
+                f32 d = dx * dx + dy * dy;
+
+                if (d < best)
+                {
+                    best = d;
+                    best_pl = pl;
+                }
+            }
+        }
+
+        if (best_pl)
+        {
+            f32 dx = best_pl->origin.x - g_pmove->origin.x;
+            f32 dy = best_pl->origin.y - g_pmove->origin.y;
+
+            tyaw = sh_atan2(dy, dx) * 57.2957795f;
+        }
+
+        if (g_cfg.antiaim.yaw_mode == sh_yaw_at_target)
+            cmd->viewangles.y = tyaw;
+        else
+            cmd->viewangles.y = tyaw + ((g_jitter_flip) ? 90.0f : -90.0f);
+
+        if (g_cfg.antiaim.yaw_mode == sh_yaw_at_target_jitter)
+            g_jitter_flip = !g_jitter_flip;
+
+        break;
+    }
     case sh_yaw_jitter:
     {
         f32 jitter = g_cfg.antiaim.yaw_jitter;

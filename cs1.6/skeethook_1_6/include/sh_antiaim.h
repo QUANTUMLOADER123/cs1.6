@@ -27,7 +27,9 @@ enum sh_yaw_mode
     sh_yaw_random = 8,
     sh_yaw_jitter = 9,
     sh_yaw_fake_sideways = 10,
-    sh_yaw_fake_edge = 11
+    sh_yaw_fake_edge = 11,
+    sh_yaw_at_target = 12,
+    sh_yaw_at_target_jitter = 13
 };
 
 qbool sh_antiaim_can_run(sh_usercmd_t *cmd);
