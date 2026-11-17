@@ -1,5 +1,6 @@
 #include "../../include/sh_config.h"
 #include "../../include/sh_movement.h"
+#include "../../include/sh_grenade.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_types.h"
 #include "../../include/sh_sdk.h"
@@ -243,6 +244,21 @@ static void sh_menu_draw_movement(f32 x, f32 y)
     g_movement_shots_dbg = (f32)sh_shots_count();
 
     sh_menu_slider(x, cy, colw, "shots", &g_movement_shots_dbg, 0.0f, 40.0f, "%.0f");
+    cy += row + 8.0f * s;
+
+    sh_menu_section("grenade predict", x, cy);
+    cy += 20.0f * s;
+
+    static f32 g_gren_angle_dbg;
+    static f32 g_gren_range_dbg;
+
+    g_gren_angle_dbg = sh_grenade_optimal_angle();
+    g_gren_range_dbg = sh_grenade_range(g_gren_angle_dbg, 64.0f);
+
+    sh_menu_slider(x, cy, colw, "best angle", &g_gren_angle_dbg, 0.0f, 90.0f, "%.0f");
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "range", &g_gren_range_dbg, 0.0f, 1200.0f, "%.0f");
 }
 
 static void sh_menu_draw_settings(f32 x, f32 y)
