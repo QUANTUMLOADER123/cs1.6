@@ -5,6 +5,7 @@
 
 #define sh_air_accel_cap 30.0f
 #define sh_max_move 450.0f
+#define sh_bunnyjump_max_factor 1.2f
 #define sh_pi 3.14159265358979f
 
 static f32 sh_atan2_deg(f32 y, f32 x)
@@ -84,8 +85,14 @@ void sh_autostrafe(sh_usercmd_t *cmd, sh_playermove_t *pm)
     f32 f = sh_cos_deg(target_yaw - cmd->viewangles.y);
     f32 r = sh_sin_deg(target_yaw - cmd->viewangles.y);
 
-    cmd->forwardmove = f * sh_max_move;
-    cmd->sidemove = -r * sh_max_move;
+    f32 move = sh_max_move;
+    f32 cap = sh_bunnyjump_max_factor * pm->maxspeed;
+
+    if (cap > 30.0f && speed > cap * 0.95f)
+        return;
+
+    cmd->forwardmove = f * move;
+    cmd->sidemove = -r * move;
 }
 
 void sh_quick_stop(sh_usercmd_t *cmd, sh_playermove_t *pm)
