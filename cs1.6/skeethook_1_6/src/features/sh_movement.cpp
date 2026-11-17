@@ -136,19 +136,19 @@ void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm)
 
     if (g_drop_frame)
     {
-        cmd->buttons &= ~2;
+        cmd->buttons &= ~sh_in_jump;
         g_drop_frame = 0;
         return;
     }
 
-    if ((pm->oldbuttons & 2) && (cmd->buttons & 2))
+    if ((pm->oldbuttons & sh_in_jump) && (cmd->buttons & sh_in_jump))
     {
-        cmd->buttons &= ~2;
+        cmd->buttons &= ~sh_in_jump;
         g_drop_frame = 1;
         return;
     }
 
-    cmd->buttons |= 2;
+    cmd->buttons |= sh_in_jump;
 }
 
 void sh_auto_jump_hold(sh_usercmd_t *cmd, sh_playermove_t *pm)
@@ -157,7 +157,7 @@ void sh_auto_jump_hold(sh_usercmd_t *cmd, sh_playermove_t *pm)
         return;
 
     if (pm->onground == -1)
-        cmd->buttons |= 2;
+        cmd->buttons |= sh_in_jump;
 }
 
 i32 g_shots_fired = 0;
@@ -202,7 +202,7 @@ void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (!g_cfg.movement.super_toss || !cmd || !pm)
         return;
 
-    if (!(cmd->buttons & 2))
+    if (!(cmd->buttons & sh_in_jump))
         return;
 
     f32 pitch = cmd->viewangles.x;
@@ -281,7 +281,7 @@ void sh_movement_run(sh_usercmd_t *cmd)
     sh_auto_jump_hold(cmd, pm);
     sh_super_toss(cmd, pm);
 
-    if (cmd->buttons & 1)
+    if (cmd->buttons & sh_in_attack)
         sh_shots_on_attack();
     else
         sh_shots_reset();

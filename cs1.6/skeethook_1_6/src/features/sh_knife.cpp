@@ -85,8 +85,5 @@ void sh_knife_run(sh_usercmd_t *cmd)
 
     cmd->viewangles = want;
 
-    if (sh_knife_should_stab(&aim, &eye, &want, best_dist))
-        cmd->buttons |= 4;
-    else
-        cmd->buttons |= 1;
+    cmd->buttons |= sh_in_attack;
 }

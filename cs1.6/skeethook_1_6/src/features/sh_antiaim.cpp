@@ -33,10 +33,10 @@ qbool sh_antiaim_can_run(sh_usercmd_t *cmd)
     if (!cmd)
         return 0;
 
-    if (cmd->buttons & 1)
+    if (cmd->buttons & sh_in_attack)
         return 0;
 
-    if (cmd->buttons & 32)
+    if (cmd->buttons & sh_in_use)
         return 0;
 
     if (!g_pmove)
@@ -236,7 +236,7 @@ void sh_antiaim_run(sh_usercmd_t *cmd)
     }
 
     if (g_cfg.antiaim.fake_duck && g_pmove && g_pmove->onground != -1)
-        cmd->buttons |= 4;
+        cmd->buttons |= sh_in_duck;
 
     if (g_cfg.antiaim.micro_move && g_pmove)
     {
