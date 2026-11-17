@@ -237,6 +237,11 @@ static f32 sh_text_scale(void)
     if (k > 3.0f)
         k = 3.0f;
 
+    if (g_cfg.esp.font == 1)
+        k *= 0.8f;
+    else if (g_cfg.esp.font == 2)
+        k *= 0.65f;
+
     return sh_scale() * k;
 }
 

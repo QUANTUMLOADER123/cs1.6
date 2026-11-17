@@ -100,7 +100,6 @@ void sh_config_defaults(void)
     g_cfg.visuals.col_skeleton = (col4_t)SH_COL_RGBA(255, 255, 255, 220);
 
     g_cfg.misc.bhop = (qbool)0;
-    g_cfg.misc.auto_strafe = (qbool)0;
     g_cfg.misc.edge_jump = (qbool)0;
     g_cfg.misc.fast_ladder = (qbool)0;
     g_cfg.misc.no_fall_damage = (qbool)0;
@@ -121,7 +120,6 @@ void sh_config_defaults(void)
     g_cfg.misc.thirdperson_dist = 120.0f;
     g_cfg.misc.spectator_list = (qbool)0;
 
-    g_cfg.esp.enemy_only = (qbool)1;
     g_cfg.esp.text_scale = 1.0f;
     g_cfg.esp.font = 0;
     g_cfg.esp.show_local = (qbool)0;

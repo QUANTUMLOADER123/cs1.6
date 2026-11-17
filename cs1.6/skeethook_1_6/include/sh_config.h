@@ -118,7 +118,6 @@ typedef struct sh_visuals_cfg
 typedef struct sh_misc_cfg
 {
     qbool bhop;
-    qbool auto_strafe;
     qbool edge_jump;
     qbool fast_ladder;
     qbool no_fall_damage;
@@ -152,7 +151,6 @@ typedef struct sh_movement_cfg
 
 typedef struct sh_esp_shared
 {
-    qbool enemy_only;
     f32 text_scale;
     i32 font;
     qbool show_local;
