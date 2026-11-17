@@ -72,6 +72,9 @@ static col4_t sh_esp_health_color(const sh_player_t *p)
 
 static col4_t sh_esp_color(const sh_player_t *p)
 {
+    if (g_cfg.visuals.col_name.a > 0)
+        return g_cfg.visuals.col_name;
+
     switch (g_cfg.visuals.esp_color_mode)
     {
     case 1:

@@ -123,8 +123,15 @@ void sh_antiaim_apply_pitch(sh_usercmd_t *cmd, f32 time)
         cmd->viewangles.x = -1619.0f;
         break;
     case sh_pitch_spin:
-        cmd->viewangles.x = sh_cos(time * 11.0f * sh_pi) * 90.0f;
+    {
+        f32 spd = g_cfg.antiaim.spin_speed;
+
+        if (spd <= 0.0f)
+            spd = 11.0f;
+
+        cmd->viewangles.x = sh_cos(time * spd * sh_pi) * 90.0f;
         break;
+    }
     case sh_pitch_static:
         cmd->viewangles.x = 0.0f;
         break;
