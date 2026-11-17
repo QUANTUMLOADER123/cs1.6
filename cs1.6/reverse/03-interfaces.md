@@ -175,8 +175,32 @@
 | `+0x024C` | `numphysent` | `[ecx+0x24c]` |
 | `+0x0250` | `physents[]` | `[ecx+0x250]` |
 
-**`sizeof(playermove_t) = 1508`**, **`sizeof(physent_t) = 224`** (код считает
-адрес как `i*7 << 5` = `i*224`).
+**`sizeof(playermove_t) = 322904` (0x4ED58)**, **`sizeof(physent_t) = 224`** (код считает
+адрес как `i*7 << 5` = `i*224`), **`sizeof(pmtrace_t) = 64` (0x40)**.
+
+Раньше здесь стояло `1508`. Это ошибка, и вот почему она
+получилась: 1508 — это размер **первых 0x250 байт** (`physents`
+начинается ровно на `0x250`, а `0x250 + 4 + 48 + 48` как раз даёт
+похожее число). Структура не кончается на `physents` — дальше идут
+`moveents[64]`, `visents[600]`, `touchindex[600]` и ещё 25 указателей.
+
+Проверка сходится до байта, если посчитать от подтверждённых оффсетов:
+
+```
+0x250                       начало physents[]
++ 600 * 0xE0 = 0x20F50      physents[600]
++ 4 + 64 * 0xE0 = 0x24754   nummoveent + moveents[64]
++ 4 + 600 * 0xE0 = 0x45458  numvisent + visents[600]
++ 0x34 + 4 + 600 * 0x40     cmd + numtouch + touchindex[600]
+  = 0x4EA90
++ 512 + 4 + 48 + 48         physinfo + movevars + mins + maxs
+  = 0x4ECF4
++ 0x64                    25 указателей PM_Info_ValueForKey..PM_TraceTexture
+  = 0x4ED58 = 322904      совпадает с sizeof от компилятора
+```
+
+Обратите внимание: `MAX_MOVEENTS` = 64, а не 600 — тоже была ошибка,
+из-за которой структура не сходилась.
 
 ### `FL_` флаги (подтверждены кодом)
 
@@ -257,7 +281,7 @@ CWeaponBox                          (0x100A41D0 BombThink, 0x100A4440 Kill)
 ```
 1. база модуля      GetModuleHandle("client.dll")
 2. gEngfuncs        client.dll + 0x125CC0   (540 Б, 135 указателей)
-3. g_pmove          client.dll + 0x136D84   (playermove_t*, 1508 Б)
+3. g_pmove          client.dll + 0x136D84   (playermove_t*, 0x4ED58 Б)
 ```
 
 Через `gEngfuncs` доступны углы (`+0x88`/`+0x8C`), квары (`+0x94`),

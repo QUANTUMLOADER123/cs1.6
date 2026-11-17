@@ -37,7 +37,7 @@ skeethook_1_6.dll   321 KB    32-bit, инжектится в hl.exe / cstrike
 
 // указатели, полученные по сигнатурам
 sh_engfuncs_t   *g_engfuncs;    // 540 Б, 135 функций движка
-sh_playermove_t *g_pmove;       // физика, 1508 Б
+sh_playermove_t *g_pmove;       // физика, 0x4ED58 Б
 i32              g_local_player;
 
 // проверка
@@ -66,7 +66,7 @@ sh_render_end();
 | структура | размер | подтверждение |
 |---|---:|---|
 | `sh_engfuncs_t` | `0x21C` | `rep movs ecx=0x87` в `Initialize` |
-| `sh_playermove_t` | `1508` | оффсеты полей из `HUD_PlayerMove` |
+| `sh_playermove_t` | `0x4ED58` | 600 physent + 64 moveent + 600 visent + 600 pmtrace |
 | `sh_physent_t` | `0xE0` | код `i*7<<5` = `i*224` |
 | `sh_usercmd_t` | `0x34` | `rep stos ecx=0xD` в `CL_CreateMove` |
 
