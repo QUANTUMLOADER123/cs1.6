@@ -219,10 +219,14 @@ static void sh_menu_draw_rage(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "auto stop", &g_cfg.aimbot.auto_stop);
+    sh_menu_checkbox(x + colw, cy, "auto stop duck", &g_cfg.aimbot.auto_stop_duck);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "auto scope", &g_cfg.aimbot.auto_scope);
     sh_menu_checkbox(x + colw, cy, "visible check", &g_cfg.aimbot.visible_check);
     cy += row;
-    sh_menu_checkbox(x + colw, cy, "smoke check", &g_cfg.aimbot.smoke_check);
-    cy -= row;
+
+    sh_menu_checkbox(x, cy, "smoke check", &g_cfg.aimbot.smoke_check);
     cy += row + 4.0f * s;
 
     sh_menu_section("target", x, cy);

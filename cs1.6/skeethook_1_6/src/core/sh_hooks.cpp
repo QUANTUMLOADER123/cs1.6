@@ -72,14 +72,22 @@ typedef void(__cdecl *txfer_override_fn)(sh_entity_state_t *state,
 
 static txfer_override_fn g_txfer_override_orig;
 
+f32 g_local_fov = 90.0f;
+i32 g_local_weapon_id;
+
 void __cdecl sh_txfer_override_hook(sh_entity_state_t *state,
                                     const sh_client_data_t *client)
 {
     if (g_txfer_override_orig)
         g_txfer_override_orig(state, client);
 
+    if (client)
+    {
+        g_local_fov = client->fov;
+        g_local_weapon_id = client->weapon_id;
+    }
+
     (void)state;
-    (void)client;
 }
 
 typedef void(__cdecl *camera_offset_fn)(f32 *ofs);

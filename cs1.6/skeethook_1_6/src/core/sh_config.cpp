@@ -23,6 +23,7 @@ void sh_config_defaults(void)
     g_cfg.aimbot.fov = 8.0f;
     g_cfg.aimbot.smooth = 4.0f;
     g_cfg.aimbot.hitbox = 0;
+    g_cfg.aimbot.auto_scope = (qbool)0;
     g_cfg.aimbot.priority = 0;
     g_cfg.aimbot.min_damage = 25.0f;
     g_cfg.aimbot.key = 0;

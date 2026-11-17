@@ -66,6 +66,9 @@ static qbool sh_rage_trace(void *user, const vec3_t *start, const vec3_t *end, s
 
 static f32 g_last_attack_sent;
 
+extern f32 g_local_fov;
+extern i32 g_local_weapon_id;
+
 
 void sh_rage_scan(sh_rage_result_t *out)
 {
@@ -117,7 +120,31 @@ void sh_rage_scan(sh_rage_result_t *out)
             continue;
 
         vec3_t center = p->origin;
-        center.z += 36.0f;
+
+        {
+            f32 h = 36.0f;
+
+            switch (g_cfg.aimbot.hitbox)
+            {
+            case 1:
+                h = 64.0f;
+                break;
+            case 2:
+                h = 44.0f;
+                break;
+            case 3:
+                h = 18.0f;
+                break;
+            default:
+                h = 36.0f;
+                break;
+            }
+
+            if (p->ent && p->ent->curstate.usehull == 1)
+                h *= 0.72f;
+
+            center.z += h;
+        }
 
         vec3_t d = center;
 
@@ -281,6 +308,17 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
             if (g_cfg.aimbot.auto_stop_duck && g_pmove &&
                 g_pmove->onground != -1)
                 cmd->buttons |= sh_in_duck;
+        }
+    }
+
+    if (g_cfg.aimbot.auto_scope && g_pmove)
+    {
+        i32 wid = local->weapon_id;
+
+        if (wid == 18 || wid == 3 || wid == 24 || wid == 13)
+        {
+            if (g_local_fov > 90.0f)
+                cmd->buttons |= sh_in_attack2;
         }
     }
 
