@@ -300,6 +300,9 @@ void sh_esp_draw_player(const sh_player_t *p)
     sh_draw_snapline(p, &box);
 }
 
+void sh_radar_draw(void);
+void sh_spectator_list_draw(void);
+
 void sh_esp_run(void)
 {
     if (!g_cfg.visuals.enabled)
@@ -311,5 +314,103 @@ void sh_esp_run(void)
         sh_player_t *p = sh_player_get(i);
         if (p)
             sh_esp_draw_player(p);
+    }
+
+    sh_radar_draw();
+    sh_spectator_list_draw();
+}
+
+void sh_radar_draw(void)
+{
+    if (!g_cfg.misc.radar_hack)
+        return;
+
+    i32 w = sh_screen_width();
+    i32 h = sh_screen_height();
+    f32 s = sh_scale();
+
+    f32 rsize = 110.0f * s;
+    f32 cx = (f32)w - rsize - 10.0f * s;
+    f32 cy = 10.0f * s;
+
+    col4_t bg = { 10, 10, 10, 200 };
+    col4_t bd = { 45, 45, 45, 255 };
+
+    sh_draw_rect(cx, cy, rsize, rsize, bg);
+    sh_draw_rect_outline(cx, cy, rsize, rsize, 1.0f, bd);
+
+    sh_player_t *local = sh_player_local();
+
+    if (!local)
+        return;
+
+    f32 half = rsize * 0.5f;
+    f32 center_x = cx + half;
+    f32 center_y = cy + half;
+
+    f32 scale = half / 2000.0f;
+
+    sh_draw_line(center_x - 3.0f, center_y, center_x + 3.0f, center_y, 1.0f, bd);
+    sh_draw_line(center_x, center_y - 3.0f, center_x, center_y + 3.0f, 1.0f, bd);
+
+    for (i32 i = 1; i <= 32; ++i)
+    {
+        sh_player_t *p = sh_player_get(i);
+
+        if (!p || !p->ent || p->index == g_local_player)
+            continue;
+
+        if (local->team && p->team == local->team)
+            continue;
+
+        if (p->health <= 0)
+            continue;
+
+        f32 dx = p->origin.x - local->origin.x;
+        f32 dy = p->origin.y - local->origin.y;
+
+        f32 px = center_x + dx * scale;
+        f32 py = center_y - dy * scale;
+
+        if (px < cx + 1.0f || px > cx + rsize - 1.0f)
+            continue;
+        if (py < cy + 1.0f || py > cy + rsize - 1.0f)
+            continue;
+
+        col4_t c = p->visible ? (col4_t){ 190, 235, 60, 255 }
+                              : (col4_t){ 255, 90, 90, 255 };
+
+        sh_draw_rect(px - 1.5f, py - 1.5f, 3.0f, 3.0f, c);
+    }
+}
+
+void sh_spectator_list_draw(void)
+{
+    if (!g_cfg.visuals.spectator_list)
+        return;
+
+    f32 s = sh_scale();
+    f32 x = 8.0f * s;
+    f32 y = (f32)sh_screen_height() - 90.0f * s;
+
+    sh_text(x, y, (col4_t){ 200, 200, 200, 220 }, "spectators");
+
+    i32 n = 0;
+
+    for (i32 i = 1; i <= 32; ++i)
+    {
+        sh_player_t *p = sh_player_get(i);
+
+        if (!p || !p->ent || p->index == g_local_player)
+            continue;
+
+        if (p->health > 0)
+            continue;
+
+        sh_text(x, y + (14.0f + (f32)n * 10.0f) * s,
+                (col4_t){ 150, 150, 150, 200 }, "%s", p->name);
+
+        if (++n >= 4)
+            break;
     }
 }
