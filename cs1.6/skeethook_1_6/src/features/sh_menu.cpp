@@ -1,6 +1,7 @@
 #include "../../include/sh_config.h"
 #include "../../include/sh_movement.h"
 #include "../../include/sh_grenade.h"
+#include "../../include/sh_skybox.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_types.h"
 #include "../../include/sh_sdk.h"
@@ -332,8 +333,43 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_section("visual", x, cy);
     cy += 20.0f * s;
 
-    sh_menu_checkbox(x, cy, "no flash", &g_cfg.misc.no_flash);
-    sh_menu_checkbox(x + colw, cy, "no smoke", &g_cfg.misc.no_smoke);
+    sh_menu_checkbox(x, cy, "nightmode", &g_cfg.visuals.nightmode);
+    sh_menu_checkbox(x + colw, cy, "no flash", &g_cfg.misc.no_flash);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "skybox change", &g_cfg.visuals.skybox_change);
+    cy += row;
+
+    static const char *g_sky_items[12];
+    static qbool sky_init;
+
+    if (!sky_init)
+    {
+        for (i32 i = 0; i < 12; ++i)
+            g_sky_items[i] = sh_skybox_name(i);
+        sky_init = 1;
+    }
+
+    static i32 sky_dbg;
+    sky_dbg = g_cfg.visuals.skybox_index;
+
+    sh_menu_combo(x, cy, colw, "skybox", &sky_dbg, g_sky_items, 12);
+    g_cfg.visuals.skybox_index = sky_dbg;
+    cy += row + 6.0f * s;
+
+    sh_menu_checkbox(x, cy, "bullets tracer", &g_cfg.visuals.tracer);
+    sh_menu_checkbox(x + colw, cy, "impacts", &g_cfg.visuals.impact);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "thirdperson", &g_cfg.visuals.thirdperson);
+    sh_menu_checkbox(x + colw, cy, "spectator list", &g_cfg.visuals.spectator_list);
+    cy += row + 6.0f * s;
+
+    sh_menu_slider(x, cy, colw, "thirdperson dist", &g_cfg.visuals.thirdperson_dist,
+                   32.0f, 400.0f, "%.0f");
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "no smoke", &g_cfg.misc.no_smoke);
     cy += row;
 
     sh_menu_checkbox(x, cy, "no scope", &g_cfg.misc.no_scope);

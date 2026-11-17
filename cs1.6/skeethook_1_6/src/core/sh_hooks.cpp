@@ -10,6 +10,8 @@
 #include "../../include/sh_visuals.h"
 #include "../../include/sh_fakelag.h"
 #include "../../include/sh_rage.h"
+#include "../../include/sh_skybox.h"
+#include "../../include/sh_visuals.h"
 #include "../../include/sh_features.h"
 
 
@@ -159,6 +161,8 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_render_begin(w, h);
 
     sh_visuals_effects_tick(time);
+    sh_skybox_tick();
+    sh_visuals_apply_nightmode();
 
     if (g_cfg.visuals.enabled)
         sh_esp_run();
