@@ -107,6 +107,10 @@ typedef struct sh_visuals_cfg
     qbool thirdperson;
     f32 thirdperson_dist;
     qbool spectator_list;
+    qbool flat_textures;
+    qbool hit_sound;
+    f32 hit_sound_volume;
+    qbool bullet_impact_sound;
 } sh_visuals_cfg;
 
 typedef struct sh_misc_cfg

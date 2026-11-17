@@ -48,6 +48,10 @@ void sh_config_defaults(void)
     g_cfg.visuals.thirdperson = (qbool)0;
     g_cfg.visuals.thirdperson_dist = 150.0f;
     g_cfg.visuals.spectator_list = (qbool)0;
+    g_cfg.visuals.flat_textures = (qbool)0;
+    g_cfg.visuals.hit_sound = (qbool)0;
+    g_cfg.visuals.hit_sound_volume = 1.0f;
+    g_cfg.visuals.bullet_impact_sound = (qbool)0;
 
     g_cfg.antiaim.enabled = (qbool)0;
     g_cfg.antiaim.pitch_mode = 0;

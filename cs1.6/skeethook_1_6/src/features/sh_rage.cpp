@@ -4,6 +4,7 @@
 #include "../../include/sh_features.h"
 #include "../../include/sh_visuals.h"
 #include "../../include/sh_hitmarker.h"
+#include "../../include/sh_worldfx.h"
 
 #include <windows.h>
 
@@ -168,6 +169,7 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
             (void)d2;
             sh_hitmarker_on_hit(r->target.hitgroup == 1, (i32)r->target.damage);
             sh_hitmarker_tick(vt);
+            sh_worldfx_hit_sound();
         }
     }
 }
