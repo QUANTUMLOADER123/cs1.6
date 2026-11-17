@@ -1,3 +1,4 @@
+#include "../../include/sh_worldfx.h"
 #include "../../include/sh_config.h"
 #include "../../include/sh_sdk.h"
 #include "../../include/sh_types.h"
@@ -56,6 +57,11 @@ void sh_worldfx_tick(void)
 
 void sh_worldfx_hit_sound(void)
 {
+    sh_worldfx_hit_sound_damage(0);
+}
+
+void sh_worldfx_hit_sound_damage(i32 dmg)
+{
     if (!g_cfg.visuals.hit_sound)
         return;
 
@@ -67,5 +73,12 @@ void sh_worldfx_hit_sound(void)
     if (vol <= 0.0f)
         return;
 
-    g_engfuncs->pfnPlaySoundByName("weapons/ric1.wav", vol);
+    const char *snd = "weapons/ric1.wav";
+
+    if (dmg >= 60)
+        snd = "weapons/ric3.wav";
+    else if (dmg >= 25)
+        snd = "weapons/ric2.wav";
+
+    g_engfuncs->pfnPlaySoundByName(snd, vol);
 }

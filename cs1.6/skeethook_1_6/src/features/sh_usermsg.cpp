@@ -233,7 +233,7 @@ static i32 __cdecl sh_cb_health(const char *name, i32 size, i32 read)
         if (g_last_health > 0 && dmg > 0)
         {
             sh_hitmarker_on_hit(0, dmg);
-            sh_worldfx_hit_sound();
+            sh_worldfx_hit_sound_damage(dmg);
             g_damage_done_time = g_pmove ? g_pmove->time : 0.0f;
         }
     }
