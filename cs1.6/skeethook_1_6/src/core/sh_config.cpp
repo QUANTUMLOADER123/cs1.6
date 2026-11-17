@@ -152,6 +152,11 @@ void sh_config_save(void)
     if (!f)
         return;
 
+    u32 magic = 0x53484B31u;
+    u32 size = (u32)sizeof(g_cfg);
+
+    fwrite(&magic, sizeof(magic), 1, f);
+    fwrite(&size, sizeof(size), 1, f);
     fwrite(&g_cfg, sizeof(g_cfg), 1, f);
     fclose(f);
 }
@@ -165,6 +170,19 @@ void sh_config_load(void)
     if (!f)
     {
         sh_config_defaults();
+        return;
+    }
+
+    u32 magic = 0;
+    u32 size = 0;
+
+    if (fread(&magic, sizeof(magic), 1, f) != 1 ||
+        fread(&size, sizeof(size), 1, f) != 1 ||
+        magic != 0x53484B31u || size != (u32)sizeof(sh_config))
+    {
+        fclose(f);
+        sh_config_defaults();
+        sh_config_save();
         return;
     }
 
