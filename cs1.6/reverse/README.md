@@ -29,6 +29,7 @@
 | [`20-weapon-data.md`](20-weapon-data.md) | **`weapon_data_t`**: 64 оружия, предсказанные таймеры |
 | [`21-clientdll-slots.md`](21-clientdll-slots.md) | **32 слота экспортов `client.dll`** — точные адреса без паттернов |
 | [`22-bones-studio.md`](22-bones-studio.md) | **кости** через `HUD_GetStudioModelInterface` |
+| [`23-client-overrides.md`](23-client-overrides.md) | `iuser1..4`: три разные семантики в трёх функциях, `iOnTrain` |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,
