@@ -1,0 +1,72 @@
+#pragma once
+
+#include "sh_types.h"
+
+enum sh_svc
+{
+    sh_svc_bad = 0,
+    sh_svc_nop = 1,
+    sh_svc_disconnect = 2,
+    sh_svc_event = 3,
+    sh_svc_version = 4,
+    sh_svc_setview = 5,
+    sh_svc_sound = 6,
+    sh_svc_time = 7,
+    sh_svc_print = 8,
+    sh_svc_stufftext = 9,
+    sh_svc_setangle = 10,
+    sh_svc_serverinfo = 11,
+    sh_svc_lightstyle = 12,
+    sh_svc_updateuserinfo = 13,
+    sh_svc_deltadescription = 14,
+    sh_svc_clientdata = 15,
+    sh_svc_stopsound = 16,
+    sh_svc_pings = 17,
+    sh_svc_particle = 18,
+    sh_svc_damage = 19,
+    sh_svc_spawnstatic = 20,
+    sh_svc_event_reliable = 21,
+    sh_svc_spawnbaseline = 22,
+    sh_svc_temp_entity = 23,
+    sh_svc_setpause = 24,
+    sh_svc_signonnum = 25,
+    sh_svc_centerprint = 26,
+    sh_svc_killedmonster = 27,
+    sh_svc_foundsecret = 28,
+    sh_svc_spawnstaticsound = 29,
+    sh_svc_intermission = 30,
+    sh_svc_finale = 31,
+    sh_svc_cdtrack = 32,
+    sh_svc_restore = 33,
+    sh_svc_cutscene = 34,
+    sh_svc_weaponanim = 35,
+    sh_svc_decalname = 36,
+    sh_svc_roomtype = 37,
+    sh_svc_addangle = 38,
+    sh_svc_newusermsg = 39,
+    sh_svc_packetentities = 40,
+    sh_svc_deltapacketentities = 41,
+    sh_svc_choke = 42,
+    sh_svc_resourcelist = 43,
+    sh_svc_newmovevars = 44,
+    sh_svc_resourcerequest = 45,
+    sh_svc_customization = 46,
+    sh_svc_crosshairangle = 47,
+    sh_svc_soundfade = 48,
+    sh_svc_filetxferfailed = 49,
+    sh_svc_hltv = 50,
+    sh_svc_director = 51,
+    sh_svc_voiceinit = 52,
+    sh_svc_voicedata = 53,
+    sh_svc_sendextrainfo = 54,
+    sh_svc_timescale = 55,
+    sh_svc_resourcelocation = 56,
+    sh_svc_sendcvarvalue = 57,
+    sh_svc_exec = 58,
+};
+
+#define sh_svc_count 59
+
+const char *sh_svc_name(i32 opcode);
+qbool sh_svc_is_entity(i32 opcode);
+qbool sh_svc_is_local(i32 opcode);
