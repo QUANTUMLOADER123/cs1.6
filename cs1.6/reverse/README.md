@@ -22,6 +22,7 @@
 | [`13-hud-layout.md`](13-hud-layout.md) | HUD в 640×480, `XRES`/`YRES`, 23 элемента, `.dem` |
 | [`14-grenades.md`](14-grenades.md) | формула броска, гравитация 800, оптимум 42°, урон |
 | [`15-antiaim.md`](15-antiaim.md) | **magic pitch 1620**, movement fix, fake lag, правда про desync |
+| [`16-feature-map.md`](16-feature-map.md) | **карта всех фич**: что работает, чем, почему нет остального |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,
