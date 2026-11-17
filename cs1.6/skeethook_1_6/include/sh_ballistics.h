@@ -38,5 +38,14 @@ const sh_recoil_t *sh_recoil_for(i32 weapon_id);
 void sh_recoil_apply(i32 shots, const sh_recoil_t *r, vec2_t *punch);
 void sh_recoil_compensate(vec3_t *viewangles, i32 weapon_id, i32 shots);
 
+typedef struct sh_weapon_ballistic_s
+{
+    i32 id;
+    f32 damage;
+    f32 range_modifier;
+    i32 penetration;
+} sh_weapon_ballistic_t;
+
+const sh_weapon_ballistic_t *sh_weapon_ballistic_for(i32 weapon_id);
 f32 sh_penetration_modifier(i32 char_texture);
 f32 sh_penetration_damage_modifier(i32 char_texture);

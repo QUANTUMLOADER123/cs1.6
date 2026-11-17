@@ -345,6 +345,50 @@ void sh_recoil_compensate(vec3_t *viewangles, i32 weapon_id, i32 shots)
     viewangles->z = 0.0f;
 }
 
+
+static const sh_weapon_ballistic_t g_weapon_ballistic[] =
+{
+    {  0,   0.0f, 0.00f, 0 },
+    {  1,  32.0f, 0.80f, 1 },
+    {  2,  25.0f, 0.75f, 1 },
+    {  3,  75.0f, 0.98f, 3 },
+    {  4,  98.0f, 0.98f, 2 },
+    {  5,   6.5f, 0.98f, 0 },
+    {  6,   0.0f, 0.00f, 0 },
+    {  7,  29.0f, 0.82f, 1 },
+    {  8,  32.0f, 0.96f, 2 },
+    {  9,   0.0f, 0.00f, 0 },
+    { 10,  36.0f, 0.75f, 1 },
+    { 11,  20.0f, 0.885f, 1 },
+    { 12,  30.0f, 0.82f, 1 },
+    { 13,  70.0f, 0.98f, 2 },
+    { 14,  30.0f, 0.98f, 2 },
+    { 15,  30.0f, 0.96f, 2 },
+    { 16,  34.0f, 0.79f, 1 },
+    { 17,  25.0f, 0.75f, 1 },
+    { 18, 115.0f, 0.99f, 3 },
+    { 19,  26.0f, 0.84f, 1 },
+    { 20,  32.0f, 0.97f, 2 },
+    { 21,   0.0f, 0.00f, 0 },
+    { 22,  32.0f, 0.97f, 2 },
+    { 23,  20.0f, 0.85f, 1 },
+    { 24,  80.0f, 0.98f, 3 },
+    { 25,   0.0f, 0.00f, 0 },
+    { 26,  54.0f, 0.81f, 2 },
+    { 27,  33.0f, 0.955f, 2 },
+    { 28,  36.0f, 0.98f, 2 },
+    { 29,  15.0f, 0.90f, 0 },
+    { 30,  21.0f, 0.885f, 1 }
+};
+
+const sh_weapon_ballistic_t *sh_weapon_ballistic_for(i32 weapon_id)
+{
+    if (weapon_id < 0 || weapon_id > 30)
+        return 0;
+
+    return &g_weapon_ballistic[weapon_id];
+}
+
 f32 sh_penetration_modifier(i32 char_texture)
 {
     switch (char_texture)

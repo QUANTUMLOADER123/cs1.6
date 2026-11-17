@@ -153,10 +153,15 @@ void sh_rage_scan(sh_rage_result_t *out)
             sh_autowall_ctx_t aw;
             aw.start = eye;
             aw.end = center;
+            const sh_weapon_ballistic_t *wb = sh_weapon_ballistic_for(local_p->weapon_id);
+
+            if (!wb || wb->damage <= 0.0f)
+                continue;
+
             aw.bullet_id = 1;
-            aw.penetration = 2;
-            aw.base_damage = 30.0f;
-            aw.range_modifier = 0.98f;
+            aw.penetration = wb->penetration;
+            aw.base_damage = wb->damage;
+            aw.range_modifier = wb->range_modifier;
             aw.penetrate_world = g_cfg.aimbot.penetration;
             aw.trace = sh_rage_trace;
             aw.user = 0;
