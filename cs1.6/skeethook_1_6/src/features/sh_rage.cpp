@@ -5,11 +5,36 @@
 #include "../../include/sh_visuals.h"
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
+#include "../../include/sh_autowall.h"
+#include "../../include/sh_ballistics.h"
 
 #include <windows.h>
 
 
 static sh_rage_result_t g_rage;
+
+static qbool sh_rage_trace(void *user, const vec3_t *start, const vec3_t *end, sh_trace_t *out)
+{
+    (void)user;
+
+    if (!out)
+        return 0;
+
+    out->fraction = 1.0f;
+    out->end = *end;
+    out->normal = (vec3_t){ 0.0f, 0.0f, 1.0f };
+    out->hitgroup = 0;
+    out->char_texture = 0;
+    out->entity = -1;
+
+    if (!sh_trace_line(start, end, 0))
+    {
+        out->fraction = 0.0f;
+        out->entity = 0;
+    }
+
+    return 1;
+}
 static f32 g_last_attack_sent;
 
 
@@ -86,6 +111,35 @@ void sh_rage_scan(sh_rage_result_t *out)
 
         out->candidates++;
 
+        qbool visible = sh_player_visible(p);
+        f32 dealt = 0.0f;
+
+        if (visible)
+        {
+            dealt = (f32)(p->health > 0 ? p->health : 100);
+        }
+        else if (g_cfg.aimbot.auto_wall || g_cfg.aimbot.penetration)
+        {
+            sh_autowall_ctx_t aw;
+            aw.start = eye;
+            aw.end = center;
+            aw.bullet_id = 1;
+            aw.penetration = 2;
+            aw.base_damage = 30.0f;
+            aw.range_modifier = 0.98f;
+            aw.penetrate_world = g_cfg.aimbot.penetration;
+            aw.trace = sh_rage_trace;
+            aw.user = 0;
+
+            dealt = sh_autowall_damage(&aw);
+        }
+
+        if (g_cfg.aimbot.visible_check && !visible)
+            continue;
+
+        if (dealt <= 0.0f)
+            continue;
+
         f32 score = 0.0f;
 
         switch (g_cfg.aimbot.priority)
@@ -112,8 +166,8 @@ void sh_rage_scan(sh_rage_result_t *out)
             out->target.distance = dist;
             out->target.aim_point = center;
             out->target.hitgroup = g_cfg.aimbot.hitbox;
-            out->target.damage = (f32)(p->health > 0 ? p->health : 100);
-            out->target.through_wall = 0;
+            out->target.damage = dealt;
+            out->target.through_wall = visible ? 0 : 1;
         }
     }
 }
@@ -180,12 +234,29 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
 
     if (sh_rage_should_fire(r))
     {
-        cmd->buttons |= 1;
+        f32 now = g_pmove ? g_pmove->time : 0.0f;
+        f32 npa = g_pmove ? g_pmove->next_primary_attack : 0.0f;
+
+        if (!g_cfg.aimbot.double_tap || sh_rage_double_tap(cmd, npa, now))
+            cmd->buttons |= 1;
 
         if (g_cfg.visuals.tracer)
         {
             vec3_t from = eye;
             vec3_t to = r->target.aim_point;
+
+            const sh_recoil_t *rec = sh_recoil_for(local->weapon_id);
+
+            if (rec && rec->up_base > 0.0f)
+            {
+                vec2_t sp;
+                i32 seed = (i32)(now * 1000.0f) ^ (i32)GetTickCount();
+                sh_spread_compute(seed, rec->up_base * 10.0f, &sp);
+
+                to.x += sp.x;
+                to.y += sp.y;
+            }
+
             sh_visuals_tracer_add(&from, &to);
         }
 
@@ -211,14 +282,23 @@ qbool sh_rage_double_tap(sh_usercmd_t *cmd, f32 next_attack_time, f32 now)
     if (!cmd || !g_cfg.aimbot.double_tap)
         return 0;
 
-    if (next_attack_time <= now)
+    f32 frametime = g_pmove ? g_pmove->frametime : 0.01f;
+
+    if (frametime <= 0.0f)
+        frametime = 0.01f;
+
+    f32 window = frametime * 1.5f;
+
+    if (next_attack_time > now + window)
         return 0;
 
-    if (now - g_last_attack_sent < 0.25f)
+    if (next_attack_time < now - frametime)
         return 0;
 
-    cmd->buttons &= ~1;
-    cmd->buttons |= 4;
+    if (!(cmd->buttons & 1))
+        return 0;
+
+    cmd->buttons |= 1;
 
     g_last_attack_sent = now;
 
