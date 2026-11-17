@@ -28,6 +28,7 @@ typedef unsigned char byte;
 typedef float f32;
 typedef double f64;
 typedef bool qbool;
+typedef i32 qboolean;
 
 typedef struct vec2_s { f32 x, y; } vec2_t;
 typedef struct vec3_s { f32 x, y, z; } vec3_t;

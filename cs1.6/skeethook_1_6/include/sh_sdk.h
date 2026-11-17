@@ -67,7 +67,7 @@ typedef struct sh_movevars_s
     f32 maxvelocity;
     f32 zmax;
     f32 waveheight;
-    qbool footsteps;
+    qboolean footsteps;
     char skyname[32];
     f32 rollangle;
     f32 rollspeed;
@@ -119,26 +119,27 @@ typedef struct sh_physent_s
 
 typedef char sh_physent_size_check[(sizeof(sh_physent_t) == 0xE0) ? 1 : -1];
 
+typedef struct sh_pmplane_s
+{
+    vec3_t normal;
+    f32 dist;
+} sh_pmplane_t;
+
 typedef struct sh_pmtrace_s
 {
-    qbool allsolid;
-    qbool startsolid;
-    qbool inopen;
-    qbool inwater;
+    qboolean allsolid;
+    qboolean startsolid;
+    qboolean inopen;
+    qboolean inwater;
     f32 fraction;
     vec3_t endpos;
-    struct
-    {
-        qbool allsolid;
-        qbool startsolid;
-        f32 fraction;
-        vec3_t endpos;
-        vec3_t normal;
-        i32 hitgroup;
-    } plane;
+    sh_pmplane_t plane;
     i32 ent;
+    vec3_t delta_velocity;
     i32 hitgroup;
 } sh_pmtrace_t;
+
+typedef char sh_pmtrace_size_check[(sizeof(sh_pmtrace_t) == 0x44) ? 1 : -1];
 
 typedef sh_pmtrace_t (*sh_ptrace_fn)(vec3_t start, vec3_t end, i32 flags, i32 ignore_pe);
 typedef i32 (*sh_pointcontents_fn)(vec3_t p, i32 *truecontents);
@@ -147,8 +148,8 @@ typedef const char *(*sh_tracetexture_fn)(i32 ground, vec3_t start, vec3_t end);
 typedef struct sh_playermove_s
 {
     i32 player_index;
-    qbool server;
-    qbool multiplayer;
+    qboolean server;
+    qboolean multiplayer;
     f32 time;
     f32 frametime;
     vec3_t forward;
@@ -162,7 +163,7 @@ typedef struct sh_playermove_s
     vec3_t basevelocity;
     vec3_t view_ofs;
     f32 duck_time;
-    qbool in_duck;
+    qboolean in_duck;
     i32 timestep_sound;
     i32 step_left;
     f32 fall_velocity;
@@ -176,7 +177,7 @@ typedef struct sh_playermove_s
     f32 friction;
     i32 oldbuttons;
     f32 waterjumptime;
-    qbool dead;
+    qboolean dead;
     i32 deadflag;
     i32 spectator;
     i32 movetype;
@@ -240,13 +241,13 @@ typedef struct sh_playermove_s
     void (*com_free_file)(void *buffer);
     char *(*memfgets)(u8 *mem_file, i32 file_size, i32 *pos, char *buffer,
                       i32 buffer_size);
-    qbool run_funcs;
+    qboolean run_funcs;
     void (*pm_play_sound)(i32 channel, const char *sample, f32 volume,
                           f32 attenuation, i32 flags, i32 pitch);
     const char *(*pm_trace_texture)(i32 ground, f32 *start, f32 *end);
 } sh_playermove_t;
 
-typedef char sh_playermove_size_check[(sizeof(sh_playermove_t) == 0x4ED58) ? 1 : -1];
+typedef char sh_playermove_size_check[(sizeof(sh_playermove_t) == 0x4F6BC) ? 1 : -1];
 #define SH_PM_OFF_MOVEVARS ((i32)((char*)&((sh_playermove_t*)0)->movevars - (char*)0))
 #define SH_PM_OFF_TRACETEX ((i32)((char*)&((sh_playermove_t*)0)->pm_trace_texture - (char*)0))
 #define SH_PM_SIZE ((i32)sizeof(sh_playermove_t))
