@@ -4,6 +4,8 @@
 #include "../../include/sh_math.h"
 #include "../../include/sh_config.h"
 
+void sh_msg_enemy_fire(i32 index);
+
 static f32 g_last_fire_time[33];
 static i32 g_fire_count[33];
 
@@ -31,6 +33,9 @@ void sh_events_on_fire(i32 entindex, const vec3_t *origin, i32 event_id)
 
     ++g_fire_count[entindex];
     g_last_fire_time[entindex] = now;
+
+    if (entindex != g_local_player)
+        sh_msg_enemy_fire(entindex);
 
     sh_player_t *shooter = sh_player_get(entindex);
 

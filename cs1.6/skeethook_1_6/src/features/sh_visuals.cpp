@@ -18,7 +18,7 @@ static sh_tracer_t g_tracers[sh_max_tracers];
 static i32 g_tracer_cursor;
 static sh_impact_t g_impacts[sh_max_impacts];
 static i32 g_impact_cursor;
-static i32 g_saved_rendermode = -1;
+static i32 g_nightmode_saved = -1;
 static f32 g_saved_monolights;
 static f32 g_saved_overbright;
 static f32 g_saved_fog;
@@ -173,7 +173,7 @@ void sh_visuals_apply_nightmode(void)
 
     if (!g_cfg.visuals.nightmode)
     {
-        if (g_saved_rendermode >= 0)
+        if (g_nightmode_saved >= 0)
             sh_visuals_restore();
         return;
     }
@@ -194,9 +194,9 @@ void sh_visuals_apply_nightmode(void)
     f32 lg = (f32)l.g / 255.0f;
     f32 lb = (f32)l.b / 255.0f;
 
-    if (g_saved_rendermode < 0)
+    if (g_nightmode_saved < 0)
     {
-        g_saved_rendermode = 1;
+        g_nightmode_saved = 1;
         g_saved_monolights = sh_get_cvar("gl_monolights");
         g_saved_overbright = sh_get_cvar("gl_overbright");
         g_saved_fog = sh_get_cvar("gl_fog");
@@ -246,7 +246,7 @@ void sh_visuals_apply_nightmode(void)
 
 void sh_visuals_restore(void)
 {
-    if (g_saved_rendermode < 0)
+    if (g_nightmode_saved < 0)
         return;
 
     if (g_engfuncs && g_engfuncs->pfnCvar_SetValue)
@@ -262,7 +262,7 @@ void sh_visuals_restore(void)
         g_engfuncs->pfnCvar_SetValue("brightness", g_saved_brightness);
     }
 
-    g_saved_rendermode = -1;
+    g_nightmode_saved = -1;
 }
 
 void sh_grenade_path_draw(void)

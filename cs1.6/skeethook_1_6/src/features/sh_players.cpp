@@ -347,12 +347,6 @@ void sh_players_track_anim(void)
         if (prev == 0 || anim == prev)
             continue;
 
-        if (anim == 1 || anim == 2 || anim == 3)
-        {
-            if (p->index != g_local_player)
-                sh_msg_enemy_fire(i);
-        }
-
         if (p->weapon_id == 9 && anim == 6)
             sh_smoke_add(&p->origin);
     }
