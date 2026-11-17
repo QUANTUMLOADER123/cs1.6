@@ -52,10 +52,7 @@ void __cdecl sh_txfer_override_hook(sh_entity_state_t *state,
         return;
 
     if (g_cfg.antiaim.fake_duck)
-        state->iuser3 = 0;
-
-    if (g_cfg.misc.hideshot)
-        state->iuser4 = 0;
+        state->origin.z -= 18.0f;
 }
 
 typedef void(__cdecl *camera_offset_fn)(f32 *ofs);
@@ -348,7 +345,7 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
 
     if (g_cfg.misc.hideshot && ent->index == g_local_player)
     {
-        ent->curstate.effects &= ~2;
+        ent->curstate.effects &= ~sh_ef_muzzleflash;
         ent->curstate.weaponanim = 0;
     }
 

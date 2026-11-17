@@ -11,6 +11,8 @@
 #define sh_fl_waterjump 0x800
 #define sh_fl_frozen 0x4000
 
+#define sh_ef_muzzleflash 2
+
 #define sh_renderfx_none 0
 #define sh_renderfx_glowshell 19
 #define sh_renderfx_clampminscale 20
