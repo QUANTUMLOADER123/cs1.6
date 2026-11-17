@@ -39,6 +39,7 @@ void sh_rage_scan(sh_rage_result_t *out)
     sh_angle_vectors(&view, &fwd, &right, &up);
 
     f32 best_fov = g_cfg.aimbot.fov;
+    f32 best_score = 0.0f;
     f32 max_dist = g_cfg.visuals.max_distance;
 
     for (i32 i = 1; i <= 32; ++i)
@@ -85,16 +86,34 @@ void sh_rage_scan(sh_rage_result_t *out)
 
         out->candidates++;
 
-        if (!out->found || dist < out->target.distance)
+        f32 score = 0.0f;
+
+        switch (g_cfg.aimbot.priority)
         {
+        case 1:
+            score = angle;
+            break;
+        case 2:
+            score = 100000.0f - (f32)(p->health > 0 ? p->health : 100);
+            break;
+        case 3:
+            score = angle * 1000.0f + dist;
+            break;
+        default:
+            score = dist;
+            break;
+        }
+
+        if (!out->found || score < best_score)
+        {
+            best_score = score;
             out->found = 1;
             out->target.index = p->index;
             out->target.distance = dist;
             out->target.aim_point = center;
-            out->target.hitgroup = 2;
-            out->target.damage = 100.0f;
+            out->target.hitgroup = g_cfg.aimbot.hitbox;
+            out->target.damage = (f32)(p->health > 0 ? p->health : 100);
             out->target.through_wall = 0;
-            best_fov = angle;
         }
     }
 }

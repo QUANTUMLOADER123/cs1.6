@@ -85,7 +85,11 @@ static void sh_draw_health(const sh_player_t *p, const sh_box_t *b)
     sh_draw_rect(x - 1.0f, b->top - 1.0f, bar_w + 2.0f, h + 2.0f,
                  (col4_t)SH_COL_RGBA(0, 0, 0, 180));
 
-    col4_t hp = { (u8)(255.0f * (1.0f - frac)), (u8)(255.0f * frac), 40, 255 };
+    col4_t hp = g_cfg.visuals.col_health;
+
+    if (hp.a == 0)
+        hp = (col4_t)SH_COL_RGBA(190, 235, 60, 255);
+
     sh_draw_rect(x, b->top + h * (1.0f - frac), bar_w, h * frac, hp);
 
     if (g_cfg.visuals.health)
@@ -115,8 +119,12 @@ static void sh_draw_armor(const sh_player_t *p, const sh_box_t *b)
     f32 x = b->right + 3.0f;
 
     sh_draw_rect(x, b->top, bar_w, h, (col4_t)SH_COL_RGBA(0, 0, 0, 150));
-    sh_draw_rect(x, b->top + h * (1.0f - frac), bar_w, h * frac,
-                 (col4_t)SH_COL_RGBA(80, 160, 255, 255));
+    col4_t ac = g_cfg.visuals.col_armor;
+
+    if (ac.a == 0)
+        ac = (col4_t)SH_COL_RGBA(80, 160, 255, 255);
+
+    sh_draw_rect(x, b->top + h * (1.0f - frac), bar_w, h * frac, ac);
 }
 
 static void sh_draw_name(const sh_player_t *p, const sh_box_t *b)
