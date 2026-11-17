@@ -1,4 +1,5 @@
 #include "../../include/sh_features.h"
+#include "../../include/sh_icons.h"
 #include "../../include/sh_math.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_ballistics.h"
@@ -141,14 +142,14 @@ static void sh_draw_weapon(const sh_player_t *p, const sh_box_t *b)
 {
     if (g_cfg.visuals.weapon_icon)
     {
-        const char *icon = sh_weapon_icon(p->weapon_id);
-
-        if (icon && icon[0])
+        if (!sh_icons_draw(p->weapon_id, b->right + 4.0f, b->top + 2.0f,
+                           1.0f))
         {
-            f32 tw = sh_text_width(icon);
-            sh_text(b->right + 4.0f, b->top + 2.0f,
-                    g_cfg.visuals.col_weapon, "%s", icon);
-            (void)tw;
+            const char *icon = sh_weapon_icon(p->weapon_id);
+
+            if (icon && icon[0])
+                sh_text(b->right + 4.0f, b->top + 2.0f,
+                        g_cfg.visuals.col_weapon, "%s", icon);
         }
     }
 

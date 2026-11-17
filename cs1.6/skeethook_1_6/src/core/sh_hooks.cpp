@@ -1,6 +1,7 @@
 #include "../../include/sh_hooks.h"
 #include "../../include/sh_config.h"
 #include "../../include/sh_features.h"
+#include "../../include/sh_icons.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_sdk.h"
 #include "../../include/sh_scanner.h"
@@ -208,6 +209,7 @@ static void sh_first_init(void)
 
     sh_render_init();
     g_render_ready = sh_font_init();
+    sh_icons_init();
 }
 
 i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)

@@ -625,9 +625,47 @@ typedef struct sh_globalvars_s
     f32 *host_frametime;
 } sh_globalvars_t;
 
+
+
+typedef struct sh_spr_rect_s
+{
+    i32 left;
+    i32 right;
+    i32 top;
+    i32 bottom;
+} sh_spr_rect_t;
+
+typedef struct sh_client_sprite_s
+{
+    char name[64];
+    char sprite[64];
+    i32 hspr;
+    i32 res;
+    sh_spr_rect_t rc;
+} sh_client_sprite_t;
+
+typedef struct sh_spr_list_fn_s
+{
+    sh_client_sprite_t *(*get_list)(const char *filename, i32 *count);
+} sh_spr_list_fn_t;
+
 typedef struct sh_engfuncs_s
 {
-    void *pad_000[12];
+    i32 (*pfnSPR_Load)(const char *name);
+    i32 (*pfnSPR_Frames)(i32 spr);
+    i32 (*pfnSPR_Height)(i32 spr, i32 frame);
+    i32 (*pfnSPR_Width)(i32 spr, i32 frame);
+    void (*pfnSPR_Set)(i32 spr, i32 r, i32 g, i32 b);
+    void (*pfnSPR_Draw)(i32 frame, i32 x, i32 y,
+                        const sh_spr_rect_t *rect);
+    void (*pfnSPR_DrawHoles)(i32 frame, i32 x, i32 y,
+                             const sh_spr_rect_t *rect);
+    void (*pfnSPR_DrawAdditive)(i32 frame, i32 x, i32 y,
+                                const sh_spr_rect_t *rect);
+    void (*pfnSPR_EnableScissor)(i32 x, i32 y, i32 width, i32 height);
+    void (*pfnSPR_DisableScissor)(void);
+    sh_client_sprite_t *(*pfnSPR_GetList)(const char *filename, i32 *count);
+    void *pfnFillRGBA;
 
     i32 (*pfnGetScreenInfo)(sh_screeninfo_t *info);
     void *pad_034[5];
