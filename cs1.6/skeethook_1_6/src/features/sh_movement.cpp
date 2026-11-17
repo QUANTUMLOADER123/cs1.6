@@ -135,6 +135,22 @@ void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (pm->onground == -1)
         return;
 
+    static i32 g_drop_frame;
+
+    if (g_drop_frame)
+    {
+        cmd->buttons &= ~2;
+        g_drop_frame = 0;
+        return;
+    }
+
+    if ((pm->oldbuttons & 2) && (cmd->buttons & 2))
+    {
+        cmd->buttons &= ~2;
+        g_drop_frame = 1;
+        return;
+    }
+
     cmd->buttons |= 2;
 }
 
