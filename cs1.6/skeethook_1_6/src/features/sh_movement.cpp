@@ -103,10 +103,7 @@ void sh_quick_stop(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (speed < 1.0f)
         return;
 
-    if (speed < pm->maxspeed * 0.9f)
-        return;
-
-    if (!(cmd->buttons & 1))
+    if (speed < pm->maxspeed * 0.25f)
         return;
 
     f32 vel_yaw = sh_atan2_deg(vy, vx);
@@ -250,8 +247,7 @@ void sh_movement_run(sh_usercmd_t *cmd)
     if (g_cfg.movement.autostrafe)
         sh_autostrafe(cmd, pm);
 
-    else if (g_cfg.movement.quick_stop)
-        sh_quick_stop(cmd, pm);
+    sh_quick_stop(cmd, pm);
 
     sh_tick_control(cmd);
 
