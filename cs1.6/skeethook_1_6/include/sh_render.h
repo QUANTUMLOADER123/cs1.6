@@ -28,3 +28,5 @@ void sh_text_shadow(f32 x, f32 y, col4_t col, const char *fmt, ...);
 i32 sh_screen_width(void);
 i32 sh_screen_height(void);
 f32 sh_scale(void);
+f32 sh_xres(f32 x);
+f32 sh_yres(f32 y);

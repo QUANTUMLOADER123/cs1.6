@@ -106,6 +106,16 @@ f32 sh_scale(void)
     return s;
 }
 
+f32 sh_xres(f32 x)
+{
+    return x * ((f32)g_width / 640.0f);
+}
+
+f32 sh_yres(f32 y)
+{
+    return y * ((f32)g_height / 480.0f);
+}
+
 void sh_draw_rect(f32 x, f32 y, f32 w, f32 h, col4_t col)
 {
     if (!sh_render_ready())
