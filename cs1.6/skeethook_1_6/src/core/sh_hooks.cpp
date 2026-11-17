@@ -35,6 +35,27 @@ typedef i32(__cdecl *player_move_fn)(sh_playermove_t *pmove, i32 server);
 typedef i32(__cdecl *hook_user_msg_fn)(const char *name, i32 size);
 typedef i32(__cdecl *add_entity_fn)(i32 type, sh_cl_entity_t *ent);
 
+typedef void(__cdecl *txfer_override_fn)(sh_entity_state_t *state,
+                                         const sh_client_data_t *client);
+
+static txfer_override_fn g_txfer_override_orig;
+
+void __cdecl sh_txfer_override_hook(sh_entity_state_t *state,
+                                    const sh_client_data_t *client)
+{
+    if (g_txfer_override_orig)
+        g_txfer_override_orig(state, client);
+
+    if (!state || !client)
+        return;
+
+    if (g_cfg.antiaim.fake_duck)
+        state->iuser3 = 0;
+
+    if (g_cfg.misc.hideshot)
+        state->iuser4 = 0;
+}
+
 typedef void(__cdecl *camera_offset_fn)(f32 *ofs);
 typedef i32(__cdecl *is_thirdperson_fn)(void);
 
@@ -387,6 +408,14 @@ qbool sh_hooks_install(void)
         if (MH_CreateHook(hud_redraw, (void *)sh_hud_redraw_hook,
                           (void **)&g_hud_redraw_orig) == MH_OK)
             MH_EnableHook(hud_redraw);
+    }
+
+    void *ovr = sh_find_export_body("client.dll", "HUD_TxferLocalOverrides");
+    if (ovr)
+    {
+        if (MH_CreateHook(ovr, (void *)sh_txfer_override_hook,
+                          (void **)&g_txfer_override_orig) == MH_OK)
+            MH_EnableHook(ovr);
     }
 
     void *cam = sh_find_export_body("client.dll", "CL_CameraOffset");
