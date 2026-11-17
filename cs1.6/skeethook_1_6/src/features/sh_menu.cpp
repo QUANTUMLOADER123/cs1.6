@@ -2,6 +2,7 @@
 #include "../../include/sh_movement.h"
 #include "../../include/sh_grenade.h"
 #include "../../include/sh_skybox.h"
+#include "../../include/sh_hitmarker.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_types.h"
 #include "../../include/sh_sdk.h"
@@ -458,22 +459,50 @@ static void sh_menu_draw_movement(f32 x, f32 y)
     sh_menu_slider(x, cy, colw, "range", &g_gren_range_dbg, 0.0f, 1200.0f, "%.0f");
 }
 
+static const char *g_font_items[] = { "default", "small", "bold" };
+
 static void sh_menu_draw_settings(f32 x, f32 y)
 {
     f32 s = sh_scale();
+    f32 row = 20.0f * s;
+    f32 colw = 210.0f * s;
 
-    sh_menu_section("config", x, y);
+    sh_menu_section("esp", x, y);
 
-    f32 cy = y + 22.0f * s;
-    sh_text(x, cy, (col4_t)SH_COL_RGBA(200, 200, 200, 255), "insert - open menu");
-    cy += 16.0f * s;
-    sh_text(x, cy, (col4_t)SH_COL_RGBA(200, 200, 200, 255), "config autosaves on close");
+    f32 cy = y + 20.0f * s;
+    sh_menu_checkbox(x, cy, "enemy only", &g_cfg.esp.enemy_only);
+    sh_menu_checkbox(x + colw, cy, "show local", &g_cfg.esp.show_local);
+    cy += row + 6.0f * s;
 
-    cy += 26.0f * s;
+    sh_menu_slider(x, cy, colw, "text scale", &g_cfg.esp.text_scale, 0.5f, 2.0f, "x");
+    cy += row + 6.0f * s;
+
+    sh_menu_section("status", x, cy);
+    cy += 20.0f * s;
+
     qbool ready = sh_sdk_ready();
+
     sh_text(x, cy, ready ? (col4_t)SH_COL_RGBA(120, 255, 120, 255)
                          : (col4_t)SH_COL_RGBA(255, 90, 90, 255),
             "sdk: %s", ready ? "attached" : "waiting");
+    cy += 14.0f * s;
+
+    sh_text(x, cy, (col4_t)SH_COL_RGBA(170, 170, 170, 255),
+            "players: %d", sh_players_count());
+    cy += 14.0f * s;
+
+    sh_text(x, cy, (col4_t)SH_COL_RGBA(170, 170, 170, 255),
+            "hits: %d   shots: %d", sh_hitmarker_count(), sh_shots_count());
+    cy += row + 6.0f * s;
+
+    sh_menu_section("keys", x, cy);
+    cy += 20.0f * s;
+
+    sh_text(x, cy, (col4_t)SH_COL_RGBA(200, 200, 200, 255), "insert - menu");
+    cy += 14.0f * s;
+    sh_text(x, cy, (col4_t)SH_COL_RGBA(200, 200, 200, 255), "config autosaves on close");
+    cy += 14.0f * s;
+    sh_text(x, cy, (col4_t)SH_COL_RGBA(200, 200, 200, 255), "delete - save config");
 }
 
 static void sh_draw_tab_button(f32 x, f32 y, f32 w, const char *label, i32 index)
