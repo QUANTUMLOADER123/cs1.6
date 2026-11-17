@@ -28,7 +28,14 @@ skeethook_1_6.dll   321 KB    32-bit, инжектится в hl.exe / cstrike
 | SDK | `src/sdk/sh_patterns.cpp` | резолв `gEngfuncs`, `g_pmove` по сигнатурам |
 | рендер | `src/render/sh_render.cpp` | примитивы через OpenGL |
 | | `src/render/sh_font.cpp` | свой растровый шрифт 8x10, атлас 16x6 |
-| фичи | `src/features/*` | aimbot, antiaim, misc, esp, menu |
+| фичи | `src/features/sh_rage.cpp` | ragebot: скан цели, автоогонь, отдача |
+| | `src/features/sh_antiaim.cpp` | pitch/yaw/desync/roll, movement fix |
+| | `src/features/sh_movement.cpp` | автострейфер, bhop, quick stop, super toss |
+| | `src/features/sh_fakelag.cpp` | задержка команд по `g_next_send_time` |
+| | `src/features/sh_bones.cpp` | кости через хук `StudioDrawPlayer` |
+| | `src/features/sh_icons.cpp` | иконки оружия из `sprites/<wpn>.txt` |
+| | `src/features/sh_surface.cpp` | материал поверхности через `PM_TraceTexture` |
+| | `src/features/sh_esp.cpp` | боксы, скелетон, инфо, радар, спектаторы |
 
 ## API
 
