@@ -80,6 +80,15 @@ qbool sh_demo_open(sh_demo_reader_t *r, const u8 *data, i32 size)
         r->pos += 4;
     }
 
+    if (r->pos + 4 <= size)
+    {
+        sh_memcpy_(&r->header.dirs_offset, data + r->pos, 4);
+        r->pos += 4;
+    }
+
+    if (r->header.dirs_offset > 0 && r->header.dirs_offset < size)
+        r->pos = (i32)r->header.dirs_offset;
+
     r->valid = 1;
     return 1;
 }
@@ -137,6 +146,10 @@ void sh_demo_rewind(sh_demo_reader_t *r)
     if (!r)
         return;
 
-    r->pos = 8 + 8 + 260 + 260 + 4;
+    if (r->header.dirs_offset > 0 && r->header.dirs_offset < r->size)
+        r->pos = (i32)r->header.dirs_offset;
+    else
+        r->pos = 8 + 8 + 260 + 260 + 4 + 4;
+
     r->valid = r->data != 0;
 }

@@ -21,6 +21,8 @@ typedef struct sh_demo_header_s
     i32 dirs_offset;
 } sh_demo_header_t;
 
+typedef char sh_demo_header_size_check[(sizeof(sh_demo_header_t) == 544) ? 1 : -1];
+
 typedef struct sh_demo_block_s
 {
     i32 type;
