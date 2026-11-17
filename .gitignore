@@ -1,0 +1,37 @@
+# --- бинарники и вендоры, восстановимые скриптами ---
+tools/*.zip
+tools/ghidra_*/
+tools/ghidra-src/
+tools/hooks/
+cs1.6-src/
+
+# --- сама игра (коммерческий контент Valve) ---
+cs1.6/cstrike/
+cs1.6/valve/
+cs1.6/*.zip
+cs1.6/*.pak
+cs1.6/*.bsp
+
+# --- меню: третьи стороны и сборка ---
+cs1.6/menu/third_party/minhook/
+cs1.6/menu/third_party/kiero/
+cs1.6/menu/build/
+cs1.6/menu/*.o
+cs1.6/menu/headless/*.o
+cs1.6/menu/menu.png
+
+# --- общие ---
+*.zip
+*.exe
+*.so
+*.o
+*.gpr
+*.rep
+__pycache__/
+
+# --- загруженные DLL игры (в корне репо, для реверса) ---
+# они трекаются намеренно: Git LFS не настроен, размер в пределах лимита
+
+# --- результаты декомпиляции: воспроизводимы scripts (r2_decompile.py) ---
+cs1.6/analysis/*/decomp/
+cs1.6/analysis/*/*.r2proj
