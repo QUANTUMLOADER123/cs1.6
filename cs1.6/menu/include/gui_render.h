@@ -236,12 +236,17 @@ namespace render
                 // шрифт: сэмплируем атлас глифов (8-битный alpha)
                 if (g_atlas.valid && ur > 0.0f && vr > 0.0f)
                 {
-                    const int tx = std::clamp((int)(ur * g_atlas.w), 0, g_atlas.w - 1);
-                    const int ty = std::clamp((int)(vr * g_atlas.h), 0, g_atlas.h - 1);
-                    const uint8_t alpha = g_atlas.pixels[(size_t)ty * g_atlas.w + tx];
-                    if (alpha == 0) continue;
-                    // умножаем цвет на alpha текстуры
-                    const uint32_t a8 = ((col >> 24) & 0xff) * alpha / 255;
+                    // ТОЧНАЯ выборка глифа: UV → пиксель атласа.
+                    // Атлас ImGui держит по 1px прозрачного запаса вокруг глифа,
+                    // поэтому берём целый тексель без интерполяции: билинейка
+                    // размазывала штрихи и буквы «слипались».
+                    const float fx = ur * g_atlas.w;
+                    const float fy = vr * g_atlas.h;
+                    const int tx = std::clamp((int)fx, 0, g_atlas.w - 1);
+                    const int ty = std::clamp((int)fy, 0, g_atlas.h - 1);
+                    const float af = (float)g_atlas.pixels[(size_t)ty * g_atlas.w + tx];
+                    if (af < 0.5f) continue;
+                    const uint32_t a8 = (uint32_t)(((col >> 24) & 0xff) * af / 255.0f);
                     col = (a8 << 24) | (col & 0x00ffffff);
                 }
 

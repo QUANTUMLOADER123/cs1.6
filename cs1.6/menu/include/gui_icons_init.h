@@ -73,11 +73,11 @@ namespace gui
         t.px.resize((size_t)sp.w * sp.h);
         for (size_t i = 0; i < (size_t)sp.w * sp.h; ++i)
         {
-            const unsigned char r = sp.rgba[i * 4 + 0];
-            const unsigned char g = sp.rgba[i * 4 + 1];
-            const unsigned char b = sp.rgba[i * 4 + 2];
+            // Спрайт gamesense — ЧЁРНАЯ маска: RGB ~0, информация только в альфе.
+            // Растеризатор/GL умножают текстуру на цвет вершины (tint), поэтому
+            // RGB обязан быть белым, иначе иконка получается почти чёрной.
             const unsigned char a = sp.rgba[i * 4 + 3];
-            t.px[i] = ((uint32_t)a << 24) | ((uint32_t)b << 16) | ((uint32_t)g << 8) | r;
+            t.px[i] = ((uint32_t)a << 24) | 0x00ffffffu;
         }
         at.tex = render::RegisterTexture(std::move(t));
         at.ready = true;

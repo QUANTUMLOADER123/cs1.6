@@ -51,6 +51,14 @@ namespace gui
         return a;
     }
 
+    // Крупный шрифт для подписи вкладки в сайдбаре (бейк ~21px).
+    inline ImFont*& BigFont()
+    {
+        static ImFont* f = nullptr;
+        return f;
+    }
+    inline void SetBigFont(ImFont* f) { BigFont() = f; }
+
     // Рисует ОРИГИНАЛЬНУЮ иконку из спрайта gamesense: тайл 48x48, тонирование.
     inline void DrawIcon(ImDrawList* dl, Icon ic, ImVec2 c, float size, ImU32 tint)
     {
@@ -65,11 +73,47 @@ namespace gui
         const float u1 = ((idx + 1) * t) / (float)a.w - pu;
         const float pv = 2.0f / (float)a.h;
 
-        const float half = size * 0.5f;
+        // Пропорции сохраняем: в референсе иконки чуть «сплюснуты» по Y
+        // (напр. 38x34 при тайле 48x48) — это исходный спрайт, а не искажение.
+        const float half_w = size * 0.5f;
+        const float half_h = size * geo::ICON_ASPECT * 0.5f;
         dl->AddImage(a.tex,
-                     ImVec2(c.x - half, c.y - half),
-                     ImVec2(c.x + half, c.y + half),
+                     ImVec2(c.x - half_w, c.y - half_h),
+                     ImVec2(c.x + half_w, c.y + half_h),
                      ImVec2(u0, pv), ImVec2(u1, 1.0f - pv), tint);
+    }
+
+    // ------------------------------------------------------------------
+    // Текст с точным межбуквенным интервалом.
+    //
+    // В оригинале gamesense (GDI/FreeType) буквы стоят на целых пикселях и
+    // между ними есть зазор. ImGui-атлас пакует глифы вплотную, поэтому
+    // рисуем каждый символ отдельно и сдвигаем курсор на целое число пикселей.
+    // ------------------------------------------------------------------
+    inline void DrawTextSpaced(ImDrawList* dl, ImVec2 pos, ImU32 color, const char* text,
+                               float size, float extra = 0.0f, ImFont* font_override = nullptr)
+    {
+        ImFont* font = font_override ? font_override : ImGui::GetFont();
+        ImFontBaked* baked = font->GetFontBaked(size);
+        if (!baked) { dl->AddText(font, size, pos, color, text); return; }
+
+        float x = pos.x;
+        const float y = pos.y;
+        for (const char* p = text; *p; ++p)
+        {
+            const unsigned char ch = (unsigned char)*p;
+            if (ch == ' ')
+            {
+                x += baked->GetCharAdvance(' ') + extra;
+                continue;
+            }
+            const ImFontGlyph* g = baked->FindGlyph((ImWchar)ch);
+            if (!g) continue;
+            // AddText сам учитывает g->X0/Y0, поэтому позицию не смещаем —
+            // иначе глифы уезжают вниз на высоту строки.
+            dl->AddText(font, size, ImVec2(ImFloor(x), ImFloor(y)), color, p, p + 1);
+            x += g->AdvanceX + extra;
+        }
     }
 
     // ------------------------------------------------------------------
@@ -126,7 +170,7 @@ namespace gui
                               hovered ? IM_COL32(90, 90, 90, 255) : col::CHECK_OFF);
         }
 
-        dl->AddText(tpos, col::TEXT, label);
+        DrawTextSpaced(dl, tpos, col::TEXT, label, geo::TEXT_SIZE, 0.5f * geo::SCALE);
         row_y += geo::ITEM_H;
         return changed;
     }
@@ -138,9 +182,9 @@ namespace gui
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
         const ImVec2 p(col_pos.x + (geo::LABEL_X - 1 - geo::COL_X_A) * geo::SCALE,
-                       col_pos.y + row_y * geo::SCALE);
-        dl->AddText(p, col::TEXT, text);
-        row_y += 9.0f;
+                       col_pos.y + row_y * geo::SCALE - 2 * geo::SCALE);
+        DrawTextSpaced(dl, p, col::TEXT, text, geo::TEXT_SIZE, 0.5f * geo::SCALE);
+        row_y += 18.0f;
     }
 
     // ------------------------------------------------------------------
@@ -152,8 +196,8 @@ namespace gui
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
         // ink-top текста поля -> верх поля ровно +12px (референс: текст 89, поле 101)
-        const float y = col_pos.y + row_y * geo::SCALE - 5.0f * geo::SCALE;
-        const float fh = 19.0f * geo::SCALE;   // 101..119
+        const float y = col_pos.y + row_y * geo::SCALE + 12.0f * geo::SCALE;
+        const float fh = 18.0f * geo::SCALE;   // 101..118 (бордер сверху + 17 градиента + бордер снизу)
         const float w = 181.0f * geo::SCALE;   // x 153..333
         const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
         const ImVec2 q(p.x + w, p.y + fh);
@@ -164,13 +208,32 @@ namespace gui
         if (ImGui::IsItemClicked())
             ImGui::OpenPopup(id);
 
-        VGradient(dl, p, q,
-                  hovered ? IM_COL32(40, 40, 40, 255) : col::FIELD_TOP,
-                  hovered ? IM_COL32(45, 45, 45, 255) : col::FIELD_BOT);
+        if (hovered)
+        {
+            VGradient(dl, p, q, IM_COL32(40, 40, 40, 255), IM_COL32(45, 45, 45, 255));
+        }
+        else
+        {
+            // оригинал: 1px #0C0C0C сверху, затем 31,31,32,32,32,33,33,33,34,34,34,34,
+            // 35,35,35,36,36 и 1px #0C0C0C снизу
+            // Ступени выравниваем по ЦЕЛЫМ пикселям (иначе растеризатор
+            // интерполирует края и вместо 31..36 получается лесенка вниз).
+            static const int ramp[17] = {31,31,32,32,32,33,33,33,34,34,34,34,35,35,35,36,36};
+            const float hh = (q.y - p.y) / 17.0f;
+            for (int i = 0; i < 17; ++i)
+            {
+                const int v = ramp[i];
+                const float y0 = ImFloor(p.y) + ImFloor(hh * i);
+                const float y1 = ImFloor(p.y) + ImFloor(hh * (i + 1));
+                if (y1 > y0)
+                    dl->AddRectFilled(ImVec2(ImFloor(p.x), y0), ImVec2(ImFloor(q.x), y1),
+                                      IM_COL32(v, v, v, 255));
+            }
+        }
 
         const ImVec2 ts = ImGui::CalcTextSize(items[*current]);
-        dl->AddText(ImVec2(p.x + 11 * geo::SCALE, p.y + (fh - ts.y) * 0.5f),
-                    col::FIELD_GLYPH, items[*current]);
+        DrawTextSpaced(dl, ImVec2(p.x + 11 * geo::SCALE, p.y + (fh - ts.y) * 0.5f),
+                       col::FIELD_GLYPH, items[*current], geo::TEXT_SIZE, 0.5f * geo::SCALE);
 
         // шеврон: 5x3 треугольника на x 325..330, центр y
         const float cxx = q.x - 5 * geo::SCALE;      // центр 328
@@ -213,8 +276,8 @@ namespace gui
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
         // ink-top текста поля -> верх поля ровно +12px (референс: текст 89, поле 101)
-        const float y = col_pos.y + row_y * geo::SCALE - 5.0f * geo::SCALE;
-        const float fh = 19.0f * geo::SCALE;   // 101..119
+        const float y = col_pos.y + row_y * geo::SCALE + 12.0f * geo::SCALE;
+        const float fh = 18.0f * geo::SCALE;   // 101..118 (бордер сверху + 17 градиента + бордер снизу)
         const float w = 181.0f * geo::SCALE;   // x 153..333
         const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
         const ImVec2 q(p.x + w, p.y + fh);

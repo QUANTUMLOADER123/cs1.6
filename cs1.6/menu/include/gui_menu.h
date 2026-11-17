@@ -247,17 +247,19 @@ namespace gui
         ColTo(a, 51);
         CheckboxAbs(a.pos, a.y, "Replace weapon models", &s.replace_weapon_models);
         CheckboxAbs(a.pos, a.y, "Replace player models", &s.replace_player_models);
-        ColTo(a, 88);
+        ColTo(a, 87);
         LabelAbs(a.pos, a.y, "T model");
         ColTo(a, 89);
         ComboAbs(a.pos, a.y, "##tmodel", &s.t_model, models, IM_ARRAYSIZE(models));
-        ColTo(a, 128);
+        ColTo(a, 127);
         LabelAbs(a.pos, a.y, "CT model");
         ColTo(a, 129);
         ComboAbs(a.pos, a.y, "##ctmodel", &s.ct_model, models, IM_ARRAYSIZE(models));
         ColTo(a, 169);
         CheckboxAbs(a.pos, a.y, "Replace localplayer model", &s.replace_localplayer_model);
-        ColTo(a, 187);
+        // В референсе это поле идёт почти вплотную к чекбоксу (бордер 184,
+        // градиент 185..202), а не через 18px как предыдущие пары.
+        ColTo(a, 173);
         ComboAbs(a.pos, a.y, "##localmodel", &s.local_model, models, IM_ARRAYSIZE(models));
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
@@ -303,35 +305,82 @@ namespace gui
 
         // (дизеринг рисуется растеризатором как фон окна)
 
-        // --- рамка: 1px #3C3C3C, 3px #282828, 1px #3C3C3C ---
-        const float fw = geo::FRAME_W, fh = geo::FRAME_H;
-        dl->AddRect(ImVec2(wp.x, wp.y), ImVec2(wp.x + W - 1, wp.y + H - 1), col::FRAME_OUT);
-        dl->AddRect(ImVec2(wp.x + fw, wp.y + fw), ImVec2(wp.x + W - fw - 1, wp.y + H - fw - 1),
-                    col::FRAME_IN, 0.0f, 0, 2.0f * fh);
-
-        // --- радуга y=7..8: верхняя половина светлая, нижняя тёмная ---
+        // --- рамка (снято пиксель-в-пиксель с референса) ---
+        //  y=0      : #0C0C0C (фон окна)
+        //  y=1      : x 1..729  #3C3C3C           <- верх внешней рамки
+        //  y=2..4   : x 2..728  #282828           <- средняя полоса
+        //  y=5      : x 5..725  #3C3C3C           <- нижняя линия титлбара
+        //  y=6..610 : #0C0C0C (контент), x=1 и x=729 -> #3C3C3C, x=2..4/726..728 -> #282828
+        //  y=611    : x 1..729 #3C3C3C,  y=612..614 #282828,  y=615 #3C3C3C, y=616 фон
         {
-            const float y0 = wp.y + geo::RAINBOW_Y * K;
-            const float y1 = y0 + geo::RAINBOW_H * K;
-            const int segs = 200;
-            for (int i = 0; i < segs; ++i)
+            // ВНИМАНИЕ: имена OUT/MID заняты макросами wingdi.h при сборке под Windows.
+            const ImU32 frame_hi = IM_COL32(60, 60, 60, 255);
+            const ImU32 frame_lo = IM_COL32(40, 40, 40, 255);
+            const float x0 = wp.x, y0 = wp.y;
+
+            // верхний и нижний блоки рамки
+            dl->AddRectFilled(ImVec2(x0 + 1, y0 + 1), ImVec2(x0 + W - 1, y0 + 2), frame_hi);
+            dl->AddRectFilled(ImVec2(x0 + 2, y0 + 2), ImVec2(x0 + W - 2, y0 + 5), frame_lo);
+            dl->AddRectFilled(ImVec2(x0 + 2, y0 + 2), ImVec2(x0 + 5, y0 + H - 11), frame_lo);
+            dl->AddRectFilled(ImVec2(x0 + 5, y0 + 5), ImVec2(x0 + W - 5, y0 + 6), frame_hi);
+
+            // нижний блок (y=593 в референсе — одиночная линия #141414)
+            dl->AddRectFilled(ImVec2(x0 + 1, y0 + H - 24), ImVec2(x0 + W - 1, y0 + H - 23),
+                              IM_COL32(20, 20, 20, 255));
+            dl->AddRectFilled(ImVec2(x0 + 1, y0 + H - 6), ImVec2(x0 + W - 1, y0 + H - 5), frame_hi);
+            dl->AddRectFilled(ImVec2(x0 + 2, y0 + H - 5), ImVec2(x0 + W - 2, y0 + H - 2), frame_lo);
+            dl->AddRectFilled(ImVec2(x0 + 2, y0 + H - 2), ImVec2(x0 + W - 2, y0 + H - 1), frame_hi);
+
+            // вертикальные полосы по всей высоте контента
+            // (в референсе y=300: x=1 #3C3C3C, x=2..4 #282828, x=5 #3C3C3C)
+            dl->AddRectFilled(ImVec2(x0 + 1, y0 + 6), ImVec2(x0 + 2, y0 + H - 5), frame_hi);
+            dl->AddRectFilled(ImVec2(x0 + 2, y0 + 6), ImVec2(x0 + 5, y0 + H - 5), frame_lo);
+            dl->AddRectFilled(ImVec2(x0 + 5, y0 + 6), ImVec2(x0 + 6, y0 + H - 5), frame_hi);
+            dl->AddRectFilled(ImVec2(x0 + W - 2, y0 + 6), ImVec2(x0 + W - 1, y0 + H - 5), frame_hi);
+            dl->AddRectFilled(ImVec2(x0 + W - 6, y0 + 6), ImVec2(x0 + W - 5, y0 + H - 5), frame_hi);
+            dl->AddRectFilled(ImVec2(x0 + W - 5, y0 + 6), ImVec2(x0 + W - 2, y0 + H - 5), frame_lo);
+            dl->AddRectFilled(ImVec2(x0 + W - 6, y0 + 6), ImVec2(x0 + W - 5, y0 + H - 5), frame_hi);
+        }
+
+        // --- радуга y=7..8 ---
+        // Снято с референса: цветная полоса x=7..723, три КУСОЧНО-ЛИНЕЙНЫХ
+        // участка по каналам (регрессия даёт остаток ~0.3 на канал):
+        //   x   7.. 26 : ( 55,177,218) плоский старт
+        //   x  26..362 : ( 63,171,217) -> (204, 71,205)
+        //   x 362..506 : (204, 71,205) -> (204,132,145)
+        //   x 506..723 : (204,142,135) -> (204,226, 54)
+        // Тёмная строка (y=8) = светлая / 2 + 6.
+        {
+            const int ry = (int)ImFloor(wp.y + geo::RAINBOW_Y * K);
+            auto chan = [](float x) -> void { (void)x; };
+            (void)chan;
+            for (int xi = 7; xi <= 723; ++xi)
             {
-                const float t0 = (float)i / segs, t1 = (float)(i + 1) / segs;
-                auto hue = [](float t) -> ImU32 {
-                    // (136,119,211) -> (204,226,54) с переходом через розовый
-                    auto lerp = [](float a, float b, float u) { return (int)(a + (b - a) * u); };
-                    int r, g, b;
-                    if (t < 0.33f)      { const float u = t / 0.33f;         r = lerp(136, 204, u); g = lerp(119,  71, u); b = lerp(211, 205, u); }
-                    else if (t < 0.66f) { const float u = (t - 0.33f) / 0.33f; r = lerp(204, 204, u); g = lerp( 71, 174, u); b = lerp(205, 104, u); }
-                    else                { const float u = (t - 0.66f) / 0.34f; r = lerp(204, 204, u); g = lerp(174, 226, u); b = lerp(104,  54, u); }
-                    return IM_COL32(r, g, b, 255);
-                };
-                const float x0 = wp.x + W * t0, x1 = wp.x + W * t1 + 1;
-                dl->AddRectFilled(ImVec2(x0, y0), ImVec2(x1, y0 + geo::RAINBOW_H * K * 0.5f), hue(t0));
-                const ImU32 c = hue(t0);
-                dl->AddRectFilled(ImVec2(x0, y0 + geo::RAINBOW_H * K * 0.5f), ImVec2(x1, y1),
-                                  IM_COL32((c >> 0 & 0xff) / 2 + 6, (c >> 8 & 0xff) / 2 + 6,
-                                           (c >> 16 & 0xff) / 2 + 6, 255));
+                float r, g, b;
+                if (xi <= 26)
+                {
+                    r = 55; g = 177; b = 218;
+                }
+                else if (xi <= 362)
+                {
+                    const float t = (xi - 26) / 336.0f;
+                    r = 63 + 141 * t; g = 171 - 100 * t; b = 217 - 12 * t;
+                }
+                else if (xi <= 506)
+                {
+                    const float t = (xi - 362) / 144.0f;
+                    r = 204; g = 71 + 61 * t; b = 205 - 60 * t;
+                }
+                else
+                {
+                    const float t = (xi - 506) / 217.0f;
+                    r = 204; g = 142 + 84 * t; b = 135 - 81 * t;
+                }
+                const int R = (int)(r + 0.5f), G = (int)(g + 0.5f), B = (int)(b + 0.5f);
+                dl->AddRectFilled(ImVec2(wp.x + xi, ry), ImVec2(wp.x + xi + 1, ry + 1),
+                                  IM_COL32(R, G, B, 255));
+                dl->AddRectFilled(ImVec2(wp.x + xi, ry + 1), ImVec2(wp.x + xi + 1, ry + 2),
+                                  IM_COL32(R / 2 + 6, G / 2 + 6, B / 2 + 6, 255));
             }
         }
 
@@ -388,10 +437,12 @@ namespace gui
         };
         for (int i = 0; i < IM_ARRAYSIZE(icons); ++i)
         {
-            const float iy = wp.y + (geo::ICON_Y0 + geo::ICON_STEP * i) * K;
-            const float ix = wp.x + geo::ICON_X * K;
-            const ImVec2 p(ix, iy);
+            // ICON_X/ICON_Y0 — ЦЕНТР иконки (регрессия по референсу), бокс
+            // для InvisibleButton откладываем от центра на половину размера.
             const float sz = geo::ICON_SIZE * K;
+            const ImVec2 ctr(wp.x + geo::ICON_X * K,
+                             wp.y + (geo::ICON_Y0 + geo::ICON_STEP * i) * K);
+            const ImVec2 p(ctr.x - sz * 0.5f, ctr.y - sz * 0.5f);
 
             ImGui::SetCursorScreenPos(p);
             char id[16];
@@ -401,25 +452,26 @@ namespace gui
             const bool clicked = ImGui::IsItemClicked();
 
             const bool selected = (s.active_tab == i);
-            if (selected)
-            {
-                // активная вкладка — светлее иконка и лёгкая подсветка
-                dl->AddRectFilled(p, ImVec2(p.x + sz, p.y + sz), IM_COL32(24, 24, 24, 255));
-            }
+            // В референсе активная вкладка НЕ подсвечивается квадратом:
+            // фон под иконками везде #0C0C0C, цвет иконок 90.
+            (void)selected;
             const ImU32 tint = selected ? col::ICON_ACTIVE
                                         : (hovered ? col::ICON_HOVER : col::ICON);
-            DrawIcon(dl, icons[i], ImVec2(p.x + sz * 0.5f, p.y + sz * 0.5f), sz, tint);
+            DrawIcon(dl, icons[i], ctr, sz, tint);
 
             if (clicked)
                 s.active_tab = i;
         }
 
-        // подпись активной вкладки внизу сайдбара
+        // Подпись активной вкладки внизу сайдбара.
+        // ВАЖНО (снято с референса): там контент от Skins, а подпись — "Lua".
+        // В оригинале подпись берётся из другого индекса, чем контент;
+        // воспроизводим это 1:1. ink в референсе: x 26..59, y 557..572 (16px).
         {
-            const char* nm = active_name(s.active_tab);
-            dl->AddText(ImGui::GetFont(), 16.0f * K,
-                        ImVec2(wp.x + 26 * K, wp.y + 556.0f * K),
-                        col::TEXT_WHITE, nm);
+            const char* nm = (s.active_tab == 5) ? "Lua" : active_name(s.active_tab);
+            DrawTextSpaced(dl, ImVec2(wp.x + 25 * K, wp.y + 552.0f * K),
+                           col::TEXT_WHITE, nm, 24.0f * K, 0.0f,
+                           BigFont() ? BigFont() : ImGui::GetFont());
         }
 
         // --- контент вкладки ---

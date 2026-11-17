@@ -45,8 +45,8 @@ namespace gui
         constexpr ImU32 FIELD_GLYPH = IM_COL32(205, 205, 205, 255); // текст дропдауна
         constexpr ImU32 CHEVRON     = IM_COL32(152, 152, 152, 255);
         constexpr ImU32 ICON        = IM_COL32( 90,  90,  90, 255); // неактивная иконка
-        constexpr ImU32 ICON_ACTIVE = IM_COL32(140, 140, 140, 255);
-        constexpr ImU32 ICON_HOVER  = IM_COL32(190, 190, 190, 255);
+        constexpr ImU32 ICON_ACTIVE = IM_COL32( 90,  90,  90, 255); // в REF активная НЕ ярче
+        constexpr ImU32 ICON_HOVER  = IM_COL32(150, 150, 150, 255);
     }
 
     // Геометрия в логических пикселях (1x = ровно 731x617, как в референсе).
@@ -72,10 +72,13 @@ namespace gui
         inline float COL_H      = 560.0f;  // 31..590 (591 — нижняя граница)
         inline float COL_PAD    = 10.0f;   // контент от x=111 / y=41
 
-        inline float ICON_SIZE  = 34.0f;   // плитка спрайта, отрисовывается 34x34
-        inline float ICON_STEP  = 65.0f;   // шаг по Y (34, 97, 158 ... 483)
-        inline float ICON_X     = 25.0f;
-        inline float ICON_Y0    = 34.0f;
+        inline float ICON_SIZE  = 46.0f;   // ширина (совпала с REF 1:1)
+        inline float ICON_STEP  = 64.08f;  // шаг по Y (центры 50.7, 114.8 ... 499.3)
+        inline float ICON_X     = 43.2f;   // центр иконки по X
+        // Вертикальный сжим иконок: в REF высота ink на 2-3px МЕНЬШЕ ширины
+        // (спрайт 48x48, а ink 38x34). Подобрано по 8 иконкам.
+        inline float ICON_ASPECT = 0.945f;
+        inline float ICON_Y0    = 52.7f;   // центр ПЕРВОЙ иконки по Y
 
         inline float CHECK_SIZE = 6.0f;
         inline float CHECK_X    = 123.0f;  // абсолютный x чекбокса (123..128)
@@ -83,7 +86,7 @@ namespace gui
         inline float FIELD_X    = 153.0f;  // абсолютный x дропдауна/поля
         inline float ITEM_H     = 18.0f;   // шаг строк (52,70,88,...)
         inline float CONTENT_Y0 = 53.0f;  // ink-top первой строки
-        inline float TEXT_SIZE  = 9.0f;   // Tahoma Bold ~9px
+        inline float TEXT_SIZE  = 8.0f;   // Verdana Bold 8px (как в gamesense)
         inline float FIELD_H    = 20.0f;   // 101..120
 
         // позиция окна на экране (ставится в Render)
@@ -110,17 +113,17 @@ namespace gui
             COL_Y           = 31.0f  * s;
             COL_H           = 560.0f * s;
             COL_PAD         = 10.0f  * s;
-            ICON_SIZE       = 34.0f  * s;
-            ICON_STEP       = 65.0f  * s;
-            ICON_X          = 25.0f  * s;
-            ICON_Y0         = 34.0f  * s;
+            ICON_SIZE       = 46.0f   * s;
+            ICON_STEP       = 64.08f  * s;
+            ICON_X          = 41.7f   * s;
+            ICON_Y0         = 50.7f   * s;
             CHECK_SIZE      = 6.0f   * s;
             CHECK_X         = 122.0f * s;
             LABEL_X         = 143.0f * s;
             FIELD_X         = 153.0f * s;
             ITEM_H          = 18.0f  * s;
             CONTENT_Y0      = 53.0f  * s;
-            TEXT_SIZE       = 9.0f   * s;
+            TEXT_SIZE       = 11.0f   * s;
             FIELD_H         = 20.0f  * s;
             CAPTION_Y       = 557.0f * s;
             CAPTION_H       = 40.0f  * s;

@@ -127,7 +127,7 @@ int main(int argc, char** argv)
     const char* out_path = (argc > 1) ? argv[1] : "menu.png";
     const int scale = (argc > 2) ? atoi(argv[2]) : 2;
     const int tab = (argc > 3) ? atoi(argv[3]) : 0;
-    const char* font_path = (argc > 4) ? argv[4] : "assets/Tahoma-Bold.ttf";
+    const char* font_path = (argc > 4) ? argv[4] : "assets/Tahoma.ttf";
     // нативный 1:1 режим: кадр ровно 731x617, масштаб 1.0
     const bool native = (scale == 1);
 
@@ -157,10 +157,19 @@ int main(int argc, char** argv)
         fprintf(stderr, "[!] не загрузился шрифт: %s\n", font_path);
         return 1;
     }
+    // Второй, КРУПНЫЙ шрифт — для подписи активной вкладки в сайдбаре
+    // (в референсе ink подписи 16px, т.е. ~22px кегль). ImGui не масштабирует
+    // глифы, поэтому нужен отдельный бейк.
+    ImFontConfig big_cfg = cfg;
+    big_cfg.SizePixels = 24.0f * ui_scale;
+    ImFont* big_font = io.Fonts->AddFontFromFileTTF(font_path, big_cfg.SizePixels, &big_cfg);
+    gui::SetBigFont(big_font);
     io.Fonts->Build();
     io.FontDefault = font;
     ImportAtlasFromImGui();
 
+
+    // отладка глифов: bbox и UV
     // ОРИГИНАЛЬНЫЙ спрайт иконок gamesense
     if (!gui::InitIconAtlasCPU())
         fprintf(stderr, "[!] спрайт иконок не загрузился\n");
