@@ -52,7 +52,7 @@ SDK + чит для CS 1.6. Все адреса — по сигнатурам, �
 | структура | размер | как подтверждено |
 |---|---:|---|
 | `sh_engfuncs_t` | `0x21C` | `rep movs ecx=0x87` в `Initialize` + typedef-assert |
-| `sh_playermove_t` | `0x4ED58` | 600 physent + 64 moveent + 600 visent + 600 pmtrace |
+| `sh_playermove_t` | `0x4F6BC` | 600 physent + 64 moveent + 600 visent + 600 pmtrace |
 | `sh_physent_t` | `0xE0` | код `i*7<<5` |
 | `sh_usercmd_t` | `0x34` | `rep stos ecx=0xD` |
 | `sh_cl_entity_t` | `2996` | RTTI + sizeof-assert |

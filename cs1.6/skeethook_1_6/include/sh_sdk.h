@@ -248,6 +248,7 @@ typedef struct sh_playermove_s
 } sh_playermove_t;
 
 typedef char sh_playermove_size_check[(sizeof(sh_playermove_t) == 0x4F6BC) ? 1 : -1];
+typedef char sh_playermove_exact[(sizeof(sh_playermove_t) == 325308) ? 1 : -1];
 #define SH_PM_OFF_MOVEVARS ((i32)((char*)&((sh_playermove_t*)0)->movevars - (char*)0))
 #define SH_PM_OFF_TRACETEX ((i32)((char*)&((sh_playermove_t*)0)->pm_trace_texture - (char*)0))
 #define SH_PM_SIZE ((i32)sizeof(sh_playermove_t))

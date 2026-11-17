@@ -53,7 +53,7 @@ mp.dll       ReGameDLL version: 5.23.0.620-dev  /  commit ac07e89
 | `enginefuncs_t` | 632 | `rep movs ecx=0x9E` = 632 | ✅ |
 | `usercmd_t` | 52 | `rep stos ecx=0xD` = 52 | ✅ |
 | `physent_t` | 224 | код `i*7<<5` = 224 | ✅ |
-| `playermove_t` | `0x4ED58` | 600 physent + 64 moveent + 600 visent + 600 pmtrace (было ошибочно 1508) | ✅ |
+| `playermove_t` | `0x4F6BC` | 600 physent + 64 moveent + 600 visent + 600 pmtrace (было ошибочно 1508) | ✅ |
 | `INTERFACE_VERSION` | 7 | `cmp eax,7` в `Initialize` | ✅ |
 | `entity_state_t` | 340 | `cl+0x364` weaponmodel читается кодом | ✅ |
 | `cl_entity_t` | 2996 | `cl+0xB54/0xB58/0xB5C` = angles.x/y/z | ✅ |
