@@ -106,9 +106,25 @@ void sh_quick_stop(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (speed < pm->maxspeed * 0.9f)
         return;
 
-    cmd->viewangles.y = sh_atan2_deg(vy, vx) + 180.0f;
-    cmd->forwardmove = sh_max_move;
-    cmd->sidemove = 0.0f;
+    if (!(cmd->buttons & 1))
+        return;
+
+    f32 vel_yaw = sh_atan2_deg(vy, vx);
+    f32 back = vel_yaw + 180.0f;
+
+    f32 dw = back - cmd->viewangles.y;
+
+    while (dw > 180.0f)
+        dw -= 360.0f;
+    while (dw < -180.0f)
+        dw += 360.0f;
+
+    f32 r = sh_sin_deg(dw);
+
+    cmd->forwardmove = (sh_cos_deg(dw) < 0.0f) ? -sh_max_move : sh_max_move;
+    cmd->sidemove = -r * sh_max_move;
+
+    (void)vel_yaw;
 }
 
 void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm)
