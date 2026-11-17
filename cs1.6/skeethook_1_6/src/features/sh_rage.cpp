@@ -77,7 +77,11 @@ void sh_rage_scan(sh_rage_result_t *out)
         if (p->index == g_local_player)
             continue;
 
-        if (local_p->team && p->team == local_p->team)
+        if (g_cfg.visuals.team_check && local_p->team &&
+            p->team == local_p->team)
+            continue;
+
+        if (g_cfg.visuals.visible_only && !p->visible)
             continue;
 
         if (p->health <= 0)
