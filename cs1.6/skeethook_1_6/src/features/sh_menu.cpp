@@ -252,7 +252,7 @@ static const char *g_pitch_items[] = {
 
 static const char *g_yaw_items[] = {
     "none", "backwards", "static left", "static right", "left", "right",
-    "spin", "static", "random", "jitter", "fake sideways"
+    "spin", "static", "random", "jitter", "fake sideways", "fake edge"
 };
 
 static void sh_menu_draw_antiaim(f32 x, f32 y)
@@ -272,7 +272,7 @@ static void sh_menu_draw_antiaim(f32 x, f32 y)
     cy += row;
 
     sh_menu_combo(x, cy, colw, "yaw", &g_cfg.antiaim.yaw_mode,
-                  g_yaw_items, 11);
+                  g_yaw_items, 12);
     cy += row;
 
     sh_menu_slider(x, cy, colw, "roll", &g_cfg.antiaim.roll, -50.0f, 50.0f, "%.0f");

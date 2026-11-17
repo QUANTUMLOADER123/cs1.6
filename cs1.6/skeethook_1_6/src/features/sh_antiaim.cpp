@@ -1,5 +1,7 @@
 #include "../../include/sh_antiaim.h"
 #include "../../include/sh_config.h"
+#include "../../include/sh_features.h"
+#include "../../include/sh_math.h"
 #include "../../include/sh_math.h"
 
 static f32 g_prev_time;
@@ -8,6 +10,47 @@ static qbool g_jitter_flip;
 static qbool g_desync_flip;
 static qbool g_sideways_flip;
 static u32 g_jitter_seed = 12345u;
+
+qbool sh_antiaim_fake_edge(f32 *out_angle)
+{
+    if (!g_pmove)
+        return 0;
+
+    vec3_t eye = g_pmove->origin;
+    eye.z += g_pmove->view_ofs.z;
+
+    f32 closest = 1000.0f;
+    f32 best = 0.0f;
+
+    for (i32 i = 0; i < 8; ++i)
+    {
+        f32 a = ((f32)i / 8.0f) * 6.2831853f;
+
+        vec3_t to;
+        to.x = eye.x + sh_cos(a) * 128.0f;
+        to.y = eye.y + sh_sin(a) * 128.0f;
+        to.z = eye.z;
+
+        vec3_t hit;
+        f32 frac = 1.0f;
+
+        if (!sh_trace_fraction(&eye, &to, &frac))
+            continue;
+
+        f32 d = frac * 128.0f;
+
+        if (d < closest)
+        {
+            closest = d;
+            best = a * 57.29578f;
+        }
+    }
+
+    if (out_angle)
+        *out_angle = best;
+
+    return closest < 128.0f;
+}
 
 static u32 sh_rand(void)
 {
@@ -152,6 +195,17 @@ void sh_antiaim_apply_yaw(sh_usercmd_t *cmd, f32 time)
 
         cmd->viewangles.y = base + ((g_jitter_flip) ? jitter : -jitter);
         g_jitter_flip = !g_jitter_flip;
+
+        break;
+    }
+    case sh_yaw_fake_edge:
+    {
+        f32 edge = 0.0f;
+
+        if (sh_antiaim_fake_edge(&edge))
+            cmd->viewangles.y = base + edge;
+        else
+            cmd->viewangles.y = base;
 
         break;
     }

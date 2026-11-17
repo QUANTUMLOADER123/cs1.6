@@ -62,6 +62,8 @@ static qbool sh_rage_trace(void *user, const vec3_t *start, const vec3_t *end, s
 
     return 1;
 }
+#define sh_autostop_threshold 1.0f
+
 static f32 g_last_attack_sent;
 
 
@@ -266,18 +268,19 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
 
     if (g_cfg.aimbot.auto_stop && sh_rage_should_fire(r))
     {
-        if (g_pmove && g_pmove->onground != -1)
+        f32 vx = g_pmove ? g_pmove->velocity.x : 0.0f;
+        f32 vy = g_pmove ? g_pmove->velocity.y : 0.0f;
+        f32 speed = sh_sqrt(vx * vx + vy * vy);
+
+        if (speed > sh_autostop_threshold)
         {
             cmd->forwardmove = 0.0f;
             cmd->sidemove = 0.0f;
-        }
-        else if (g_pmove)
-        {
-            f32 vx = g_pmove->velocity.x;
-            f32 vy = g_pmove->velocity.y;
+            cmd->upmove = 0.0f;
 
-            if (sh_sqrt(vx * vx + vy * vy) > 30.0f)
-                cmd->sidemove = 0.0f;
+            if (g_cfg.aimbot.auto_stop_duck && g_pmove &&
+                g_pmove->onground != -1)
+                cmd->buttons |= sh_in_duck;
         }
     }
 

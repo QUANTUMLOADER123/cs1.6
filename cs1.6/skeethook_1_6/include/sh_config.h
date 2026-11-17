@@ -41,6 +41,7 @@ typedef struct sh_aimbot_cfg
     qbool double_tap;
     qbool penetration;
     qbool auto_stop;
+    qbool auto_stop_duck;
 } sh_aimbot_cfg;
 
 typedef struct sh_antiaim_cfg

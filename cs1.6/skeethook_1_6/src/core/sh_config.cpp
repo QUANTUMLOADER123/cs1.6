@@ -29,6 +29,7 @@ void sh_config_defaults(void)
     g_cfg.aimbot.double_tap = (qbool)0;
     g_cfg.aimbot.penetration = (qbool)1;
     g_cfg.aimbot.auto_stop = (qbool)0;
+    g_cfg.aimbot.auto_stop_duck = (qbool)0;
 
     g_cfg.movement.autostrafe = (qbool)1;
     g_cfg.movement.quick_stop = (qbool)0;
