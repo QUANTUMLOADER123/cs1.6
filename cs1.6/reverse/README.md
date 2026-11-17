@@ -28,6 +28,7 @@
 | [`19-move-prediction.md`](19-move-prediction.md) | **predecition движения**: friction, accelerate, air-кап 30, система координат |
 | [`20-weapon-data.md`](20-weapon-data.md) | **`weapon_data_t`**: 64 оружия, предсказанные таймеры |
 | [`21-clientdll-slots.md`](21-clientdll-slots.md) | **32 слота экспортов `client.dll`** — точные адреса без паттернов |
+| [`22-bones-studio.md`](22-bones-studio.md) | **кости** через `HUD_GetStudioModelInterface` |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,
