@@ -2,8 +2,8 @@
 
 SDK + чит для CS 1.6. Все адреса — по сигнатурам, без хардкода.
 
-**DLL:** `skeethook_1_6.dll` — 354 KB (363 008 байт), 32-bit, PE32
-**SHA256:** `b29a6b1d1e6c8cea0e7e0ab6bbee3ade72c426d415162f9ab72717a55eb8b117`
+**DLL:** `skeethook_1_6.dll` — 361 KB (369 152 байта), 32-bit, PE32
+**SHA256:** `045f283273b1dc22b28ef7d30820b17f874001273f19fc55f13e6b82b312c3b6`
 
 ## Установка
 
@@ -32,12 +32,27 @@ SDK + чит для CS 1.6. Все адреса — по сигнатурам, �
 | process_state | `0x01946010` | |
 | txfer_overrides | `0x01945FC0` | |
 
+## Хуки (9 через MinHook + 1 в интерфейсе)
+
+| функция | что даёт |
+|---|---|
+| `CL_CreateMove` | ввод: антиаим, автострейфер, bhop, hideshot |
+| `HUD_Redraw` | меню, ESP, индикаторы, туман/скайбокс |
+| `HUD_PlayerMove` | автострейфер, quick stop, edge jump, лестницы |
+| `HUD_AddEntity` | фильтр сущностей по имени модели (`no_smoke`), chams |
+| `HUD_TxferLocalOverrides` | `fake_duck` через `origin`, `iuser1..4` |
+| `HUD_TxferPredictionData` | `weapon_data_t[64]`: патроны, таймеры |
+| `CL_CameraOffset` | thirdperson: `ofs[2] = dist` |
+| `CL_IsThirdPerson` | включение вида от третьего лица |
+| `HUD_GetStudioModelInterface` | `engine_studio_api_t` + подмена `StudioDrawPlayer` |
+| `StudioDrawPlayer` (интерфейс) | **кости игроков**: 20 точек, поиск по имени |
+
 ## Структуры
 
 | структура | размер | как подтверждено |
 |---|---:|---|
 | `sh_engfuncs_t` | `0x21C` | `rep movs ecx=0x87` в `Initialize` + typedef-assert |
-| `sh_playermove_t` | `1508` | оффсеты полей из `HUD_PlayerMove` |
+| `sh_playermove_t` | `0x4ED58` | 600 physent + 64 moveent + 600 visent + 600 pmtrace |
 | `sh_physent_t` | `0xE0` | код `i*7<<5` |
 | `sh_usercmd_t` | `0x34` | `rep stos ecx=0xD` |
 | `sh_cl_entity_t` | `2996` | RTTI + sizeof-assert |
