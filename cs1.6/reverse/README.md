@@ -19,6 +19,7 @@
 | [`10-anticheat.md`](10-anticheat.md) | что реально видит VAC, границы SDK |
 | [`11-clientdata.md`](11-clientdata.md) | `clientdata_t` 476 Б, `weapon_data_t` 60 Б, конвейер кадра |
 | [`12-ballistics.md`](12-ballistics.md) | `random_seed`, ГПСЧ, разброс, отдача, автоволл, autostrafe |
+| [`13-hud-layout.md`](13-hud-layout.md) | HUD в 640×480, `XRES`/`YRES`, 23 элемента, `.dem` |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,
