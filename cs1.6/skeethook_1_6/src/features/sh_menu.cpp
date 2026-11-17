@@ -552,11 +552,14 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "hitmarker", &g_cfg.visuals.hitmarker);
-    sh_menu_checkbox(x + colw, cy, "hitmarker damage", &g_cfg.visuals.hitmarker_damage);
+    sh_menu_checkbox(x + colw, cy, "indicators", &g_cfg.visuals.indicators);
     cy += row;
 
-    sh_menu_checkbox(x, cy, "hit sound", &g_cfg.visuals.hit_sound);
-    sh_menu_slider(x + colw, cy, colw, "hit vol", &g_cfg.visuals.hit_sound_volume, 0.0f, 1.0f, "%");
+    sh_menu_checkbox(x, cy, "hitmarker damage", &g_cfg.visuals.hitmarker_damage);
+    sh_menu_checkbox(x + colw, cy, "hit sound", &g_cfg.visuals.hit_sound);
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "hit vol", &g_cfg.visuals.hit_sound_volume, 0.0f, 1.0f, "%");
     cy += row;
 
     sh_menu_checkbox(x, cy, "radar hack", &g_cfg.misc.radar_hack);

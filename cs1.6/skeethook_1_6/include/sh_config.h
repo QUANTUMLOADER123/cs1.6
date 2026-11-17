@@ -99,6 +99,7 @@ typedef struct sh_visuals_cfg
     qbool hitbox_scan;
     i32 esp_color_mode;
     qbool hitmarker;
+    qbool indicators;
     qbool hitmarker_damage;
     qbool model_changer;
     i32 model_index;

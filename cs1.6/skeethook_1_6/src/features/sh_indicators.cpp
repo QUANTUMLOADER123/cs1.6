@@ -12,6 +12,9 @@ typedef struct sh_indicator_s
 
 void sh_indicators_draw(void)
 {
+    if (!g_cfg.visuals.indicators)
+        return;
+
     static const f32 pad = 6.0f;
 
     sh_indicator_t list[24];
