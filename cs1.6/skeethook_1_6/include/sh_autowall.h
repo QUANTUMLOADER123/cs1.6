@@ -47,3 +47,4 @@ i32  sh_hitgroup_multiplier(i32 hitgroup);
 f32  sh_damage_at_range(f32 base_damage, f32 range_modifier, f32 distance);
 qbool sh_autowall_trace(const sh_autowall_ctx_t *ctx, sh_autowall_result_t *out);
 f32  sh_autowall_damage(const sh_autowall_ctx_t *ctx);
+i32  sh_autowall_walls(const vec3_t *start, const vec3_t *dir, i32 weapon_id);

@@ -1,4 +1,5 @@
 #include "../../include/sh_features.h"
+#include "../../include/sh_autowall.h"
 #include "../../include/sh_icons.h"
 #include "../../include/sh_math.h"
 #include "../../include/sh_render.h"
@@ -388,6 +389,42 @@ void sh_radar_draw(void);
 void sh_spectator_list_draw(void);
 
 void sh_crosshair_draw(void);
+
+void sh_wallbang_draw(void)
+{
+    if (!g_cfg.visuals.penetration_info)
+        return;
+
+    sh_player_t *local = sh_player_local();
+
+    if (!local || local->health <= 0)
+        return;
+
+    if (!g_pmove)
+        return;
+
+    vec3_t eye = g_pmove->origin;
+    eye.z += g_pmove->view_ofs.z;
+
+    vec3_t fwd;
+    vec3_t ang = g_pmove->angles;
+
+    vec3_t right, up;
+    sh_angle_vectors(&ang, &fwd, &right, &up);
+
+    i32 walls = sh_autowall_walls(&eye, &fwd, local->weapon_id);
+
+    if (walls <= 0)
+        return;
+
+    f32 s = sh_scale();
+    f32 cx = (f32)sh_screen_width() * 0.5f;
+    f32 cy = (f32)sh_screen_height() * 0.5f;
+
+    sh_text_center(cx, cy + 32.0f * s,
+                   (col4_t)SH_COL_RGBA(0, 255, 0, 230), "wallbang (%d)",
+                   walls);
+}
 
 void sh_esp_run(void)
 {

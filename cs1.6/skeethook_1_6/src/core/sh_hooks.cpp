@@ -12,6 +12,7 @@
 qbool sh_soundesp_init(void);
 void sh_soundesp_draw(void);
 void sh_soundesp_tick(void);
+void sh_wallbang_draw(void);
 #include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
@@ -373,6 +374,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 
     sh_visuals_effects_draw();
     sh_soundesp_draw();
+    sh_wallbang_draw();
     sh_grenade_path_draw();
     sh_hitmarker_draw();
     sh_indicators_draw();

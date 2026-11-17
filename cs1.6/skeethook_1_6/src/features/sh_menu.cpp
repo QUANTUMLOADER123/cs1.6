@@ -402,6 +402,7 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "fake markers", &g_cfg.visuals.draw_fakes);
+    sh_menu_checkbox(x + colw, cy, "wallbang info", &g_cfg.visuals.penetration_info);
     cy += row;
 
     {

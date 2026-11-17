@@ -2,6 +2,7 @@
 #include "../../include/sh_ballistics.h"
 #include "../../include/sh_math.h"
 #include "../../include/sh_sdk.h"
+#include "../../include/sh_features.h"
 
 static f32 _pow(f32 b, f32 e)
 {
@@ -161,4 +162,76 @@ f32 sh_autowall_damage(const sh_autowall_ctx_t *ctx)
     if (!sh_autowall_trace(ctx, &r))
         return 0.0f;
     return r.damage;
+}
+
+i32 sh_autowall_walls(const vec3_t *start, const vec3_t *dir, i32 weapon_id)
+{
+    if (!start || !dir || !g_trace_fn)
+        return 0;
+
+    const sh_weapon_ballistic_t *wb = sh_weapon_ballistic_for(weapon_id);
+
+    if (!wb || wb->damage <= 0.0f)
+        return 0;
+
+    i32 pen_left = wb->penetration;
+    f32 damage = wb->damage;
+    f32 traveled = 0.0f;
+
+    vec3_t from = *start;
+    i32 walls = 0;
+
+    for (i32 step = 0; step < 8 && pen_left > 0; ++step)
+    {
+        vec3_t to;
+        to.x = from.x + dir->x * 8192.0f;
+        to.y = from.y + dir->y * 8192.0f;
+        to.z = from.z + dir->z * 8192.0f;
+
+        f32 frac = 1.0f;
+
+        if (!sh_trace_fraction(&from, &to, &frac))
+            break;
+
+        if (frac >= 0.999f)
+            break;
+
+        if (frac <= 0.0f)
+            break;
+
+        f32 dist = frac * 8192.0f;
+        traveled += dist;
+
+        damage = damage * _pow(wb->range_modifier, dist / 500.0f);
+
+        if (damage < 1.0f)
+            break;
+
+        vec3_t hit;
+        hit.x = from.x + (to.x - from.x) * frac;
+        hit.y = from.y + (to.y - from.y) * frac;
+        hit.z = from.z + (to.z - from.z) * frac;
+
+        i32 tex = sh_trace_material(&from, &hit);
+        f32 mod = sh_penetration_modifier(tex);
+
+        if (mod >= 0.6f && tex != 'G')
+            break;
+
+        damage *= sh_penetration_damage_modifier(tex);
+
+        if (damage < 1.0f)
+            break;
+
+        ++walls;
+        --pen_left;
+
+        from.x = hit.x + dir->x * 16.0f;
+        from.y = hit.y + dir->y * 16.0f;
+        from.z = hit.z + dir->z * 16.0f;
+    }
+
+    (void)traveled;
+
+    return walls;
 }
