@@ -6,6 +6,7 @@
 #include "../../include/sh_sdk.h"
 #include "../../include/sh_scanner.h"
 #include "../../include/sh_font.h"
+#include "../../include/sh_nospread.h"
 #include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
@@ -287,6 +288,7 @@ static void sh_first_init(void)
     sh_icons_init();
     sh_events_reset();
     sh_spread_reset();
+    sh_nospread_reset();
 }
 
 i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)

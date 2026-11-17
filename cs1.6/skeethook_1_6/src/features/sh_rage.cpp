@@ -6,6 +6,7 @@
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
 #include "../../include/sh_autowall.h"
+#include "../../include/sh_nospread.h"
 #include "../../include/sh_ballistics.h"
 
 #include <windows.h>
@@ -407,5 +408,12 @@ void sh_rage_apply_recoil(sh_usercmd_t *cmd)
     }
 
     if (g_cfg.misc.no_spread)
-        sh_spread_compensate(&cmd->viewangles);
+    {
+        sh_player_t *lp = sh_player_local();
+        i32 wid = lp ? lp->weapon_id : 0;
+
+        u32 seed = sh_spread_seed();
+
+        sh_nospread_angles(wid, seed, 0, 1, &cmd->viewangles);
+    }
 }

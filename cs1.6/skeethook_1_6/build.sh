@@ -18,7 +18,7 @@ CXF="-target $T -std=c++17 -O2 -fno-exceptions -fno-rtti -Iinclude -Iext/minhook
 SRC="src/core/sh_scanner.cpp src/core/sh_math.cpp src/core/sh_config.cpp src/core/sh_hooks.cpp src/core/sh_dllmain.cpp
      src/sdk/sh_patterns.cpp src/render/sh_render.cpp src/render/sh_font.cpp src/render/sh_font_data.cpp
      src/features/sh_players.cpp src/features/sh_bones.cpp src/features/sh_antiaim.cpp
-     src/features/sh_misc.cpp src/features/sh_esp.cpp src/features/sh_menu.cpp src/features/sh_usermsg.cpp src/features/sh_ballistics.cpp src/features/sh_autowall.cpp src/features/sh_movement.cpp src/features/sh_visuals.cpp src/features/sh_events.cpp src/features/sh_demo.cpp src/features/sh_grenade.cpp src/features/sh_fakelag.cpp src/features/sh_rage.cpp src/features/sh_skybox.cpp src/features/sh_hitmarker.cpp src/features/sh_knife.cpp src/features/sh_worldfx.cpp src/features/sh_indicators.cpp src/features/sh_svc.cpp src/features/sh_surface.cpp src/features/sh_icons.cpp"
+     src/features/sh_misc.cpp src/features/sh_esp.cpp src/features/sh_menu.cpp src/features/sh_usermsg.cpp src/features/sh_ballistics.cpp src/features/sh_autowall.cpp src/features/sh_movement.cpp src/features/sh_visuals.cpp src/features/sh_events.cpp src/features/sh_nospread.cpp src/features/sh_demo.cpp src/features/sh_grenade.cpp src/features/sh_fakelag.cpp src/features/sh_rage.cpp src/features/sh_skybox.cpp src/features/sh_hitmarker.cpp src/features/sh_knife.cpp src/features/sh_worldfx.cpp src/features/sh_indicators.cpp src/features/sh_svc.cpp src/features/sh_surface.cpp src/features/sh_icons.cpp"
 for f in $SRC; do
   "$ZIG" c++ $CXF -c "$f" -o "$OUT/$(basename ${f%.cpp}).o"
 done
