@@ -2,6 +2,8 @@
 #include "../../include/sh_config.h"
 #include "../../include/sh_math.h"
 #include "../../include/sh_features.h"
+#include "../../include/sh_visuals.h"
+#include "../../include/sh_hitmarker.h"
 
 #include <windows.h>
 
@@ -150,7 +152,24 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
     }
 
     if (sh_rage_should_fire(r))
+    {
         cmd->buttons |= 1;
+
+        if (g_cfg.visuals.tracer)
+        {
+            vec3_t from = eye;
+            vec3_t to = r->target.aim_point;
+            sh_visuals_tracer_add(&from, &to);
+        }
+
+        {
+            f32 vt = g_pmove ? g_pmove->time : 0.0f;
+            vec3_t d2 = r->target.aim_point;
+            (void)d2;
+            sh_hitmarker_on_hit(r->target.hitgroup == 1, (i32)r->target.damage);
+            sh_hitmarker_tick(vt);
+        }
+    }
 }
 
 qbool sh_rage_double_tap(sh_usercmd_t *cmd, f32 next_attack_time, f32 now)

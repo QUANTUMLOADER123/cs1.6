@@ -11,6 +11,7 @@
 #include "../../include/sh_fakelag.h"
 #include "../../include/sh_rage.h"
 #include "../../include/sh_skybox.h"
+#include "../../include/sh_hitmarker.h"
 #include "../../include/sh_visuals.h"
 #include "../../include/sh_features.h"
 
@@ -168,6 +169,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
         sh_esp_run();
 
     sh_visuals_effects_draw();
+    sh_hitmarker_draw();
 
     sh_menu_draw();
 
