@@ -252,6 +252,63 @@ qbool sh_trace_fraction(const vec3_t *start, const vec3_t *end,
     return 1;
 }
 
+static i32 sh_material_from_name(const char *name)
+{
+    if (!name || !name[0])
+        return 'C';
+
+    static const struct { const char *prefix; i32 tex; } tbl[] = {
+        { "concrete", 'C' }, { "metal", 'M' }, { "dirt", 'D' },
+        { "vent", 'V' }, { "grate", 'G' }, { "tile", 'T' },
+        { "slime", 'S' }, { "slosh", 'S' }, { "wood", 'W' },
+        { "computer", 'P' }, { "grass", 'X' }, { "glass", 'Y' },
+        { "flesh", 'F' }, { "snow", 'N' }
+    };
+
+    for (i32 i = 0; i < (i32)(sizeof(tbl) / sizeof(tbl[0])); ++i)
+    {
+        const char *a = name;
+        const char *b = tbl[i].prefix;
+
+        i32 k = 0;
+
+        for (; b[k]; ++k)
+        {
+            char ca = a[k];
+            char cb = b[k];
+
+            if (!ca)
+                break;
+
+            if (ca >= 'A' && ca <= 'Z') ca = (char)(ca + 32);
+
+            if (ca != cb)
+                break;
+        }
+
+        if (!b[k])
+            return tbl[i].tex;
+    }
+
+    return 'C';
+}
+
+i32 sh_trace_material(const vec3_t *start, const vec3_t *end)
+{
+    if (!g_pmove || !g_pmove->pm_trace_texture)
+        return 'C';
+
+    if (!start || !end)
+        return 'C';
+
+    vec3_t s = *start;
+    vec3_t e = *end;
+
+    const char *tex = g_pmove->pm_trace_texture(-1, (f32 *)&s, (f32 *)&e);
+
+    return sh_material_from_name(tex);
+}
+
 qbool sh_trace_line(const vec3_t *start, const vec3_t *end, vec3_t *hitsh)
 {
     f32 frac = 1.0f;

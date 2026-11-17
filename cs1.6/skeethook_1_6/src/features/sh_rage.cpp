@@ -31,6 +31,7 @@ static qbool sh_rage_trace(void *user, const vec3_t *start, const vec3_t *end, s
 
     if (sh_trace_fraction(start, end, &frac))
     {
+        out->char_texture = sh_trace_material(start, end);
         out->fraction = frac;
         out->entity = 0;
 
