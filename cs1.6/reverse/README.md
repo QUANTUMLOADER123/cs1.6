@@ -21,6 +21,7 @@
 | [`12-ballistics.md`](12-ballistics.md) | `random_seed`, ГПСЧ, разброс, отдача, автоволл, autostrafe |
 | [`13-hud-layout.md`](13-hud-layout.md) | HUD в 640×480, `XRES`/`YRES`, 23 элемента, `.dem` |
 | [`14-grenades.md`](14-grenades.md) | формула броска, гравитация 800, оптимум 42°, урон |
+| [`15-antiaim.md`](15-antiaim.md) | **magic pitch 1620**, movement fix, fake lag, правда про desync |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,

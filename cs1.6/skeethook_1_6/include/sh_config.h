@@ -54,6 +54,9 @@ typedef struct sh_antiaim_cfg
     f32 micro_move_speed;
     qbool spin;
     f32 spin_speed;
+    f32 roll;
+    qbool fake_lag;
+    i32 fake_lag_ticks;
 } sh_antiaim_cfg;
 
 typedef struct sh_visuals_cfg

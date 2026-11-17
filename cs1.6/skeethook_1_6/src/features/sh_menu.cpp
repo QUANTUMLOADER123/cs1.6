@@ -31,6 +31,32 @@ static void sh_menu_toggle(void)
     prev = now;
 }
 
+static POINT g_mouse;
+static qbool g_click;
+
+static void sh_menu_input_begin(void)
+{
+    GetCursorPos(&g_mouse);
+
+    HWND wnd = WindowFromPoint(g_mouse);
+
+    if (wnd)
+        ScreenToClient(wnd, &g_mouse);
+
+    g_click = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+}
+
+static qbool sh_mouse_in(f32 x, f32 y, f32 w, f32 h)
+{
+    return (f32)g_mouse.x >= x && (f32)g_mouse.x <= x + w &&
+           (f32)g_mouse.y >= y && (f32)g_mouse.y <= y + h;
+}
+
+static qbool sh_mouse_clicked(void)
+{
+    return g_click;
+}
+
 static void sh_menu_checkbox(f32 x, f32 y, const char *label, qbool *value)
 {
     f32 s = sh_scale();
@@ -44,6 +70,24 @@ static void sh_menu_checkbox(f32 x, f32 y, const char *label, qbool *value)
                      (col4_t)SH_COL_RGBA(190, 235, 60, 255));
 
     sh_text(x + box + 6.0f * s, y, (col4_t)SH_COL_RGBA(215, 215, 215, 255), "%s", label);
+
+    f32 tw = sh_text_width(label);
+
+    if (sh_mouse_in(x, y - 2.0f * s, box + 6.0f * s + tw, box + 2.0f * s) &&
+        sh_mouse_clicked())
+    {
+        static const void *last_toggle;
+        static u32 last_tick;
+
+        u32 now = GetTickCount();
+
+        if (last_toggle != (const void *)value || now - last_tick > 250)
+        {
+            *value = !*value;
+            last_toggle = (const void *)value;
+            last_tick = now;
+        }
+    }
 }
 
 static void sh_menu_slider(f32 x, f32 y, f32 w, const char *label, f32 *value,
@@ -65,11 +109,72 @@ static void sh_menu_slider(f32 x, f32 y, f32 w, const char *label, f32 *value,
     f32 frac = (*value - lo) / (hi - lo);
     sh_draw_rect(x, tracky, w * frac, 3.0f * s, (col4_t)SH_COL_RGBA(190, 235, 60, 255));
 
-    POINT p;
-    GetCursorPos(&p);
-    HWND wnd = WindowFromPoint(p);
-    if (wnd)
-        ScreenToClient(wnd, &p);
+    if (sh_mouse_in(x, tracky - 4.0f * s, w, 11.0f * s) && sh_mouse_clicked())
+    {
+        f32 t = ((f32)g_mouse.x - x) / (w > 1.0f ? w : 1.0f);
+
+        if (t < 0.0f) t = 0.0f;
+        if (t > 1.0f) t = 1.0f;
+
+        *value = lo + t * (hi - lo);
+    }
+}
+
+static void sh_menu_combo(f32 x, f32 y, f32 w, const char *label, i32 *value,
+                         const char **items, i32 count)
+{
+    f32 s = sh_scale();
+    f32 h = 16.0f * s;
+
+    static i32 open_combo = -1;
+    static const void *owner;
+
+    col4_t bg = { 26, 26, 26, 255 };
+    col4_t bd = { 44, 44, 44, 255 };
+    col4_t tx = { 200, 200, 200, 255 };
+
+    sh_draw_rect(x, y, w, h, bg);
+    sh_draw_rect_outline(x, y, w, h, 1.0f, bd);
+
+    sh_text(x + 5.0f * s, y + 3.0f * s, tx, "%s", label);
+    sh_text(x + w - 10.0f * s, y + 3.0f * s, tx, "v");
+
+    qbool hovered = sh_mouse_in(x, y, w, h);
+
+    if (hovered && sh_mouse_clicked())
+    {
+        if (open_combo == *value && owner == (const void *)value)
+        {
+            open_combo = -1;
+            owner = 0;
+        }
+        else
+        {
+            open_combo = *value;
+            owner = (const void *)value;
+        }
+    }
+
+    if (owner != (const void *)value)
+        return;
+
+    for (i32 i = 0; i < count; ++i)
+    {
+        f32 iy = y + h + (f32)i * h;
+
+        sh_draw_rect(x, iy, w, h, bg);
+        sh_draw_rect_outline(x, iy, w, h, 1.0f, bd);
+
+        col4_t it = (i == *value) ? (col4_t){ 120, 180, 255, 255 } : tx;
+        sh_text(x + 5.0f * s, iy + 3.0f * s, it, "%s", items[i]);
+
+        if (sh_mouse_in(x, iy, w, h) && sh_mouse_clicked())
+        {
+            *value = i;
+            open_combo = -1;
+            owner = 0;
+        }
+    }
 }
 
 static void sh_menu_section(const char *title, f32 x, f32 y)
@@ -106,6 +211,15 @@ static void sh_menu_draw_rage(f32 x, f32 y)
     sh_menu_slider(x, cy, colw, "min damage", &g_cfg.aimbot.min_damage, 1.0f, 100.0f, "");
 }
 
+static const char *g_pitch_items[] = {
+    "none", "down", "up", "fake down", "fake up", "spin", "static"
+};
+
+static const char *g_yaw_items[] = {
+    "none", "backwards", "static left", "static right", "left", "right",
+    "spin", "static", "random", "jitter", "fake sideways"
+};
+
 static void sh_menu_draw_antiaim(f32 x, f32 y)
 {
     f32 s = sh_scale();
@@ -116,18 +230,38 @@ static void sh_menu_draw_antiaim(f32 x, f32 y)
 
     f32 cy = y + 20.0f * s;
     sh_menu_checkbox(x, cy, "enabled", &g_cfg.antiaim.enabled);
-    sh_menu_checkbox(x + colw, cy, "desync", &g_cfg.antiaim.desync);
     cy += row;
 
-    sh_menu_checkbox(x, cy, "fake duck", &g_cfg.antiaim.fake_duck);
-    sh_menu_checkbox(x + colw, cy, "micro move", &g_cfg.antiaim.micro_move);
-    cy += row + 6.0f * s;
+    sh_menu_combo(x, cy, colw, "pitch", &g_cfg.antiaim.pitch_mode,
+                  g_pitch_items, 7);
+    cy += row;
 
-    sh_menu_slider(x, cy, colw, "yaw jitter", &g_cfg.antiaim.yaw_jitter, 0.0f, 180.0f, "");
-    cy += row + 6.0f * s;
-    sh_menu_slider(x, cy, colw, "desync amount", &g_cfg.antiaim.desync_amount, 0.0f, 60.0f, "");
-    cy += row + 6.0f * s;
-    sh_menu_slider(x, cy, colw, "spin speed", &g_cfg.antiaim.spin_speed, 0.0f, 10.0f, "");
+    sh_menu_combo(x, cy, colw, "yaw", &g_cfg.antiaim.yaw_mode,
+                  g_yaw_items, 11);
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "roll", &g_cfg.antiaim.roll, -50.0f, 50.0f, "%.0f");
+    cy += row + 8.0f * s;
+
+    sh_menu_section("fake lag", x, cy);
+    cy += 20.0f * s;
+
+    sh_menu_checkbox(x, cy, "enabled", &g_cfg.antiaim.fake_lag);
+    cy += row;
+
+    static f32 g_fl_dbg;
+    g_fl_dbg = (f32)g_cfg.antiaim.fake_lag_ticks;
+
+    sh_menu_slider(x, cy, colw, "ticks", &g_fl_dbg, 0.0f, 22.0f, "%.0f");
+    cy += row;
+
+    if (g_fl_dbg >= 0.0f)
+        g_cfg.antiaim.fake_lag_ticks = (i32)(g_fl_dbg + 0.5f);
+
+    static f32 g_spin_dbg;
+    g_spin_dbg = g_cfg.antiaim.spin_speed;
+    sh_menu_slider(x, cy, colw, "spin speed", &g_spin_dbg, 0.0f, 10.0f, "%.1f");
+    g_cfg.antiaim.spin_speed = g_spin_dbg;
 }
 
 static void sh_menu_draw_visuals(f32 x, f32 y)
@@ -318,13 +452,10 @@ void sh_menu_draw(void)
     sh_draw_rect(ox, oy + 26.0f * s, sidebar, h - 26.0f * s,
                  (col4_t)SH_COL_RGBA(16, 16, 16, 255));
 
-    POINT mp;
-    GetCursorPos(&mp);
-    HWND wnd = WindowFromPoint(mp);
-    if (wnd)
-        ScreenToClient(wnd, &mp);
+    sh_menu_input_begin();
 
-    qbool clicked = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+    POINT mp = g_mouse;
+    qbool clicked = g_click;
 
     for (i32 i = 0; i < (i32)sh_countof(g_tabs); ++i)
     {

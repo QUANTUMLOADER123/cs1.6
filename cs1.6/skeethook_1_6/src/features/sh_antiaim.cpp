@@ -1,177 +1,210 @@
-#include "../../include/sh_features.h"
+#include "../../include/sh_antiaim.h"
+#include "../../include/sh_config.h"
 #include "../../include/sh_math.h"
 
-#include <windows.h>
-#include <math.h>
+static f32 g_prev_time;
+static f32 g_spin_accum;
+static qbool g_sideways_flip;
+static u32 g_jitter_seed = 12345u;
 
-enum
+static u32 sh_rand(void)
 {
-    sh_pitch_none = 0,
-    sh_pitch_down,
-    sh_pitch_up,
-    sh_pitch_fake_down,
-    sh_pitch_fake_up,
-    sh_pitch_random
-};
-
-enum
-{
-    sh_yaw_none = 0,
-    sh_yaw_backward,
-    sh_yaw_spin,
-    sh_yaw_jitter,
-    sh_yaw_fake_side,
-    sh_yaw_lby_break
-};
-
-static f32 g_spin_angle;
-static f32 g_jitter_phase;
-static f32 g_lby_timer;
-static f32 g_fake_duck_timer;
-
-static f32 sh_get_frametime(void)
-{
-    if (g_pmove && g_pmove->frametime > 0.0f)
-        return g_pmove->frametime;
-    return 0.015f;
+    g_jitter_seed = g_jitter_seed * 1103515245u + 12345u;
+    return (g_jitter_seed >> 16) & 0x7FFF;
 }
 
-static f32 sh_randf(f32 lo, f32 hi)
+static i32 sh_rand_range(i32 lo, i32 hi)
 {
-    static u32 seed = 0x9E3779B9;
-    seed ^= seed << 13;
-    seed ^= seed >> 17;
-    seed ^= seed << 5;
-    f32 t = (f32)(seed & 0xFFFF) / 65535.0f;
-    return lo + t * (hi - lo);
+    if (hi <= lo)
+        return lo;
+
+    return lo + (i32)(sh_rand() % (u32)(hi - lo + 1));
 }
 
-void sh_antiaim_apply_pitch(vec3_t *angles, sh_usercmd_t *cmd, f32 frametime)
+f32 sh_antiaim_max_delta(void)
 {
-    (void)cmd;
-    (void)frametime;
+    return 91.0f;
+}
 
+qbool sh_antiaim_can_run(sh_usercmd_t *cmd)
+{
+    if (!cmd)
+        return 0;
+
+    if (cmd->buttons & 1)
+        return 0;
+
+    if (cmd->buttons & 32)
+        return 0;
+
+    if (!g_pmove)
+        return 0;
+
+    if (g_pmove->movetype == 5)
+        return 0;
+
+    if (g_pmove->movetype == 6 && g_pmove->onground != -1)
+        return 0;
+
+    return 1;
+}
+
+static f32 sh_time_flow(f32 time)
+{
+    f32 dt = time - g_prev_time;
+
+    if (dt < 0.0f || dt > 1.0f)
+        dt = 0.0f;
+
+    g_prev_time = time;
+
+    return dt;
+}
+
+void sh_antiaim_apply_pitch(sh_usercmd_t *cmd, f32 time)
+{
     switch (g_cfg.antiaim.pitch_mode)
     {
     case sh_pitch_down:
-        angles->x = 89.0f;
+        cmd->viewangles.x = 88.0f;
         break;
     case sh_pitch_up:
-        angles->x = -89.0f;
+        cmd->viewangles.x = -88.0f;
         break;
     case sh_pitch_fake_down:
-        angles->x = 89.0f;
+        cmd->viewangles.x = 1620.0f;
         break;
     case sh_pitch_fake_up:
-        angles->x = -89.0f;
+        cmd->viewangles.x = -1619.0f;
         break;
-    case sh_pitch_random:
-        angles->x = sh_randf(-89.0f, 89.0f);
+    case sh_pitch_spin:
+        cmd->viewangles.x = sh_cos(time * 11.0f * sh_pi) * 90.0f;
+        break;
+    case sh_pitch_static:
+        cmd->viewangles.x = 0.0f;
         break;
     default:
         break;
     }
 }
 
-void sh_antiaim_apply_yaw(vec3_t *angles, sh_usercmd_t *cmd, f32 frametime)
+void sh_antiaim_apply_yaw(sh_usercmd_t *cmd, f32 time)
 {
-    f32 base = g_cfg.antiaim.yaw_base;
+    f32 base = cmd->viewangles.y;
 
     switch (g_cfg.antiaim.yaw_mode)
     {
-    case sh_yaw_backward:
-        angles->y += 180.0f;
+    case sh_yaw_backwards:
+        cmd->viewangles.y = base + 180.0f;
         break;
-
+    case sh_yaw_static_left:
+        cmd->viewangles.y = 90.0f;
+        break;
+    case sh_yaw_static_right:
+        cmd->viewangles.y = 270.0f;
+        break;
+    case sh_yaw_left:
+        cmd->viewangles.y = base + 90.0f;
+        break;
+    case sh_yaw_right:
+        cmd->viewangles.y = base + 270.0f;
+        break;
     case sh_yaw_spin:
-        g_spin_angle += g_cfg.antiaim.spin_speed * frametime * 360.0f;
-        while (g_spin_angle > 360.0f)
-            g_spin_angle -= 360.0f;
-        angles->y += g_spin_angle;
+        g_spin_accum += g_cfg.antiaim.spin_speed * g_cfg.antiaim.spin_speed;
+        cmd->viewangles.y = base + g_spin_accum;
         break;
+    case sh_yaw_static:
+        cmd->viewangles.y = 0.0f;
+        break;
+    case sh_yaw_random:
+    {
+        i32 r = sh_rand_range(0, 99);
 
+        if (r < 98)
+            cmd->viewangles.y = base - 180.0f;
+
+        if (r < 15)
+            cmd->viewangles.y += (f32)sh_rand_range(-70, 70);
+
+        if (r == 69)
+            cmd->viewangles.y += (f32)sh_rand_range(-90, 90);
+
+        break;
+    }
     case sh_yaw_jitter:
-        g_jitter_phase += frametime * 8.0f;
-        angles->y += sinf(g_jitter_phase) * g_cfg.antiaim.yaw_jitter;
-        break;
+    {
+        i32 r = sh_rand_range(1, 100);
 
-    case sh_yaw_fake_side:
-        angles->y += g_cfg.antiaim.yaw_jitter * ((cmd->buttons & sh_in_duck) ? 1.0f : -1.0f);
-        break;
+        if (r < 10)
+            cmd->viewangles.y = base + 180.0f;
 
-    case sh_yaw_lby_break:
-        g_lby_timer += frametime;
-        if (g_lby_timer > 1.1f)
-        {
-            angles->y += 180.0f;
-            g_lby_timer = 0.0f;
-        }
         break;
+    }
+    case sh_yaw_fake_sideways:
+        cmd->viewangles.y = base - sh_antiaim_max_delta();
 
+        g_sideways_flip = !g_sideways_flip;
+
+        if (g_sideways_flip)
+            cmd->viewangles.y -= 180.0f;
+
+        break;
     default:
         break;
     }
 
-    angles->y += base;
-    sh_angle_normalize(angles);
+    if (g_cfg.antiaim.roll != 0.0f)
+        cmd->viewangles.z = g_cfg.antiaim.roll;
 }
 
-static void sh_micro_move(sh_usercmd_t *cmd)
+void sh_antiaim_movement_fix(sh_usercmd_t *cmd, const vec3_t *old_angles)
 {
-    f32 speed = g_cfg.antiaim.micro_move_speed;
-    if (speed <= 0.0f)
+    if (!cmd || !old_angles)
         return;
 
-    i32 phase = (i32)(g_spin_angle * 10.0f) % 4;
+    vec3_t view_fwd, view_right, view_up;
+    vec3_t aim_fwd, aim_right, aim_up;
 
-    switch (phase)
-    {
-    case 0:
-        cmd->forwardmove = speed;
-        cmd->sidemove = 0.0f;
-        break;
-    case 1:
-        cmd->forwardmove = 0.0f;
-        cmd->sidemove = speed;
-        break;
-    case 2:
-        cmd->forwardmove = -speed;
-        cmd->sidemove = 0.0f;
-        break;
-    default:
-        cmd->forwardmove = 0.0f;
-        cmd->sidemove = -speed;
-        break;
-    }
+    sh_angle_vectors(old_angles, &view_fwd, &view_right, &view_up);
+
+    vec3_t flat = cmd->viewangles;
+    flat.x = 0.0f;
+    flat.z = 0.0f;
+
+    sh_angle_vectors(&flat, &aim_fwd, &aim_right, &aim_up);
+
+    f32 fwd = cmd->forwardmove;
+    f32 side = cmd->sidemove;
+    f32 up = cmd->upmove;
+
+    cmd->forwardmove = fwd * sh_dot(&view_fwd, &aim_fwd)
+                     + side * sh_dot(&view_right, &aim_fwd)
+                     + up * sh_dot(&view_up, &aim_fwd);
+
+    cmd->sidemove = fwd * sh_dot(&view_fwd, &aim_right)
+                  + side * sh_dot(&view_right, &aim_right)
+                  + up * sh_dot(&view_up, &aim_right);
+
+    cmd->upmove = fwd * sh_dot(&view_fwd, &aim_up)
+                + side * sh_dot(&view_right, &aim_up)
+                + up * sh_dot(&view_up, &aim_up);
 }
 
 void sh_antiaim_run(sh_usercmd_t *cmd)
 {
-    if (!g_cfg.antiaim.enabled || !cmd)
+    if (!cmd || !g_cfg.antiaim.enabled)
         return;
 
-    f32 ft = sh_get_frametime();
+    if (!sh_antiaim_can_run(cmd))
+        return;
 
-    if (g_cfg.antiaim.pitch_mode)
-        sh_antiaim_apply_pitch(&cmd->viewangles, cmd, ft);
+    f32 time = g_pmove ? g_pmove->time : 0.0f;
+    sh_time_flow(time);
 
-    if (g_cfg.antiaim.yaw_mode)
-        sh_antiaim_apply_yaw(&cmd->viewangles, cmd, ft);
+    vec3_t old_angles = cmd->viewangles;
 
-    if (g_cfg.antiaim.micro_move)
-        sh_micro_move(cmd);
+    sh_antiaim_apply_pitch(cmd, time);
+    sh_antiaim_apply_yaw(cmd, time);
 
-    if (g_cfg.antiaim.fake_duck)
-    {
-        g_fake_duck_timer += ft;
-        if (g_fake_duck_timer > 0.2f)
-        {
-            cmd->buttons |= sh_in_duck;
-            g_fake_duck_timer = 0.0f;
-        }
-        else
-        {
-            cmd->buttons &= ~sh_in_duck;
-        }
-    }
+    sh_antiaim_movement_fix(cmd, &old_angles);
 }

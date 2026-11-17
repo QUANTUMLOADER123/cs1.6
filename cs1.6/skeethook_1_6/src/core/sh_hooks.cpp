@@ -8,6 +8,7 @@
 #include "../../include/sh_movement.h"
 #include "../../include/sh_ballistics.h"
 #include "../../include/sh_visuals.h"
+#include "../../include/sh_fakelag.h"
 
 
 #include <windows.h>
@@ -115,6 +116,8 @@ i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
     sh_movement_run(cmd);
 
     sh_visuals_thirdperson(cmd);
+
+    sh_fakelag_run(cmd);
 
     sh_misc_run(cmd);
 
