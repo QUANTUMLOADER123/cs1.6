@@ -6,6 +6,7 @@
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
 #include "../../include/sh_autowall.h"
+#include "../../include/sh_bones.h"
 #include "../../include/sh_nospread.h"
 #include "../../include/sh_ballistics.h"
 
@@ -120,30 +121,52 @@ void sh_rage_scan(sh_rage_result_t *out)
             continue;
 
         vec3_t center = p->origin;
+        i32 hit_grp = 2;
 
         {
-            f32 h = 36.0f;
+            const sh_bone_snapshot_t *snap = sh_bones_get(p->index);
+            i32 want = -1;
 
             switch (g_cfg.aimbot.hitbox)
             {
             case 1:
-                h = 64.0f;
+                want = sh_bone_head;
+                hit_grp = 1;
                 break;
             case 2:
-                h = 44.0f;
+                want = sh_bone_spine3;
+                hit_grp = 2;
                 break;
             case 3:
-                h = 18.0f;
+                want = sh_bone_pelvis;
+                hit_grp = 3;
                 break;
             default:
-                h = 36.0f;
+                want = sh_bone_spine3;
+                hit_grp = 2;
                 break;
             }
 
-            if (p->ent && p->ent->curstate.usehull == 1)
-                h *= 0.72f;
+            if (snap && snap->valid && want >= 0 && snap->pos[want].x != 0.0f)
+            {
+                center = snap->pos[want];
+            }
+            else
+            {
+                f32 h = 36.0f;
 
-            center.z += h;
+                if (g_cfg.aimbot.hitbox == 1)
+                    h = 64.0f;
+                else if (g_cfg.aimbot.hitbox == 2)
+                    h = 44.0f;
+                else if (g_cfg.aimbot.hitbox == 3)
+                    h = 18.0f;
+
+                if (p->ent && p->ent->curstate.usehull == 1)
+                    h *= 0.72f;
+
+                center.z += h;
+            }
         }
 
         vec3_t d = center;
@@ -233,7 +256,7 @@ void sh_rage_scan(sh_rage_result_t *out)
             out->target.index = p->index;
             out->target.distance = dist;
             out->target.aim_point = center;
-            out->target.hitgroup = g_cfg.aimbot.hitbox;
+            out->target.hitgroup = hit_grp;
             out->target.damage = dealt;
             out->target.through_wall = visible ? 0 : 1;
         }
