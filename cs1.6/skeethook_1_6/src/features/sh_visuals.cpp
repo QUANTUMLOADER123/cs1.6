@@ -24,6 +24,10 @@ static f32 g_saved_overbright;
 static f32 g_saved_fog;
 static f32 g_saved_lightholes;
 static f32 g_saved_flashblend;
+static f32 g_saved_lightgamma;
+static f32 g_saved_texgamma;
+static f32 g_saved_gamma;
+static f32 g_saved_brightness;
 
 static f32 sh_get_cvar(const char *name)
 {
@@ -198,32 +202,44 @@ void sh_visuals_apply_nightmode(void)
         g_saved_fog = sh_get_cvar("gl_fog");
         g_saved_lightholes = sh_get_cvar("gl_lightholes");
         g_saved_flashblend = sh_get_cvar("gl_flashblend");
+        g_saved_lightgamma = sh_get_cvar("lightgamma");
+        g_saved_texgamma = sh_get_cvar("texgamma");
+        g_saved_gamma = sh_get_cvar("gamma");
+        g_saved_brightness = sh_get_cvar("brightness");
     }
 
     if (g_cfg.visuals.world_color)
     {
         f32 lum = wr * 0.299f + wg * 0.587f + wb * 0.114f;
-        f32 mono = 1.0f - lum;
 
-        if (mono < 0.0f)
-            mono = 0.0f;
-        if (mono > 1.0f)
-            mono = 1.0f;
+        if (lum < 0.0f) lum = 0.0f;
+        if (lum > 1.0f) lum = 1.0f;
 
-        g_engfuncs->pfnCvar_SetValue("gl_monolights", mono);
-        g_engfuncs->pfnCvar_SetValue("gl_fog", 1.0f);
+        g_engfuncs->pfnCvar_SetValue("gl_monolights", 1.0f);
+        g_engfuncs->pfnCvar_SetValue("lightgamma", 2.5f - lum * 1.5f);
+        g_engfuncs->pfnCvar_SetValue("texgamma", 2.5f - lum * 1.5f);
         g_engfuncs->pfnCvar_SetValue("gl_lightholes", 0.0f);
     }
 
     if (g_cfg.visuals.sky_color)
     {
         f32 avg = (sr + sg + sb) / 3.0f;
-        g_engfuncs->pfnCvar_SetValue("gl_overbright", avg);
+
+        if (avg < 0.0f) avg = 0.0f;
+        if (avg > 1.0f) avg = 1.0f;
+
+        g_engfuncs->pfnCvar_SetValue("gamma", 3.0f - avg * 1.5f);
+        g_engfuncs->pfnCvar_SetValue("brightness", 2.0f - avg * 1.2f);
     }
 
     if (g_cfg.visuals.light_color)
     {
         f32 avg = (lr + lg + lb) / 3.0f;
+
+        if (avg < 0.0f) avg = 0.0f;
+        if (avg > 1.0f) avg = 1.0f;
+
+        g_engfuncs->pfnCvar_SetValue("gl_fog", (avg > 0.5f) ? 0.0f : 1.0f);
         g_engfuncs->pfnCvar_SetValue("gl_flashblend", (avg > 0.5f) ? 1.0f : 0.0f);
     }
 }
@@ -240,6 +256,10 @@ void sh_visuals_restore(void)
         g_engfuncs->pfnCvar_SetValue("gl_fog", g_saved_fog);
         g_engfuncs->pfnCvar_SetValue("gl_lightholes", g_saved_lightholes);
         g_engfuncs->pfnCvar_SetValue("gl_flashblend", g_saved_flashblend);
+        g_engfuncs->pfnCvar_SetValue("lightgamma", g_saved_lightgamma);
+        g_engfuncs->pfnCvar_SetValue("texgamma", g_saved_texgamma);
+        g_engfuncs->pfnCvar_SetValue("gamma", g_saved_gamma);
+        g_engfuncs->pfnCvar_SetValue("brightness", g_saved_brightness);
     }
 
     g_saved_rendermode = -1;
