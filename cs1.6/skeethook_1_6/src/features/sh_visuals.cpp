@@ -14,6 +14,8 @@ typedef struct sh_tracer_s
 
 static sh_tracer_t g_tracers[sh_max_tracers];
 static i32 g_tracer_cursor;
+static sh_impact_t g_impacts[sh_max_impacts];
+static i32 g_impact_cursor;
 static i32 g_saved_rendermode = -1;
 static f32 g_saved_monolights;
 static f32 g_saved_overbright;
@@ -57,17 +59,26 @@ void sh_visuals_tracer_add(const vec3_t *from, const vec3_t *to)
 
 void sh_visuals_impact_add(const vec3_t *pos, const vec3_t *normal)
 {
-    if (!pos || !normal)
+    if (!pos)
         return;
 
-    if (!g_tri_api || !g_tri_api->box_in_pvs)
-        return;
+    sh_impact_t *im = &g_impacts[g_impact_cursor];
 
-    vec3_t mins = { pos->x - 1.0f, pos->y - 1.0f, pos->z - 1.0f };
-    vec3_t maxs = { pos->x + 1.0f, pos->y + 1.0f, pos->z + 1.0f };
+    im->pos = *pos;
 
-    (void)g_tri_api->box_in_pvs((f32 *)&mins, (f32 *)&maxs);
-    (void)normal;
+    if (normal)
+        im->normal = *normal;
+    else
+        im->normal = (vec3_t){ 0.0f, 0.0f, 1.0f };
+
+    im->born = sh_now();
+    im->life = sh_impact_life;
+    im->active = 1;
+
+    g_impact_cursor = (g_impact_cursor + 1) % sh_max_impacts;
+
+    if (g_cfg.visuals.bullet_impact_sound && g_engfuncs && g_engfuncs->pfnPlaySoundByName)
+        g_engfuncs->pfnPlaySoundByName("weapons/bullet_hit1.wav", 0.4f);
 }
 
 void sh_visuals_effects_tick(f32 frametime)
@@ -81,6 +92,15 @@ void sh_visuals_effects_tick(f32 frametime)
 
         if (now - g_tracers[i].born > g_tracers[i].life)
             g_tracers[i].active = 0;
+    }
+
+    for (i32 i = 0; i < sh_max_impacts; ++i)
+    {
+        if (!g_impacts[i].active)
+            continue;
+
+        if (now - g_impacts[i].born > g_impacts[i].life)
+            g_impacts[i].active = 0;
     }
 }
 
@@ -110,6 +130,33 @@ void sh_visuals_effects_draw(void)
         c.a = (u8)((f32)c.a * fade);
 
         sh_draw_line(a.x, a.y, b.x, b.y, 1.0f, c);
+    }
+
+    if (!g_cfg.visuals.impact)
+        return;
+
+    for (i32 i = 0; i < sh_max_impacts; ++i)
+    {
+        sh_impact_t *im = &g_impacts[i];
+
+        if (!im->active)
+            continue;
+
+        vec2_t sp;
+
+        if (!sh_world_to_screen(&im->pos, &sp))
+            continue;
+
+        f32 age = (sh_now() - im->born) / im->life;
+        f32 fade = 1.0f - sh_clampf(age, 0.0f, 1.0f);
+
+        col4_t c = g_cfg.visuals.col_impact;
+        c.a = (u8)((f32)c.a * fade);
+
+        f32 r = (2.0f + 4.0f * age) * sh_scale();
+
+        sh_draw_line(sp.x - r, sp.y, sp.x + r, sp.y, 1.0f, c);
+        sh_draw_line(sp.x, sp.y - r, sp.x, sp.y + r, 1.0f, c);
     }
 }
 

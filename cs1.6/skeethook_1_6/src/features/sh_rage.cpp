@@ -189,6 +189,12 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
             sh_visuals_tracer_add(&from, &to);
         }
 
+        if (g_cfg.visuals.impact)
+        {
+            vec3_t norm = { 0.0f, 0.0f, 1.0f };
+            sh_visuals_impact_add(&r->target.aim_point, &norm);
+        }
+
         {
             f32 vt = g_pmove ? g_pmove->time : 0.0f;
             vec3_t d2 = r->target.aim_point;

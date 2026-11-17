@@ -12,4 +12,15 @@ void sh_visuals_effects_tick(f32 frametime);
 void sh_visuals_effects_draw(void);
 
 #define sh_max_tracers 64
+#define sh_max_impacts 32
+#define sh_impact_life 1.0f
+
+typedef struct sh_impact_s
+{
+    vec3_t pos;
+    vec3_t normal;
+    f32 born;
+    f32 life;
+    qbool active;
+} sh_impact_t;
 #define sh_tracer_life 2.0f
