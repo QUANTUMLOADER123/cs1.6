@@ -146,6 +146,7 @@ typedef struct sh_misc_cfg
     qbool fast_ladder;
     qbool no_fall_damage;
     qbool grenade_predict;
+    qbool grenade_radius;
     qbool enemy_fire_indicator;
     qbool hideshot;
     qbool auto_pistol;

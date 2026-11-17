@@ -271,7 +271,7 @@ void sh_grenade_path_draw(void)
     if (local)
         wpn = local->weapon_id;
 
-    if (wpn != 4 && wpn != 9 && wpn != 11 && wpn != 13 && wpn != 25)
+    if (wpn != 4 && wpn != 9 && wpn != 25)
         return;
 
     vec3_t origin = g_pmove->origin;
@@ -316,6 +316,39 @@ void sh_grenade_path_draw(void)
             col4_t c = { 255, 90, 90, 220 };
             sh_draw_line(sp.x - r, sp.y, sp.x + r, sp.y, 2.0f, c);
             sh_draw_line(sp.x, sp.y - r, sp.x, sp.y + r, 2.0f, c);
+
+            if (g_cfg.misc.grenade_radius)
+            {
+                f32 rad = 0.0f;
+                f32 fuse = 0.0f;
+
+                switch (wpn)
+                {
+                case 9:
+                    rad = 350.0f;
+                    fuse = 3.0f;
+                    break;
+                case 11:
+                    rad = 240.0f;
+                    fuse = 1.5f;
+                    break;
+                case 13:
+                    rad = 185.0f;
+                    fuse = 2.0f;
+                    break;
+                case 25:
+                    rad = 185.0f;
+                    fuse = 2.0f;
+                    break;
+                default:
+                    break;
+                }
+
+                if (rad > 0.0f)
+                    sh_text_center(sp.x, sp.y - 12.0f,
+                                   (col4_t)SH_COL_RGBA(255, 160, 80, 230),
+                                   "%.1fm  r%.0f  %.1fs", rad / 39.37f, rad, fuse);
+            }
         }
     }
 }

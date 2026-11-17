@@ -224,7 +224,7 @@ void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (lp)
         wspn = lp->weapon_id;
 
-    if (wspn != 4 && wspn != 9 && wspn != 11 && wspn != 13 && wspn != 25)
+    if (wspn != 4 && wspn != 9 && wspn != 25)
         return;
 
     f32 pitch = cmd->viewangles.x;
