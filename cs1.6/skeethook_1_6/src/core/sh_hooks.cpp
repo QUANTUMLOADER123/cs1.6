@@ -48,11 +48,8 @@ void __cdecl sh_txfer_override_hook(sh_entity_state_t *state,
     if (g_txfer_override_orig)
         g_txfer_override_orig(state, client);
 
-    if (!state || !client)
-        return;
-
-    if (g_cfg.antiaim.fake_duck)
-        state->origin.z -= 18.0f;
+    (void)state;
+    (void)client;
 }
 
 typedef void(__cdecl *camera_offset_fn)(f32 *ofs);
