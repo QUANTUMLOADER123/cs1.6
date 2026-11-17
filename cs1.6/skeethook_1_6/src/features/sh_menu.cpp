@@ -1,4 +1,5 @@
 #include "../../include/sh_config.h"
+#include "../../include/sh_modelchanger.h"
 #include "../../include/sh_movement.h"
 #include "../../include/sh_grenade.h"
 #include "../../include/sh_skybox.h"
@@ -389,6 +390,42 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
                    20.0f, 255.0f, "");
 
     sh_menu_checkbox(x, cy, "xqz chams", &g_cfg.visuals.chams_xqz);
+
+    cy += row + 6.0f * s;
+
+    sh_menu_section("model changer", x, cy);
+    cy += 20.0f * s;
+
+    sh_menu_checkbox(x, cy, "player model", &g_cfg.visuals.model_changer);
+    cy += row;
+
+    {
+        static const char *items[16];
+        static char names[16][32];
+
+        i32 n = sh_model_changer_count();
+
+        if (n > 16)
+            n = 16;
+
+        for (i32 i = 0; i < n; ++i)
+        {
+            const char *src = sh_model_changer_name(i);
+            i32 k = 0;
+
+            while (src[k] && k < 31)
+            {
+                names[i][k] = src[k];
+                ++k;
+            }
+
+            names[i][k] = 0;
+            items[i] = names[i];
+        }
+
+        sh_menu_combo(x, cy, colw, "model", &g_cfg.visuals.model_index,
+                      items, n);
+    }
 }
 
 static void sh_menu_draw_misc(f32 x, f32 y)

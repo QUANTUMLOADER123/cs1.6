@@ -7,6 +7,7 @@
 #include "../../include/sh_scanner.h"
 #include "../../include/sh_font.h"
 #include "../../include/sh_nospread.h"
+#include "../../include/sh_modelchanger.h"
 #include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
@@ -358,6 +359,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 
     sh_visuals_effects_tick(time);
     sh_skybox_tick();
+    sh_model_changer_tick();
     sh_visuals_apply_nightmode();
     sh_worldfx_tick();
 

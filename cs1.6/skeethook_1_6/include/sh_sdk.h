@@ -743,7 +743,8 @@ typedef struct sh_engfuncs_s
 
     void *pad_0D8[9];
 
-    void *pad_0FC[4];
+    sh_model_t *(*cl_load_model)(const char *name, i32 *index);
+    void *pad_0F4[3];
 
     f32 (*pfnRandomFloat)(f32 lo, f32 hi);
     i32 (*pfnRandomLong)(i32 lo, i32 hi);

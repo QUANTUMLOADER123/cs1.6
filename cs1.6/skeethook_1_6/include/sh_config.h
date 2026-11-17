@@ -82,6 +82,8 @@ typedef struct sh_visuals_cfg
     qbool chams;
     qbool chams_team_color;
     qbool chams_xqz;
+    qbool model_changer;
+    i32 model_index;
     col4_t col_chams_vis;
     col4_t col_chams_xqz;
     qbool glow;
