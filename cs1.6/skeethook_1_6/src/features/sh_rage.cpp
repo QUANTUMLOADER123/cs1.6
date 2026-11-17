@@ -269,7 +269,6 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
         {
             f32 vt = g_pmove ? g_pmove->time : 0.0f;
             sh_hitmarker_tick(vt);
-            sh_worldfx_hit_sound();
         }
     }
 }

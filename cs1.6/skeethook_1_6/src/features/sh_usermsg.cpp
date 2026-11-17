@@ -1,5 +1,6 @@
 #include "../../include/sh_features.h"
 #include "../../include/sh_hitmarker.h"
+#include "../../include/sh_worldfx.h"
 
 sh_msg_state_t g_msgs;
 
@@ -178,6 +179,7 @@ static i32 __cdecl sh_cb_health(const char *name, i32 size, i32 read)
         if (g_last_health > 0 && dmg > 0)
         {
             sh_hitmarker_on_hit(0, dmg);
+            sh_worldfx_hit_sound();
             g_damage_done_time = g_pmove ? g_pmove->time : 0.0f;
         }
     }
@@ -218,6 +220,7 @@ static i32 __cdecl sh_cb_damage(const char *name, i32 size, i32 read)
     if (dmg > 0.0f && dmg < 200.0f)
     {
         sh_hitmarker_on_hit(0, (i32)dmg);
+        sh_worldfx_hit_sound();
         g_damage_done_time = t;
     }
 
