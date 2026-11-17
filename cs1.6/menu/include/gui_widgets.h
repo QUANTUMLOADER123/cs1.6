@@ -335,82 +335,93 @@ namespace gui
                           float lo, float hi, const char* fmt)
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
-        // та же привязка, что у дропдауна: бордер поля = row_y + 14
-        const float y = col_pos.y + row_y * geo::SCALE + 14.0f * geo::SCALE;
-        const float fh = 20.0f * geo::SCALE;   // как у дропдауна: 20px
-        const float w = 193.0f * geo::SCALE;   // как у дропдауна
-        const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
-        const ImVec2 q(p.x + w, p.y + fh);
+        // Снято с ОРИГИНАЛЬНОГО меню (скит): трек — тонкая полоса 8px
+        // (1px бордер + 6px заливки + 1px бордер), значение рисуется ПРЯМО НА
+        // треке у края заливки, а не отдельной колонкой справа.
+        const float w  = 155.0f * geo::SCALE;   // как поле дропдауна в ските
+        const float th = 8.0f * geo::SCALE;
+        const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE,
+                       col_pos.y + row_y * geo::SCALE + 16.0f * geo::SCALE);
 
-        // плашка поля — как у дропдауна
-        VGradient(dl, p, q, col::FIELD_TOP, col::FIELD_BOT);
-        const float px = ImFloor(p.x), pw = ImFloor(q.x) - px, py = ImFloor(p.y);
-        dl->AddRectFilled(ImVec2(px, py), ImVec2(px + pw, py + 1), col::CHECK_BORDER);
-        dl->AddRectFilled(ImVec2(px, py + 19), ImVec2(px + pw, py + 20), col::CHECK_BORDER);
-        dl->AddRectFilled(ImVec2(px, py), ImVec2(px + 1, py + 20), col::CHECK_BORDER);
-        dl->AddRectFilled(ImVec2(px + pw - 1, py), ImVec2(px + pw, py + 20), col::CHECK_BORDER);
+        const int x0 = (int)ImFloor(p.x), y0 = (int)ImFloor(p.y);
+        const int bw = (int)std::lround(w);
+        const int x1 = x0 + bw, y1 = y0 + 8;
 
-        ImGui::SetCursorScreenPos(p);
-        ImGui::InvisibleButton(id, ImVec2(w, fh));
+        // Хитбокс на всю строку — тащить удобнее.
+        ImGui::SetCursorScreenPos(ImVec2((float)x0 - 12.0f, (float)y0 - 5.0f));
+        ImGui::InvisibleButton(id, ImVec2((float)bw + 24.0f, 18.0f));
         const bool active = ImGui::IsItemActive();
-        const float t = std::clamp((*v - lo) / (hi - lo), 0.0f, 1.0f);
 
-        // ЗАЛИВКА трека градиентом #99C427 -> #699404 (как в gamesense),
-        // строго внутри бордеров: x 154..332, y 101..118.
-        // при t=1 заливка должна дойти ровно до правого бордера (x=pw-2 включительно)
-        const int fx0 = (int)px + 1;
-        const int fy0 = (int)py + 1;
-        const int fw = (int)pw - 2;
-        const int fill_w = (int)std::floor(fw * t + 0.5f);
-        for (int i = 0; i < 18; ++i)
+        // Рамка трека
+        dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)x1, (float)(y0 + 1)), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2((float)x0, (float)(y1 - 1)), ImVec2((float)x1, (float)y1), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)(x0 + 1), (float)y1), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2((float)(x1 - 1), (float)y0), ImVec2((float)x1, (float)y1), col::CHECK_BORDER);
+        // Подложка (пустая часть трека)
+        for (int i = 1; i < 7; ++i)
         {
-            const float u = (float)i / 17.0f;
-            const int r = (int)(0x99 + (0x69 - 0x99) * u);
-            const int g = (int)(0xC4 + (0x94 - 0xC4) * u);
-            const int b = (int)(0x27 + (0x04 - 0x27) * u);
+            const int v0 = 48 - i * 3;
+            dl->AddRectFilled(ImVec2((float)(x0 + 1), (float)(y0 + i)),
+                              ImVec2((float)(x1 - 1), (float)(y0 + i + 1)),
+                              IM_COL32(v0, v0, v0, 255));
+        }
+
+        // Заливка: 6 строк, #99C427 -> #699404 (как в ските: 154/197 -> 104/147)
+        const float t = std::clamp((*v - lo) / (hi - lo), 0.0f, 1.0f);
+        const int fw = (x1 - 1) - (x0 + 1);
+        const int fill_w = (int)std::floor((float)fw * t + 0.5f);
+        for (int i = 0; i < 6; ++i)
+        {
+            const float u = (float)i / 5.0f;
+            const int r = (int)std::lround(154 + (104 - 154) * u);
+            const int g = (int)std::lround(197 + (147 - 197) * u);
+            const int b = (int)std::lround(38  + (5   - 38)  * u);
             if (fill_w > 0)
-                dl->AddRectFilled(ImVec2((float)fx0, (float)(fy0 + i)),
-                                  ImVec2((float)(fx0 + fill_w), (float)(fy0 + i + 1)),
+                dl->AddRectFilled(ImVec2((float)(x0 + 1), (float)(y0 + 1 + i)),
+                                  ImVec2((float)(x0 + 1 + fill_w), (float)(y0 + 2 + i)),
                                   IM_COL32(r, g, b, 255));
         }
 
-        // Знаки "минус" и "плюс" по краям трека — как в оригинальном меню.
+        // '-' слева и '+' справа
         {
-            const float cy = ImFloor(p.y) + 10.0f;
+            const int cy = y0 + 6;
             const ImU32 sc = col::TEXT_DIM;
-            dl->AddRectFilled(ImVec2(ImFloor(p.x) - 14.0f, cy), ImVec2(ImFloor(p.x) - 9.0f, cy + 1.0f), sc);
-            dl->AddRectFilled(ImVec2(ImFloor(q.x) + 7.0f, cy), ImVec2(ImFloor(q.x) + 12.0f, cy + 1.0f), sc);
-            dl->AddRectFilled(ImVec2(ImFloor(q.x) + 9.0f, cy - 2.0f), ImVec2(ImFloor(q.x) + 10.0f, cy + 3.0f), sc);
+            dl->AddRectFilled(ImVec2((float)x0 - 11.0f, (float)cy), ImVec2((float)x0 - 5.0f, (float)cy + 1.0f), sc);
+            dl->AddRectFilled(ImVec2((float)x1 + 5.0f, (float)cy), ImVec2((float)x1 + 11.0f, (float)cy + 1.0f), sc);
+            dl->AddRectFilled(ImVec2((float)x1 + 7.0f, (float)cy - 2.0f), ImVec2((float)x1 + 9.0f, (float)cy + 3.0f), sc);
         }
 
+        // Значение — ПОВЕРХ трека, у края заливки (как в ските: "90°" на стыке).
         char buf[64];
         snprintf(buf, sizeof(buf), fmt, *v);
         {
             ImFontBaked* bk = ImGui::GetFont()->GetFontBaked(geo::TEXT_SIZE);
-            const float glyph_h = bk ? bk->Size : geo::TEXT_SIZE;
-            const float ty = ImFloor(p.y) + ImFloor((fh - glyph_h) * 0.5f) + 1.0f;
-            float tw = 0.0f;
+            const float gh = bk ? bk->Size : geo::TEXT_SIZE;
+            float tw2 = 0.0f;
             if (bk)
-                for (const char* c = buf; *c; ++c) tw += bk->GetCharAdvance((ImWchar)*c);
-            // Подложка под числом — как в оригинале: значение всегда на тёмной
-            // плашке, а заливка под ней обрезается, иначе справа торчит зелёный хвост.
-            const int share_x = (int)(px + pw) - (int)tw - 13;
-            dl->AddRectFilled(ImVec2((float)share_x, ImFloor(p.y) + 1),
-                              ImVec2(px + pw - 1, ImFloor(p.y) + 19), col::FIELD_BOT);
-            DrawTextSpaced(dl, ImVec2(ImFloor(px + pw - tw - 11), ty),
-                           col::TEXT, buf, geo::TEXT_SIZE, 0.5f * geo::SCALE);
+                for (const char* c = buf; *c; ++c) tw2 += bk->GetCharAdvance((ImWchar)*c);
+            const float ty = ImFloor((float)y0 + (8.0f - gh) * 0.5f) - 1.0f;
+            // Число держим ВНУТРИ трека: у края (значение 0 или max) оно
+            // иначе уезжало за "+" — в оригинале оно всегда на треке.
+            float tx = (float)(x0 + 1 + fill_w) - tw2 * 0.5f;
+            const float tx_min = (float)x0 + 3.0f;
+            const float tx_max = (float)(x1 - 3) - tw2;
+            tx = std::clamp(tx, tx_min, std::max(tx_min, tx_max));
+            dl->AddRectFilled(ImVec2(tx - 2.0f, (float)y0 + 1.0f),
+                              ImVec2(tx + tw2 + 2.0f, (float)y1 - 1.0f),
+                              IM_COL32(0, 0, 0, 190));
+            DrawTextSpaced(dl, ImVec2(ImFloor(tx), ty), col::TEXT_WHITE, buf,
+                           geo::TEXT_SIZE, 0.5f * geo::SCALE);
         }
 
         bool changed = false;
         if (active)
         {
             const float mx = ImGui::GetIO().MousePos.x;
-            const float nt = std::clamp((mx - p.x) / w, 0.0f, 1.0f);
+            const float nt = std::clamp((mx - (float)(x0 + 1)) / (float)std::max(1, fw - 1), 0.0f, 1.0f);
             const float nv = lo + (hi - lo) * nt;
             if (nv != *v) { *v = nv; changed = true; }
         }
-
-        // (курсор НЕ двигаем: строку задаёт ColTo у вызывающего кода)
         return changed;
     }
 
