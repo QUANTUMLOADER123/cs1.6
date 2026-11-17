@@ -327,12 +327,5 @@ void sh_rage_apply_recoil(sh_usercmd_t *cmd)
     }
 
     if (g_cfg.misc.no_spread)
-    {
-        cmd->viewangles.z -= g_pmove->punchangle.z;
-
-        if (cmd->viewangles.z > 180.0f)
-            cmd->viewangles.z -= 360.0f;
-        if (cmd->viewangles.z < -180.0f)
-            cmd->viewangles.z += 360.0f;
-    }
+        sh_spread_compensate(&cmd->viewangles);
 }

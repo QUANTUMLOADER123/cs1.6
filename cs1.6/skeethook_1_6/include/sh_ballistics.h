@@ -16,6 +16,7 @@ typedef struct sh_recoil_s
 
 f32  sh_shared_random_float(u32 seed, f32 low, f32 high);
 void sh_spread_compute(i32 seed, f32 spread, vec2_t *out);
+void sh_spread_compensate(vec3_t *viewangles);
 
 const sh_recoil_t *sh_recoil_for(i32 weapon_id);
 void sh_recoil_apply(i32 shots, const sh_recoil_t *r, vec2_t *punch);
