@@ -169,6 +169,38 @@ void sh_rage_scan(sh_rage_result_t *out)
             }
         }
 
+        if (g_cfg.aimbot.backtrack > 0)
+        {
+            i32 want_bt = -1;
+
+            if (g_cfg.aimbot.hitbox == 1)
+                want_bt = sh_bone_head;
+            else if (g_cfg.aimbot.hitbox == 3)
+                want_bt = sh_bone_pelvis;
+            else
+                want_bt = sh_bone_spine3;
+
+            vec3_t bt;
+
+            if (sh_bones_backtrack_vec(p->index, want_bt, g_cfg.aimbot.backtrack - 1, &bt))
+            {
+                f32 dx = bt.x - eye.x;
+                f32 dy = bt.y - eye.y;
+                f32 dz = bt.z - eye.z;
+
+                f32 d_bt = dx * dx + dy * dy + dz * dz;
+
+                dx = center.x - eye.x;
+                dy = center.y - eye.y;
+                dz = center.z - eye.z;
+
+                f32 d_now = dx * dx + dy * dy + dz * dz;
+
+                if (d_bt > 1.0f && d_bt < d_now * 4.0f)
+                    center = bt;
+            }
+        }
+
         if (g_cfg.aimbot.multipoint > 0)
         {
             const sh_bone_snapshot_t *snap = sh_bones_get(p->index);

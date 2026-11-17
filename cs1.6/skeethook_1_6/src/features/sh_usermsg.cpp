@@ -274,7 +274,7 @@ static i32 __cdecl sh_cb_damage(const char *name, i32 size, i32 read)
     if (dmg > 0.0f && dmg < 200.0f)
     {
         sh_hitmarker_on_hit(0, (i32)dmg);
-        sh_worldfx_hit_sound();
+        sh_worldfx_hit_sound_damage((i32)dmg);
         g_damage_done_time = t;
     }
 

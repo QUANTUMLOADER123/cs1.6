@@ -252,6 +252,18 @@ void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
     if (got < 6)
         return;
 
+    {
+        i32 h = snap->hist_head;
+
+        snap->hist[h].time = g_pmove ? g_pmove->time : 0.0f;
+        snap->hist[h].valid = 1;
+
+        for (i32 b = 0; b < sh_bone_count; ++b)
+            snap->hist[h].pos[b] = snap->pos[b];
+
+        snap->hist_head = (h + 1) % sh_bone_history;
+    }
+
     snap->index = index;
     snap->born = g_pmove ? g_pmove->time : 0.0f;
     snap->valid = 1;
@@ -359,6 +371,53 @@ i32 sh_bones_bbox_corners(const sh_bone_snapshot_t *snap, i32 box, vec3_t out[8]
         out[c].y = m[1][0] * lx + m[1][1] * ly + m[1][2] * lz + m[1][3];
         out[c].z = m[2][0] * lx + m[2][1] * ly + m[2][2] * lz + m[2][3];
     }
+
+    return 1;
+}
+
+i32 sh_bones_backtrack_frames(i32 index)
+{
+    if (index <= 0 || index >= sh_max_bone_players)
+        return 0;
+
+    const sh_bone_snapshot_t *snap = &g_bones[index];
+
+    if (!snap->valid)
+        return 0;
+
+    i32 n = 0;
+
+    for (i32 i = 0; i < sh_bone_history; ++i)
+        if (snap->hist[i].valid)
+            ++n;
+
+    return n;
+}
+
+qbool sh_bones_backtrack_vec(i32 index, i32 bone, i32 back, vec3_t *out)
+{
+    if (!out || index <= 0 || index >= sh_max_bone_players)
+        return 0;
+
+    if (bone < 0 || bone >= sh_bone_count)
+        return 0;
+
+    const sh_bone_snapshot_t *snap = &g_bones[index];
+
+    if (!snap->valid)
+        return 0;
+
+    if (back < 0)
+        back = 0;
+    if (back >= sh_bone_history)
+        back = sh_bone_history - 1;
+
+    i32 h = (snap->hist_head - 1 - back + sh_bone_history * 2) % sh_bone_history;
+
+    if (!snap->hist[h].valid)
+        return 0;
+
+    *out = snap->hist[h].pos[bone];
 
     return 1;
 }

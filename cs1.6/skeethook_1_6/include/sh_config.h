@@ -37,6 +37,7 @@ typedef struct sh_aimbot_cfg
     i32 hitbox;
     qbool auto_scope;
     i32 multipoint;
+    i32 backtrack;
     i32 priority;
     f32 min_damage;
     i32 key;
