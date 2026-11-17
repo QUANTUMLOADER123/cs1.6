@@ -117,7 +117,6 @@ typedef struct sh_visuals_cfg
 
 typedef struct sh_misc_cfg
 {
-    qbool bhop;
     qbool edge_jump;
     qbool fast_ladder;
     qbool no_fall_damage;
@@ -134,9 +133,6 @@ typedef struct sh_misc_cfg
     qbool no_scope;
     qbool crosshair;
     qbool radar_hack;
-    qbool thirdperson;
-    f32 thirdperson_dist;
-    qbool spectator_list;
 } sh_misc_cfg;
 
 typedef struct sh_movement_cfg

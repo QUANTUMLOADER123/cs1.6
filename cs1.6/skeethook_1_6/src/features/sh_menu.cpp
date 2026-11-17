@@ -472,7 +472,6 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "radar hack", &g_cfg.misc.radar_hack);
-    sh_menu_checkbox(x + colw, cy, "spectator list", &g_cfg.visuals.spectator_list);
 }
 
 static f32 g_movement_shots_dbg;
