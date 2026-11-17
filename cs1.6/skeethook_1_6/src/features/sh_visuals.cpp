@@ -112,10 +112,7 @@ void sh_visuals_effects_tick(f32 frametime)
 
 void sh_visuals_effects_draw(void)
 {
-    if (!g_cfg.visuals.tracer)
-        return;
-
-    for (i32 i = 0; i < sh_max_tracers; ++i)
+    for (i32 i = 0; g_cfg.visuals.tracer && i < sh_max_tracers; ++i)
     {
         sh_tracer_t *t = &g_tracers[i];
 
@@ -138,10 +135,7 @@ void sh_visuals_effects_draw(void)
         sh_draw_line(a.x, a.y, b.x, b.y, 1.0f, c);
     }
 
-    if (!g_cfg.visuals.impact)
-        return;
-
-    for (i32 i = 0; i < sh_max_impacts; ++i)
+    for (i32 i = 0; g_cfg.visuals.impact && i < sh_max_impacts; ++i)
     {
         sh_impact_t *im = &g_impacts[i];
 
