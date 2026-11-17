@@ -349,20 +349,34 @@ f32 sh_penetration_modifier(i32 char_texture)
 {
     switch (char_texture)
     {
-    case 67:
-        return 0.15f;
-    case 84:
-        return 0.25f;
-    case 71:
-        return 0.50f;
-    case 86:
-        return 0.50f;
-    case 88:
+    case 'C':
+        return 0.30f;
+    case 'M':
         return 0.65f;
-    case 80:
+    case 'D':
+        return 0.18f;
+    case 'V':
         return 0.40f;
+    case 'G':
+        return 0.55f;
+    case 'T':
+        return 0.45f;
+    case 'S':
+        return 0.05f;
+    case 'W':
+        return 0.12f;
+    case 'P':
+        return 0.60f;
+    case 'X':
+        return 0.10f;
+    case 'Y':
+        return 0.05f;
+    case 'F':
+        return 0.08f;
+    case 'N':
+        return 0.25f;
     default:
-        return 1.0f;
+        return 0.35f;
     }
 }
 
@@ -370,19 +384,33 @@ f32 sh_penetration_damage_modifier(i32 char_texture)
 {
     switch (char_texture)
     {
-    case 67:
-        return 0.2f;
-    case 71:
-        return 0.4f;
-    case 86:
-        return 0.45f;
-    case 88:
-        return 0.3f;
-    case 80:
-        return 0.45f;
-    case 87:
-        return 0.6f;
+    case 'C':
+        return 0.85f;
+    case 'M':
+        return 0.60f;
+    case 'D':
+        return 0.95f;
+    case 'V':
+        return 0.80f;
+    case 'G':
+        return 0.75f;
+    case 'T':
+        return 0.80f;
+    case 'S':
+        return 0.99f;
+    case 'W':
+        return 0.97f;
+    case 'P':
+        return 0.70f;
+    case 'X':
+        return 0.98f;
+    case 'Y':
+        return 0.99f;
+    case 'F':
+        return 0.99f;
+    case 'N':
+        return 0.90f;
     default:
-        return 0.5f;
+        return 0.90f;
     }
 }
