@@ -1,0 +1,159 @@
+nth paddr      vaddr      bind   type size lib             name                                      demangled
+--------------------------------------------------------------------------------------------------------------
+1   0x0000a450 0x1000b050 GLOBAL FUNC 0    client_mini.dll ?SUB_CallUseToggle@CBaseEntity@@QAEXXZ    public: void __thiscall CBaseEntity::SUB_CallUseToggle(void)
+2   0x0000a470 0x1000b070 GLOBAL FUNC 0    client_mini.dll ?SUB_Remove@CBaseEntity@@QAEXXZ           public: void __thiscall CBaseEntity::SUB_Remove(void)
+3   0x0000f9f0 0x100105f0 GLOBAL FUNC 0    client_mini.dll CreateInterface
+1   0x00030930 0x10032130 NONE   FUNC 0    tier0.dll       imp.GetCPUInformation
+2   0x00030934 0x10032134 NONE   FUNC 0    tier0.dll       imp.AssertValidStringPtr
+3   0x00030938 0x10032138 NONE   FUNC 0    tier0.dll       imp._AssertValidWritePtr
+1   0x00030910 0x10032110 NONE   FUNC 0    OPENGL32.dll    imp.glMatrixMode
+2   0x00030914 0x10032114 NONE   FUNC 0    OPENGL32.dll    imp.glFrustum
+3   0x00030918 0x10032118 NONE   FUNC 0    OPENGL32.dll    imp.glLoadIdentity
+4   0x0003091c 0x1003211c NONE   FUNC 0    OPENGL32.dll    imp.glPushMatrix
+5   0x00030920 0x10032120 NONE   FUNC 0    OPENGL32.dll    imp.glPopMatrix
+1   0x00030928 0x10032128 NONE   FUNC 0    PSAPI.DLL       imp.GetModuleInformation
+1   0x00030800 0x10032000 NONE   FUNC 0    KERNEL32.dll    imp.TlsSetValue
+2   0x00030804 0x10032004 NONE   FUNC 0    KERNEL32.dll    imp.CreateFileW
+3   0x00030808 0x10032008 NONE   FUNC 0    KERNEL32.dll    imp.CloseHandle
+4   0x0003080c 0x1003200c NONE   FUNC 0    KERNEL32.dll    imp.GetConsoleMode
+5   0x00030810 0x10032010 NONE   FUNC 0    KERNEL32.dll    imp.GetConsoleOutputCP
+6   0x00030814 0x10032014 NONE   FUNC 0    KERNEL32.dll    imp.WriteFile
+7   0x00030818 0x10032018 NONE   FUNC 0    KERNEL32.dll    imp.FlushFileBuffers
+8   0x0003081c 0x1003201c NONE   FUNC 0    KERNEL32.dll    imp.HeapSize
+9   0x00030820 0x10032020 NONE   FUNC 0    KERNEL32.dll    imp.SetStdHandle
+10  0x00030824 0x10032024 NONE   FUNC 0    KERNEL32.dll    imp.SetFilePointerEx
+11  0x00030828 0x10032028 NONE   FUNC 0    KERNEL32.dll    imp.FreeLibrary
+12  0x0003082c 0x1003202c NONE   FUNC 0    KERNEL32.dll    imp.GetModuleHandleA
+13  0x00030830 0x10032030 NONE   FUNC 0    KERNEL32.dll    imp.GetProcAddress
+14  0x00030834 0x10032034 NONE   FUNC 0    KERNEL32.dll    imp.MultiByteToWideChar
+15  0x00030838 0x10032038 NONE   FUNC 0    KERNEL32.dll    imp.WideCharToMultiByte
+16  0x0003083c 0x1003203c NONE   FUNC 0    KERNEL32.dll    imp.GetCurrentProcess
+17  0x00030840 0x10032040 NONE   FUNC 0    KERNEL32.dll    imp.VirtualProtect
+18  0x00030844 0x10032044 NONE   FUNC 0    KERNEL32.dll    imp.GetStringTypeW
+19  0x00030848 0x10032048 NONE   FUNC 0    KERNEL32.dll    imp.UnhandledExceptionFilter
+20  0x0003084c 0x1003204c NONE   FUNC 0    KERNEL32.dll    imp.SetUnhandledExceptionFilter
+21  0x00030850 0x10032050 NONE   FUNC 0    KERNEL32.dll    imp.TerminateProcess
+22  0x00030854 0x10032054 NONE   FUNC 0    KERNEL32.dll    imp.IsProcessorFeaturePresent
+23  0x00030858 0x10032058 NONE   FUNC 0    KERNEL32.dll    imp.IsDebuggerPresent
+24  0x0003085c 0x1003205c NONE   FUNC 0    KERNEL32.dll    imp.GetStartupInfoW
+25  0x00030860 0x10032060 NONE   FUNC 0    KERNEL32.dll    imp.GetModuleHandleW
+26  0x00030864 0x10032064 NONE   FUNC 0    KERNEL32.dll    imp.QueryPerformanceCounter
+27  0x00030868 0x10032068 NONE   FUNC 0    KERNEL32.dll    imp.GetCurrentProcessId
+28  0x0003086c 0x1003206c NONE   FUNC 0    KERNEL32.dll    imp.GetCurrentThreadId
+29  0x00030870 0x10032070 NONE   FUNC 0    KERNEL32.dll    imp.GetSystemTimeAsFileTime
+30  0x00030874 0x10032074 NONE   FUNC 0    KERNEL32.dll    imp.InitializeSListHead
+31  0x00030878 0x10032078 NONE   FUNC 0    KERNEL32.dll    imp.RtlUnwind
+32  0x0003087c 0x1003207c NONE   FUNC 0    KERNEL32.dll    imp.RaiseException
+33  0x00030880 0x10032080 NONE   FUNC 0    KERNEL32.dll    imp.InterlockedFlushSList
+34  0x00030884 0x10032084 NONE   FUNC 0    KERNEL32.dll    imp.GetLastError
+35  0x00030888 0x10032088 NONE   FUNC 0    KERNEL32.dll    imp.SetLastError
+36  0x0003088c 0x1003208c NONE   FUNC 0    KERNEL32.dll    imp.EncodePointer
+37  0x00030890 0x10032090 NONE   FUNC 0    KERNEL32.dll    imp.EnterCriticalSection
+38  0x00030894 0x10032094 NONE   FUNC 0    KERNEL32.dll    imp.LeaveCriticalSection
+39  0x00030898 0x10032098 NONE   FUNC 0    KERNEL32.dll    imp.DeleteCriticalSection
+40  0x0003089c 0x1003209c NONE   FUNC 0    KERNEL32.dll    imp.InitializeCriticalSectionAndSpinCount
+41  0x000308a0 0x100320a0 NONE   FUNC 0    KERNEL32.dll    imp.TlsAlloc
+42  0x000308a4 0x100320a4 NONE   FUNC 0    KERNEL32.dll    imp.TlsGetValue
+43  0x000308a8 0x100320a8 NONE   FUNC 0    KERNEL32.dll    imp.WriteConsoleW
+44  0x000308ac 0x100320ac NONE   FUNC 0    KERNEL32.dll    imp.TlsFree
+45  0x000308b0 0x100320b0 NONE   FUNC 0    KERNEL32.dll    imp.LoadLibraryExW
+46  0x000308b4 0x100320b4 NONE   FUNC 0    KERNEL32.dll    imp.ExitProcess
+47  0x000308b8 0x100320b8 NONE   FUNC 0    KERNEL32.dll    imp.GetModuleHandleExW
+48  0x000308bc 0x100320bc NONE   FUNC 0    KERNEL32.dll    imp.GetModuleFileNameW
+49  0x000308c0 0x100320c0 NONE   FUNC 0    KERNEL32.dll    imp.HeapFree
+50  0x000308c4 0x100320c4 NONE   FUNC 0    KERNEL32.dll    imp.HeapAlloc
+51  0x000308c8 0x100320c8 NONE   FUNC 0    KERNEL32.dll    imp.GetStdHandle
+52  0x000308cc 0x100320cc NONE   FUNC 0    KERNEL32.dll    imp.GetFileType
+53  0x000308d0 0x100320d0 NONE   FUNC 0    KERNEL32.dll    imp.LCMapStringW
+54  0x000308d4 0x100320d4 NONE   FUNC 0    KERNEL32.dll    imp.HeapReAlloc
+55  0x000308d8 0x100320d8 NONE   FUNC 0    KERNEL32.dll    imp.DecodePointer
+56  0x000308dc 0x100320dc NONE   FUNC 0    KERNEL32.dll    imp.FindClose
+57  0x000308e0 0x100320e0 NONE   FUNC 0    KERNEL32.dll    imp.FindFirstFileExW
+58  0x000308e4 0x100320e4 NONE   FUNC 0    KERNEL32.dll    imp.FindNextFileW
+59  0x000308e8 0x100320e8 NONE   FUNC 0    KERNEL32.dll    imp.IsValidCodePage
+60  0x000308ec 0x100320ec NONE   FUNC 0    KERNEL32.dll    imp.GetACP
+61  0x000308f0 0x100320f0 NONE   FUNC 0    KERNEL32.dll    imp.GetOEMCP
+62  0x000308f4 0x100320f4 NONE   FUNC 0    KERNEL32.dll    imp.GetCPInfo
+63  0x000308f8 0x100320f8 NONE   FUNC 0    KERNEL32.dll    imp.GetCommandLineA
+64  0x000308fc 0x100320fc NONE   FUNC 0    KERNEL32.dll    imp.GetCommandLineW
+65  0x00030900 0x10032100 NONE   FUNC 0    KERNEL32.dll    imp.GetEnvironmentStringsW
+66  0x00030904 0x10032104 NONE   FUNC 0    KERNEL32.dll    imp.FreeEnvironmentStringsW
+67  0x00030908 0x10032108 NONE   FUNC 0    KERNEL32.dll    imp.GetProcessHeap
+nth vaddr      bind type lib          name
+------------------------------------------
+1   0x10032130 NONE FUNC tier0.dll    GetCPUInformation
+2   0x10032134 NONE FUNC tier0.dll    AssertValidStringPtr
+3   0x10032138 NONE FUNC tier0.dll    _AssertValidWritePtr
+1   0x10032110 NONE FUNC OPENGL32.dll glMatrixMode
+2   0x10032114 NONE FUNC OPENGL32.dll glFrustum
+3   0x10032118 NONE FUNC OPENGL32.dll glLoadIdentity
+4   0x1003211c NONE FUNC OPENGL32.dll glPushMatrix
+5   0x10032120 NONE FUNC OPENGL32.dll glPopMatrix
+1   0x10032128 NONE FUNC PSAPI.DLL    GetModuleInformation
+1   0x10032000 NONE FUNC KERNEL32.dll TlsSetValue
+2   0x10032004 NONE FUNC KERNEL32.dll CreateFileW
+3   0x10032008 NONE FUNC KERNEL32.dll CloseHandle
+4   0x1003200c NONE FUNC KERNEL32.dll GetConsoleMode
+5   0x10032010 NONE FUNC KERNEL32.dll GetConsoleOutputCP
+6   0x10032014 NONE FUNC KERNEL32.dll WriteFile
+7   0x10032018 NONE FUNC KERNEL32.dll FlushFileBuffers
+8   0x1003201c NONE FUNC KERNEL32.dll HeapSize
+9   0x10032020 NONE FUNC KERNEL32.dll SetStdHandle
+10  0x10032024 NONE FUNC KERNEL32.dll SetFilePointerEx
+11  0x10032028 NONE FUNC KERNEL32.dll FreeLibrary
+12  0x1003202c NONE FUNC KERNEL32.dll GetModuleHandleA
+13  0x10032030 NONE FUNC KERNEL32.dll GetProcAddress
+14  0x10032034 NONE FUNC KERNEL32.dll MultiByteToWideChar
+15  0x10032038 NONE FUNC KERNEL32.dll WideCharToMultiByte
+16  0x1003203c NONE FUNC KERNEL32.dll GetCurrentProcess
+17  0x10032040 NONE FUNC KERNEL32.dll VirtualProtect
+18  0x10032044 NONE FUNC KERNEL32.dll GetStringTypeW
+19  0x10032048 NONE FUNC KERNEL32.dll UnhandledExceptionFilter
+20  0x1003204c NONE FUNC KERNEL32.dll SetUnhandledExceptionFilter
+21  0x10032050 NONE FUNC KERNEL32.dll TerminateProcess
+22  0x10032054 NONE FUNC KERNEL32.dll IsProcessorFeaturePresent
+23  0x10032058 NONE FUNC KERNEL32.dll IsDebuggerPresent
+24  0x1003205c NONE FUNC KERNEL32.dll GetStartupInfoW
+25  0x10032060 NONE FUNC KERNEL32.dll GetModuleHandleW
+26  0x10032064 NONE FUNC KERNEL32.dll QueryPerformanceCounter
+27  0x10032068 NONE FUNC KERNEL32.dll GetCurrentProcessId
+28  0x1003206c NONE FUNC KERNEL32.dll GetCurrentThreadId
+29  0x10032070 NONE FUNC KERNEL32.dll GetSystemTimeAsFileTime
+30  0x10032074 NONE FUNC KERNEL32.dll InitializeSListHead
+31  0x10032078 NONE FUNC KERNEL32.dll RtlUnwind
+32  0x1003207c NONE FUNC KERNEL32.dll RaiseException
+33  0x10032080 NONE FUNC KERNEL32.dll InterlockedFlushSList
+34  0x10032084 NONE FUNC KERNEL32.dll GetLastError
+35  0x10032088 NONE FUNC KERNEL32.dll SetLastError
+36  0x1003208c NONE FUNC KERNEL32.dll EncodePointer
+37  0x10032090 NONE FUNC KERNEL32.dll EnterCriticalSection
+38  0x10032094 NONE FUNC KERNEL32.dll LeaveCriticalSection
+39  0x10032098 NONE FUNC KERNEL32.dll DeleteCriticalSection
+40  0x1003209c NONE FUNC KERNEL32.dll InitializeCriticalSectionAndSpinCount
+41  0x100320a0 NONE FUNC KERNEL32.dll TlsAlloc
+42  0x100320a4 NONE FUNC KERNEL32.dll TlsGetValue
+43  0x100320a8 NONE FUNC KERNEL32.dll WriteConsoleW
+44  0x100320ac NONE FUNC KERNEL32.dll TlsFree
+45  0x100320b0 NONE FUNC KERNEL32.dll LoadLibraryExW
+46  0x100320b4 NONE FUNC KERNEL32.dll ExitProcess
+47  0x100320b8 NONE FUNC KERNEL32.dll GetModuleHandleExW
+48  0x100320bc NONE FUNC KERNEL32.dll GetModuleFileNameW
+49  0x100320c0 NONE FUNC KERNEL32.dll HeapFree
+50  0x100320c4 NONE FUNC KERNEL32.dll HeapAlloc
+51  0x100320c8 NONE FUNC KERNEL32.dll GetStdHandle
+52  0x100320cc NONE FUNC KERNEL32.dll GetFileType
+53  0x100320d0 NONE FUNC KERNEL32.dll LCMapStringW
+54  0x100320d4 NONE FUNC KERNEL32.dll HeapReAlloc
+55  0x100320d8 NONE FUNC KERNEL32.dll DecodePointer
+56  0x100320dc NONE FUNC KERNEL32.dll FindClose
+57  0x100320e0 NONE FUNC KERNEL32.dll FindFirstFileExW
+58  0x100320e4 NONE FUNC KERNEL32.dll FindNextFileW
+59  0x100320e8 NONE FUNC KERNEL32.dll IsValidCodePage
+60  0x100320ec NONE FUNC KERNEL32.dll GetACP
+61  0x100320f0 NONE FUNC KERNEL32.dll GetOEMCP
+62  0x100320f4 NONE FUNC KERNEL32.dll GetCPInfo
+63  0x100320f8 NONE FUNC KERNEL32.dll GetCommandLineA
+64  0x100320fc NONE FUNC KERNEL32.dll GetCommandLineW
+65  0x10032100 NONE FUNC KERNEL32.dll GetEnvironmentStringsW
+66  0x10032104 NONE FUNC KERNEL32.dll FreeEnvironmentStringsW
+67  0x10032108 NONE FUNC KERNEL32.dll GetProcessHeap

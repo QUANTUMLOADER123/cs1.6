@@ -1,0 +1,297 @@
+nth paddr      vaddr      bind   type size lib           name                                                  demangled
+------------------------------------------------------------------------------------------------------------------------
+1   0x0000b860 0x0190b860 GLOBAL FUNC 0    client.dll    ?AttemptToMaterialize@CBasePlayerItem@@QAEXXZ         public: void __thiscall CBasePlayerItem::AttemptToMaterialize(void)
+2   0x0000b1f0 0x0190b1f0 GLOBAL FUNC 0    client.dll    ?CorpseFallThink@CBaseMonster@@QAEXXZ                 public: void __thiscall CBaseMonster::CorpseFallThink(void)
+3   0x0000b9c0 0x0190b9c0 GLOBAL FUNC 0    client.dll    ?DefaultTouch@CBasePlayerAmmo@@QAEXPAVCBaseEntity@@@Z public: void __thiscall CBasePlayerAmmo::DefaultTouch(class CBaseEntity *)
+4   0x0000b8a0 0x0190b8a0 GLOBAL FUNC 0    client.dll    ?DefaultTouch@CBasePlayerItem@@QAEXPAVCBaseEntity@@@Z public: void __thiscall CBasePlayerItem::DefaultTouch(class CBaseEntity *)
+5   0x0000b8b0 0x0190b8b0 GLOBAL FUNC 0    client.dll    ?DestroyItem@CBasePlayerItem@@QAEXXZ                  public: void __thiscall CBasePlayerItem::DestroyItem(void)
+6   0x0000b840 0x0190b840 GLOBAL FUNC 0    client.dll    ?FallThink@CBasePlayerItem@@QAEXXZ                    public: void __thiscall CBasePlayerItem::FallThink(void)
+7   0x0000b9b0 0x0190b9b0 GLOBAL FUNC 0    client.dll    ?Materialize@CBasePlayerAmmo@@QAEXXZ                  public: void __thiscall CBasePlayerAmmo::Materialize(void)
+8   0x0000b850 0x0190b850 GLOBAL FUNC 0    client.dll    ?Materialize@CBasePlayerItem@@QAEXXZ                  public: void __thiscall CBasePlayerItem::Materialize(void)
+9   0x0000b370 0x0190b370 GLOBAL FUNC 0    client.dll    ?PlayerDeathThink@CBasePlayer@@QAEXXZ                 public: void __thiscall CBasePlayer::PlayerDeathThink(void)
+10  0x0000ba20 0x0190ba20 GLOBAL FUNC 0    client.dll    ?SUB_CallUseToggle@CBaseEntity@@QAEXXZ                public: void __thiscall CBaseEntity::SUB_CallUseToggle(void)
+11  0x0000ad50 0x0190ad50 GLOBAL FUNC 0    client.dll    ?SUB_Remove@CBaseEntity@@QAEXXZ                       public: void __thiscall CBaseEntity::SUB_Remove(void)
+12  0x00016180 0x01916180 GLOBAL FUNC 0    client.dll    ?Smack@CKnife@@QAEXXZ                                 public: void __thiscall CKnife::Smack(void)
+13  0x000161a0 0x019161a0 GLOBAL FUNC 0    client.dll    ?SwingAgain@CKnife@@QAEXXZ                            public: void __thiscall CKnife::SwingAgain(void)
+14  0x00057360 0x01957360 GLOBAL FUNC 0    client.dll    CAM_Think
+15  0x00057ef0 0x01957ef0 GLOBAL FUNC 0    client.dll    CL_CameraOffset
+16  0x00058cc0 0x01958cc0 GLOBAL FUNC 0    client.dll    CL_CreateMove
+17  0x00057ec0 0x01957ec0 GLOBAL FUNC 0    client.dll    CL_IsThirdPerson
+18  0x00044bb0 0x01944bb0 GLOBAL FUNC 0    client.dll    ClientFactory
+19  0x00059b10 0x01959b10 GLOBAL FUNC 0    client.dll    CreateInterface
+20  0x00045e90 0x01945e90 GLOBAL FUNC 0    client.dll    Demo_ReadBuffer
+21  0x00044bc0 0x01944bc0 GLOBAL FUNC 0    client.dll    F
+22  0x00045f10 0x01945f10 GLOBAL FUNC 0    client.dll    HUD_AddEntity
+23  0x00027fb0 0x01927fb0 GLOBAL FUNC 0    client.dll    HUD_ChatInputPosition
+24  0x000445f0 0x019445f0 GLOBAL FUNC 0    client.dll    HUD_ConnectionlessPacket
+25  0x00046350 0x01946350 GLOBAL FUNC 0    client.dll    HUD_CreateEntities
+26  0x00044b60 0x01944b60 GLOBAL FUNC 0    client.dll    HUD_DirectorMessage
+27  0x0006a260 0x0196a260 GLOBAL FUNC 0    client.dll    HUD_DrawNormalTriangles
+28  0x0006a270 0x0196a270 GLOBAL FUNC 0    client.dll    HUD_DrawTransparentTriangles
+29  0x00044ab0 0x01944ab0 GLOBAL FUNC 0    client.dll    HUD_Frame
+30  0x000445d0 0x019445d0 GLOBAL FUNC 0    client.dll    HUD_GetHullBounds
+31  0x00044b80 0x01944b80 GLOBAL FUNC 0    client.dll    HUD_GetPlayerTeam
+32  0x0004a840 0x0194a840 GLOBAL FUNC 0    client.dll    HUD_GetStudioModelInterface
+33  0x00046e40 0x01946e40 GLOBAL FUNC 0    client.dll    HUD_GetUserEntity
+34  0x000449d0 0x019449d0 GLOBAL FUNC 0    client.dll    HUD_Init
+35  0x00058330 0x01958330 GLOBAL FUNC 0    client.dll    HUD_Key_Event
+36  0x00044620 0x01944620 GLOBAL FUNC 0    client.dll    HUD_PlayerMove
+37  0x00044600 0x01944600 GLOBAL FUNC 0    client.dll    HUD_PlayerMoveInit
+38  0x00044610 0x01944610 GLOBAL FUNC 0    client.dll    HUD_PlayerMoveTexture
+39  0x0000ec40 0x0190ec40 GLOBAL FUNC 0    client.dll    HUD_PostRunCmd
+40  0x00046010 0x01946010 GLOBAL FUNC 0    client.dll    HUD_ProcessPlayerState
+41  0x00044a60 0x01944a60 GLOBAL FUNC 0    client.dll    HUD_Redraw
+42  0x00044aa0 0x01944aa0 GLOBAL FUNC 0    client.dll    HUD_Reset
+43  0x000449e0 0x019449e0 GLOBAL FUNC 0    client.dll    HUD_Shutdown
+44  0x00046370 0x01946370 GLOBAL FUNC 0    client.dll    HUD_StudioEvent
+45  0x000464c0 0x019464c0 GLOBAL FUNC 0    client.dll    HUD_TempEntUpdate
+46  0x00045fc0 0x01945fc0 GLOBAL FUNC 0    client.dll    HUD_TxferLocalOverrides
+47  0x000461d0 0x019461d0 GLOBAL FUNC 0    client.dll    HUD_TxferPredictionData
+48  0x00044a80 0x01944a80 GLOBAL FUNC 0    client.dll    HUD_UpdateClientData
+49  0x000449c0 0x019449c0 GLOBAL FUNC 0    client.dll    HUD_VidInit
+50  0x00044ad0 0x01944ad0 GLOBAL FUNC 0    client.dll    HUD_VoiceStatus
+51  0x0002f1b0 0x0192f1b0 GLOBAL FUNC 0    client.dll    IN_Accumulate
+52  0x0002e980 0x0192e980 GLOBAL FUNC 0    client.dll    IN_ActivateMouse
+53  0x0002f330 0x0192f330 GLOBAL FUNC 0    client.dll    IN_ClearStates
+54  0x0002e9c0 0x0192e9c0 GLOBAL FUNC 0    client.dll    IN_DeactivateMouse
+55  0x0002ec20 0x0192ec20 GLOBAL FUNC 0    client.dll    IN_MouseEvent
+56  0x00044710 0x01944710 GLOBAL FUNC 0    client.dll    Initialize
+57  0x00058030 0x01958030 GLOBAL FUNC 0    client.dll    KB_Find
+58  0x0006d900 0x0196d900 GLOBAL FUNC 0    client.dll    V_CalcRefdef
+59  0x0000f670 0x0190f670 GLOBAL FUNC 0    client.dll    weapon_ak47
+60  0x0000fd30 0x0190fd30 GLOBAL FUNC 0    client.dll    weapon_aug
+61  0x00010490 0x01910490 GLOBAL FUNC 0    client.dll    weapon_awp
+62  0x00010be0 0x01910be0 GLOBAL FUNC 0    client.dll    weapon_c4
+63  0x00011350 0x01911350 GLOBAL FUNC 0    client.dll    weapon_deagle
+64  0x00011a10 0x01911a10 GLOBAL FUNC 0    client.dll    weapon_elite
+65  0x00012210 0x01912210 GLOBAL FUNC 0    client.dll    weapon_famas
+66  0x00012a00 0x01912a00 GLOBAL FUNC 0    client.dll    weapon_fiveseven
+67  0x00013100 0x01913100 GLOBAL FUNC 0    client.dll    weapon_flashbang
+68  0x00013a10 0x01913a10 GLOBAL FUNC 0    client.dll    weapon_g3sg1
+69  0x00014160 0x01914160 GLOBAL FUNC 0    client.dll    weapon_galil
+70  0x00014840 0x01914840 GLOBAL FUNC 0    client.dll    weapon_glock18
+71  0x000151b0 0x019151b0 GLOBAL FUNC 0    client.dll    weapon_hegrenade
+72  0x00015af0 0x01915af0 GLOBAL FUNC 0    client.dll    weapon_knife
+73  0x00016960 0x01916960 GLOBAL FUNC 0    client.dll    weapon_m249
+74  0x00017020 0x01917020 GLOBAL FUNC 0    client.dll    weapon_m3
+75  0x00017730 0x01917730 GLOBAL FUNC 0    client.dll    weapon_m4a1
+76  0x00018020 0x01918020 GLOBAL FUNC 0    client.dll    weapon_mac10
+77  0x00018660 0x01918660 GLOBAL FUNC 0    client.dll    weapon_mp5navy
+78  0x00018ca0 0x01918ca0 GLOBAL FUNC 0    client.dll    weapon_p228
+79  0x000193a0 0x019193a0 GLOBAL FUNC 0    client.dll    weapon_p90
+80  0x00019a50 0x01919a50 GLOBAL FUNC 0    client.dll    weapon_scout
+81  0x0001a110 0x0191a110 GLOBAL FUNC 0    client.dll    weapon_sg550
+82  0x0001a850 0x0191a850 GLOBAL FUNC 0    client.dll    weapon_sg552
+83  0x0001afd0 0x0191afd0 GLOBAL FUNC 0    client.dll    weapon_smokegrenade
+84  0x0001b940 0x0191b940 GLOBAL FUNC 0    client.dll    weapon_tmp
+85  0x0001bf60 0x0191bf60 GLOBAL FUNC 0    client.dll    weapon_ump45
+86  0x0001c5a0 0x0191c5a0 GLOBAL FUNC 0    client.dll    weapon_usp
+87  0x0001ceb0 0x0191ceb0 GLOBAL FUNC 0    client.dll    weapon_xm1014
+1   0x000c4000 0x019c4000 NONE   FUNC 0    KERNEL32.dll  imp.InterlockedExchange
+2   0x000c4004 0x019c4004 NONE   FUNC 0    KERNEL32.dll  imp.WaitForSingleObject
+3   0x000c4008 0x019c4008 NONE   FUNC 0    KERNEL32.dll  imp.CreateEventA
+4   0x000c400c 0x019c400c NONE   FUNC 0    KERNEL32.dll  imp.TerminateThread
+5   0x000c4010 0x019c4010 NONE   FUNC 0    KERNEL32.dll  imp.CloseHandle
+6   0x000c4014 0x019c4014 NONE   FUNC 0    KERNEL32.dll  imp.SetEvent
+7   0x000c4018 0x019c4018 NONE   FUNC 0    KERNEL32.dll  imp.CreateThread
+8   0x000c401c 0x019c401c NONE   FUNC 0    KERNEL32.dll  imp.GetProcAddress
+9   0x000c4020 0x019c4020 NONE   FUNC 0    KERNEL32.dll  imp.LoadLibraryA
+10  0x000c4024 0x019c4024 NONE   FUNC 0    KERNEL32.dll  imp.FreeLibrary
+11  0x000c4028 0x019c4028 NONE   FUNC 0    KERNEL32.dll  imp.GetModuleHandleA
+12  0x000c402c 0x019c402c NONE   FUNC 0    KERNEL32.dll  imp.CompareStringW
+13  0x000c4030 0x019c4030 NONE   FUNC 0    KERNEL32.dll  imp.CompareStringA
+14  0x000c4034 0x019c4034 NONE   FUNC 0    KERNEL32.dll  imp.GetLocaleInfoW
+15  0x000c4038 0x019c4038 NONE   FUNC 0    KERNEL32.dll  imp.SetEndOfFile
+16  0x000c403c 0x019c403c NONE   FUNC 0    KERNEL32.dll  imp.SetConsoleCtrlHandler
+17  0x000c4040 0x019c4040 NONE   FUNC 0    KERNEL32.dll  imp.GetOEMCP
+18  0x000c4044 0x019c4044 NONE   FUNC 0    KERNEL32.dll  imp.GetACP
+19  0x000c4048 0x019c4048 NONE   FUNC 0    KERNEL32.dll  imp.CreateFileA
+20  0x000c404c 0x019c404c NONE   FUNC 0    KERNEL32.dll  imp.FlushFileBuffers
+21  0x000c4050 0x019c4050 NONE   FUNC 0    KERNEL32.dll  imp.SetStdHandle
+22  0x000c4054 0x019c4054 NONE   FUNC 0    KERNEL32.dll  imp.UnhandledExceptionFilter
+23  0x000c4058 0x019c4058 NONE   FUNC 0    KERNEL32.dll  imp.IsBadCodePtr
+24  0x000c405c 0x019c405c NONE   FUNC 0    KERNEL32.dll  imp.SetUnhandledExceptionFilter
+25  0x000c4060 0x019c4060 NONE   FUNC 0    KERNEL32.dll  imp.GetUserDefaultLCID
+26  0x000c4064 0x019c4064 NONE   FUNC 0    KERNEL32.dll  imp.EnumSystemLocalesA
+27  0x000c4068 0x019c4068 NONE   FUNC 0    KERNEL32.dll  imp.GetLocaleInfoA
+28  0x000c406c 0x019c406c NONE   FUNC 0    KERNEL32.dll  imp.IsValidCodePage
+29  0x000c4070 0x019c4070 NONE   FUNC 0    KERNEL32.dll  imp.IsValidLocale
+30  0x000c4074 0x019c4074 NONE   FUNC 0    KERNEL32.dll  imp.HeapFree
+31  0x000c4078 0x019c4078 NONE   FUNC 0    KERNEL32.dll  imp.HeapAlloc
+32  0x000c407c 0x019c407c NONE   FUNC 0    KERNEL32.dll  imp.RtlUnwind
+33  0x000c4080 0x019c4080 NONE   FUNC 0    KERNEL32.dll  imp.HeapReAlloc
+34  0x000c4084 0x019c4084 NONE   FUNC 0    KERNEL32.dll  imp.IsBadReadPtr
+35  0x000c4088 0x019c4088 NONE   FUNC 0    KERNEL32.dll  imp.ExitProcess
+36  0x000c408c 0x019c408c NONE   FUNC 0    KERNEL32.dll  imp.TerminateProcess
+37  0x000c4090 0x019c4090 NONE   FUNC 0    KERNEL32.dll  imp.GetCurrentProcess
+38  0x000c4094 0x019c4094 NONE   FUNC 0    KERNEL32.dll  imp.GetTimeZoneInformation
+39  0x000c4098 0x019c4098 NONE   FUNC 0    KERNEL32.dll  imp.GetSystemTime
+40  0x000c409c 0x019c409c NONE   FUNC 0    KERNEL32.dll  imp.GetLocalTime
+41  0x000c40a0 0x019c40a0 NONE   FUNC 0    KERNEL32.dll  imp.InterlockedDecrement
+42  0x000c40a4 0x019c40a4 NONE   FUNC 0    KERNEL32.dll  imp.InterlockedIncrement
+43  0x000c40a8 0x019c40a8 NONE   FUNC 0    KERNEL32.dll  imp.GetCommandLineA
+44  0x000c40ac 0x019c40ac NONE   FUNC 0    KERNEL32.dll  imp.GetVersion
+45  0x000c40b0 0x019c40b0 NONE   FUNC 0    KERNEL32.dll  imp.Sleep
+46  0x000c40b4 0x019c40b4 NONE   FUNC 0    KERNEL32.dll  imp.GetLastError
+47  0x000c40b8 0x019c40b8 NONE   FUNC 0    KERNEL32.dll  imp.CreateDirectoryA
+48  0x000c40bc 0x019c40bc NONE   FUNC 0    KERNEL32.dll  imp.WideCharToMultiByte
+49  0x000c40c0 0x019c40c0 NONE   FUNC 0    KERNEL32.dll  imp.HeapSize
+50  0x000c40c4 0x019c40c4 NONE   FUNC 0    KERNEL32.dll  imp.GetModuleFileNameA
+51  0x000c40c8 0x019c40c8 NONE   FUNC 0    KERNEL32.dll  imp.GetEnvironmentVariableA
+52  0x000c40cc 0x019c40cc NONE   FUNC 0    KERNEL32.dll  imp.GetVersionExA
+53  0x000c40d0 0x019c40d0 NONE   FUNC 0    KERNEL32.dll  imp.HeapDestroy
+54  0x000c40d4 0x019c40d4 NONE   FUNC 0    KERNEL32.dll  imp.HeapCreate
+55  0x000c40d8 0x019c40d8 NONE   FUNC 0    KERNEL32.dll  imp.VirtualFree
+56  0x000c40dc 0x019c40dc NONE   FUNC 0    KERNEL32.dll  imp.VirtualAlloc
+57  0x000c40e0 0x019c40e0 NONE   FUNC 0    KERNEL32.dll  imp.IsBadWritePtr
+58  0x000c40e4 0x019c40e4 NONE   FUNC 0    KERNEL32.dll  imp.InitializeCriticalSection
+59  0x000c40e8 0x019c40e8 NONE   FUNC 0    KERNEL32.dll  imp.DeleteCriticalSection
+60  0x000c40ec 0x019c40ec NONE   FUNC 0    KERNEL32.dll  imp.EnterCriticalSection
+61  0x000c40f0 0x019c40f0 NONE   FUNC 0    KERNEL32.dll  imp.LeaveCriticalSection
+62  0x000c40f4 0x019c40f4 NONE   FUNC 0    KERNEL32.dll  imp.FatalAppExitA
+63  0x000c40f8 0x019c40f8 NONE   FUNC 0    KERNEL32.dll  imp.GetCurrentThreadId
+64  0x000c40fc 0x019c40fc NONE   FUNC 0    KERNEL32.dll  imp.TlsSetValue
+65  0x000c4100 0x019c4100 NONE   FUNC 0    KERNEL32.dll  imp.TlsAlloc
+66  0x000c4104 0x019c4104 NONE   FUNC 0    KERNEL32.dll  imp.TlsFree
+67  0x000c4108 0x019c4108 NONE   FUNC 0    KERNEL32.dll  imp.SetLastError
+68  0x000c410c 0x019c410c NONE   FUNC 0    KERNEL32.dll  imp.TlsGetValue
+69  0x000c4110 0x019c4110 NONE   FUNC 0    KERNEL32.dll  imp.GetCurrentThread
+70  0x000c4114 0x019c4114 NONE   FUNC 0    KERNEL32.dll  imp.RaiseException
+71  0x000c4118 0x019c4118 NONE   FUNC 0    KERNEL32.dll  imp.MultiByteToWideChar
+72  0x000c411c 0x019c411c NONE   FUNC 0    KERNEL32.dll  imp.LCMapStringA
+73  0x000c4120 0x019c4120 NONE   FUNC 0    KERNEL32.dll  imp.LCMapStringW
+74  0x000c4124 0x019c4124 NONE   FUNC 0    KERNEL32.dll  imp.GetStringTypeA
+75  0x000c4128 0x019c4128 NONE   FUNC 0    KERNEL32.dll  imp.GetStringTypeW
+76  0x000c412c 0x019c412c NONE   FUNC 0    KERNEL32.dll  imp.SetHandleCount
+77  0x000c4130 0x019c4130 NONE   FUNC 0    KERNEL32.dll  imp.GetStdHandle
+78  0x000c4134 0x019c4134 NONE   FUNC 0    KERNEL32.dll  imp.GetFileType
+79  0x000c4138 0x019c4138 NONE   FUNC 0    KERNEL32.dll  imp.GetStartupInfoA
+80  0x000c413c 0x019c413c NONE   FUNC 0    KERNEL32.dll  imp.SetFilePointer
+81  0x000c4140 0x019c4140 NONE   FUNC 0    KERNEL32.dll  imp.ReadFile
+82  0x000c4144 0x019c4144 NONE   FUNC 0    KERNEL32.dll  imp.WriteFile
+83  0x000c4148 0x019c4148 NONE   FUNC 0    KERNEL32.dll  imp.FreeEnvironmentStringsA
+84  0x000c414c 0x019c414c NONE   FUNC 0    KERNEL32.dll  imp.FreeEnvironmentStringsW
+85  0x000c4150 0x019c4150 NONE   FUNC 0    KERNEL32.dll  imp.GetEnvironmentStrings
+86  0x000c4154 0x019c4154 NONE   FUNC 0    KERNEL32.dll  imp.GetEnvironmentStringsW
+87  0x000c4158 0x019c4158 NONE   FUNC 0    KERNEL32.dll  imp.GetCPInfo
+88  0x000c415c 0x019c415c NONE   FUNC 0    KERNEL32.dll  imp.SetEnvironmentVariableA
+1   0x000c4188 0x019c4188 NONE   FUNC 0    USER32.dll    imp.GetCursorPos
+2   0x000c418c 0x019c418c NONE   FUNC 0    USER32.dll    imp.SystemParametersInfoA
+3   0x000c4190 0x019c4190 NONE   FUNC 0    USER32.dll    imp.SetCursorPos
+1   0x000c4164 0x019c4164 NONE   FUNC 0    SDL2.dll      imp.SDL_GetRelativeMouseState
+2   0x000c4168 0x019c4168 NONE   FUNC 0    SDL2.dll      imp.SDL_GameControllerName
+3   0x000c416c 0x019c416c NONE   FUNC 0    SDL2.dll      imp.SDL_GameControllerOpen
+4   0x000c4170 0x019c4170 NONE   FUNC 0    SDL2.dll      imp.SDL_IsGameController
+5   0x000c4174 0x019c4174 NONE   FUNC 0    SDL2.dll      imp.SDL_JoystickUpdate
+6   0x000c4178 0x019c4178 NONE   FUNC 0    SDL2.dll      imp.SDL_GameControllerGetButton
+7   0x000c417c 0x019c417c NONE   FUNC 0    SDL2.dll      imp.SDL_GameControllerGetAxis
+8   0x000c4180 0x019c4180 NONE   FUNC 0    SDL2.dll      imp.SDL_NumJoysticks
+1   0x000c4198 0x019c4198 NONE   FUNC 0    steam_api.dll imp.SteamAPI_Init
+2   0x000c419c 0x019c419c NONE   FUNC 0    steam_api.dll imp.SteamFriends
+3   0x000c41a0 0x019c41a0 NONE   FUNC 0    steam_api.dll imp.SteamUtils
+4   0x000c41a4 0x019c41a4 NONE   FUNC 0    steam_api.dll imp.SteamAPI_Shutdown
+nth vaddr      bind type lib           name
+-------------------------------------------
+1   0x019c4000 NONE FUNC KERNEL32.dll  InterlockedExchange
+2   0x019c4004 NONE FUNC KERNEL32.dll  WaitForSingleObject
+3   0x019c4008 NONE FUNC KERNEL32.dll  CreateEventA
+4   0x019c400c NONE FUNC KERNEL32.dll  TerminateThread
+5   0x019c4010 NONE FUNC KERNEL32.dll  CloseHandle
+6   0x019c4014 NONE FUNC KERNEL32.dll  SetEvent
+7   0x019c4018 NONE FUNC KERNEL32.dll  CreateThread
+8   0x019c401c NONE FUNC KERNEL32.dll  GetProcAddress
+9   0x019c4020 NONE FUNC KERNEL32.dll  LoadLibraryA
+10  0x019c4024 NONE FUNC KERNEL32.dll  FreeLibrary
+11  0x019c4028 NONE FUNC KERNEL32.dll  GetModuleHandleA
+12  0x019c402c NONE FUNC KERNEL32.dll  CompareStringW
+13  0x019c4030 NONE FUNC KERNEL32.dll  CompareStringA
+14  0x019c4034 NONE FUNC KERNEL32.dll  GetLocaleInfoW
+15  0x019c4038 NONE FUNC KERNEL32.dll  SetEndOfFile
+16  0x019c403c NONE FUNC KERNEL32.dll  SetConsoleCtrlHandler
+17  0x019c4040 NONE FUNC KERNEL32.dll  GetOEMCP
+18  0x019c4044 NONE FUNC KERNEL32.dll  GetACP
+19  0x019c4048 NONE FUNC KERNEL32.dll  CreateFileA
+20  0x019c404c NONE FUNC KERNEL32.dll  FlushFileBuffers
+21  0x019c4050 NONE FUNC KERNEL32.dll  SetStdHandle
+22  0x019c4054 NONE FUNC KERNEL32.dll  UnhandledExceptionFilter
+23  0x019c4058 NONE FUNC KERNEL32.dll  IsBadCodePtr
+24  0x019c405c NONE FUNC KERNEL32.dll  SetUnhandledExceptionFilter
+25  0x019c4060 NONE FUNC KERNEL32.dll  GetUserDefaultLCID
+26  0x019c4064 NONE FUNC KERNEL32.dll  EnumSystemLocalesA
+27  0x019c4068 NONE FUNC KERNEL32.dll  GetLocaleInfoA
+28  0x019c406c NONE FUNC KERNEL32.dll  IsValidCodePage
+29  0x019c4070 NONE FUNC KERNEL32.dll  IsValidLocale
+30  0x019c4074 NONE FUNC KERNEL32.dll  HeapFree
+31  0x019c4078 NONE FUNC KERNEL32.dll  HeapAlloc
+32  0x019c407c NONE FUNC KERNEL32.dll  RtlUnwind
+33  0x019c4080 NONE FUNC KERNEL32.dll  HeapReAlloc
+34  0x019c4084 NONE FUNC KERNEL32.dll  IsBadReadPtr
+35  0x019c4088 NONE FUNC KERNEL32.dll  ExitProcess
+36  0x019c408c NONE FUNC KERNEL32.dll  TerminateProcess
+37  0x019c4090 NONE FUNC KERNEL32.dll  GetCurrentProcess
+38  0x019c4094 NONE FUNC KERNEL32.dll  GetTimeZoneInformation
+39  0x019c4098 NONE FUNC KERNEL32.dll  GetSystemTime
+40  0x019c409c NONE FUNC KERNEL32.dll  GetLocalTime
+41  0x019c40a0 NONE FUNC KERNEL32.dll  InterlockedDecrement
+42  0x019c40a4 NONE FUNC KERNEL32.dll  InterlockedIncrement
+43  0x019c40a8 NONE FUNC KERNEL32.dll  GetCommandLineA
+44  0x019c40ac NONE FUNC KERNEL32.dll  GetVersion
+45  0x019c40b0 NONE FUNC KERNEL32.dll  Sleep
+46  0x019c40b4 NONE FUNC KERNEL32.dll  GetLastError
+47  0x019c40b8 NONE FUNC KERNEL32.dll  CreateDirectoryA
+48  0x019c40bc NONE FUNC KERNEL32.dll  WideCharToMultiByte
+49  0x019c40c0 NONE FUNC KERNEL32.dll  HeapSize
+50  0x019c40c4 NONE FUNC KERNEL32.dll  GetModuleFileNameA
+51  0x019c40c8 NONE FUNC KERNEL32.dll  GetEnvironmentVariableA
+52  0x019c40cc NONE FUNC KERNEL32.dll  GetVersionExA
+53  0x019c40d0 NONE FUNC KERNEL32.dll  HeapDestroy
+54  0x019c40d4 NONE FUNC KERNEL32.dll  HeapCreate
+55  0x019c40d8 NONE FUNC KERNEL32.dll  VirtualFree
+56  0x019c40dc NONE FUNC KERNEL32.dll  VirtualAlloc
+57  0x019c40e0 NONE FUNC KERNEL32.dll  IsBadWritePtr
+58  0x019c40e4 NONE FUNC KERNEL32.dll  InitializeCriticalSection
+59  0x019c40e8 NONE FUNC KERNEL32.dll  DeleteCriticalSection
+60  0x019c40ec NONE FUNC KERNEL32.dll  EnterCriticalSection
+61  0x019c40f0 NONE FUNC KERNEL32.dll  LeaveCriticalSection
+62  0x019c40f4 NONE FUNC KERNEL32.dll  FatalAppExitA
+63  0x019c40f8 NONE FUNC KERNEL32.dll  GetCurrentThreadId
+64  0x019c40fc NONE FUNC KERNEL32.dll  TlsSetValue
+65  0x019c4100 NONE FUNC KERNEL32.dll  TlsAlloc
+66  0x019c4104 NONE FUNC KERNEL32.dll  TlsFree
+67  0x019c4108 NONE FUNC KERNEL32.dll  SetLastError
+68  0x019c410c NONE FUNC KERNEL32.dll  TlsGetValue
+69  0x019c4110 NONE FUNC KERNEL32.dll  GetCurrentThread
+70  0x019c4114 NONE FUNC KERNEL32.dll  RaiseException
+71  0x019c4118 NONE FUNC KERNEL32.dll  MultiByteToWideChar
+72  0x019c411c NONE FUNC KERNEL32.dll  LCMapStringA
+73  0x019c4120 NONE FUNC KERNEL32.dll  LCMapStringW
+74  0x019c4124 NONE FUNC KERNEL32.dll  GetStringTypeA
+75  0x019c4128 NONE FUNC KERNEL32.dll  GetStringTypeW
+76  0x019c412c NONE FUNC KERNEL32.dll  SetHandleCount
+77  0x019c4130 NONE FUNC KERNEL32.dll  GetStdHandle
+78  0x019c4134 NONE FUNC KERNEL32.dll  GetFileType
+79  0x019c4138 NONE FUNC KERNEL32.dll  GetStartupInfoA
+80  0x019c413c NONE FUNC KERNEL32.dll  SetFilePointer
+81  0x019c4140 NONE FUNC KERNEL32.dll  ReadFile
+82  0x019c4144 NONE FUNC KERNEL32.dll  WriteFile
+83  0x019c4148 NONE FUNC KERNEL32.dll  FreeEnvironmentStringsA
+84  0x019c414c NONE FUNC KERNEL32.dll  FreeEnvironmentStringsW
+85  0x019c4150 NONE FUNC KERNEL32.dll  GetEnvironmentStrings
+86  0x019c4154 NONE FUNC KERNEL32.dll  GetEnvironmentStringsW
+87  0x019c4158 NONE FUNC KERNEL32.dll  GetCPInfo
+88  0x019c415c NONE FUNC KERNEL32.dll  SetEnvironmentVariableA
+1   0x019c4188 NONE FUNC USER32.dll    GetCursorPos
+2   0x019c418c NONE FUNC USER32.dll    SystemParametersInfoA
+3   0x019c4190 NONE FUNC USER32.dll    SetCursorPos
+1   0x019c4164 NONE FUNC SDL2.dll      SDL_GetRelativeMouseState
+2   0x019c4168 NONE FUNC SDL2.dll      SDL_GameControllerName
+3   0x019c416c NONE FUNC SDL2.dll      SDL_GameControllerOpen
+4   0x019c4170 NONE FUNC SDL2.dll      SDL_IsGameController
+5   0x019c4174 NONE FUNC SDL2.dll      SDL_JoystickUpdate
+6   0x019c4178 NONE FUNC SDL2.dll      SDL_GameControllerGetButton
+7   0x019c417c NONE FUNC SDL2.dll      SDL_GameControllerGetAxis
+8   0x019c4180 NONE FUNC SDL2.dll      SDL_NumJoysticks
+1   0x019c4198 NONE FUNC steam_api.dll SteamAPI_Init
+2   0x019c419c NONE FUNC steam_api.dll SteamFriends
+3   0x019c41a0 NONE FUNC steam_api.dll SteamUtils
+4   0x019c41a4 NONE FUNC steam_api.dll SteamAPI_Shutdown

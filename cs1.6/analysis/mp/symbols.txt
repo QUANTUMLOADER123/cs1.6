@@ -1,0 +1,528 @@
+nth paddr      vaddr      bind   type size lib          name                                                                    demangled
+-----------------------------------------------------------------------------------------------------------------------------------------
+1   0x00052df0 0x100539f0 GLOBAL FUNC 0    mp.dll       GiveFnptrsToDll
+2   0x0008ccc0 0x1008d8c0 GLOBAL FUNC 0    mp.dll       ?AngularMoveDone@CBaseToggle@@QAEXXZ                                    public: void __thiscall CBaseToggle::AngularMoveDone(void)
+3   0x0003ede0 0x1003f9e0 GLOBAL FUNC 0    mp.dll       ?AnimateThink@CSprite@@QAEXXZ                                           public: void __thiscall CSprite::AnimateThink(void)
+4   0x0003ee90 0x1003fa90 GLOBAL FUNC 0    mp.dll       ?AnimateUntilDead@CSprite@@QAEXXZ                                       public: void __thiscall CSprite::AnimateUntilDead(void)
+5   0x000a4590 0x100a5190 GLOBAL FUNC 0    mp.dll       ?ArmouryTouch@CArmoury@@QAEXPAVCBaseEntity@@@Z                          public: void __thiscall CArmoury::ArmouryTouch(class CBaseEntity *)
+6   0x000a0d30 0x100a1930 GLOBAL FUNC 0    mp.dll       ?AttemptToMaterialize@CBasePlayerItem@@QAEXXZ                           public: void __thiscall CBasePlayerItem::AttemptToMaterialize(void)
+7   0x00092e10 0x10093a10 GLOBAL FUNC 0    mp.dll       ?BombTargetTouch@CBombTarget@@QAEXPAVCBaseEntity@@@Z                    public: void __thiscall CBombTarget::BombTargetTouch(class CBaseEntity *)
+8   0x00092ed0 0x10093ad0 GLOBAL FUNC 0    mp.dll       ?BombTargetUse@CBombTarget@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z        public: void __thiscall CBombTarget::BombTargetUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+9   0x000a35d0 0x100a41d0 GLOBAL FUNC 0    mp.dll       ?BombThink@CWeaponBox@@QAEXXZ                                           public: void __thiscall CWeaponBox::BombThink(void)
+10  0x000c1df0 0x100c29f0 GLOBAL FUNC 0    mp.dll       ?BotTouch@CCSBot@@QAEXPAVCBaseEntity@@@Z                                public: void __thiscall CCSBot::BotTouch(class CBaseEntity *)
+11  0x0004f170 0x1004fd70 GLOBAL FUNC 0    mp.dll       ?BounceGibTouch@CGib@@QAEXPAVCBaseEntity@@@Z                            public: void __thiscall CGib::BounceGibTouch(class CBaseEntity *)
+12  0x0004b3b0 0x1004bfb0 GLOBAL FUNC 0    mp.dll       ?BounceTouch@CGrenade@@QAEXPAVCBaseEntity@@@Z                           public: void __thiscall CGrenade::BounceTouch(class CBaseEntity *)
+13  0x000435d0 0x100441d0 GLOBAL FUNC 0    mp.dll       ?BreakTouch@CBreakable@@QAEXPAVCBaseEntity@@@Z                          public: void __thiscall CBreakable::BreakTouch(class CBaseEntity *)
+14  0x00022d70 0x10023970 GLOBAL FUNC 0    mp.dll       ?ButtonBackHome@CBaseButton@@QAEXXZ                                     public: void __thiscall CBaseButton::ButtonBackHome(void)
+15  0x00022c70 0x10023870 GLOBAL FUNC 0    mp.dll       ?ButtonReturn@CBaseButton@@QAEXXZ                                       public: void __thiscall CBaseButton::ButtonReturn(void)
+16  0x00022600 0x10023200 GLOBAL FUNC 0    mp.dll       ?ButtonSpark@CBaseButton@@QAEXXZ                                        public: void __thiscall CBaseButton::ButtonSpark(void)
+17  0x00022810 0x10023410 GLOBAL FUNC 0    mp.dll       ?ButtonTouch@CBaseButton@@QAEXPAVCBaseEntity@@@Z                        public: void __thiscall CBaseButton::ButtonTouch(class CBaseEntity *)
+18  0x00022660 0x10023260 GLOBAL FUNC 0    mp.dll       ?ButtonUse@CBaseButton@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z            public: void __thiscall CBaseButton::ButtonUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+19  0x00092c20 0x10093820 GLOBAL FUNC 0    mp.dll       ?BuyTouch@CBuyZone@@QAEXPAVCBaseEntity@@@Z                              public: void __thiscall CBuyZone::BuyTouch(class CBaseEntity *)
+20  0x0004d330 0x1004df30 GLOBAL FUNC 0    mp.dll       ?C4Think@CGrenade@@QAEXXZ                                               public: void __thiscall CGrenade::C4Think(void)
+21  0x0004d810 0x1004e410 GLOBAL FUNC 0    mp.dll       ?C4Touch@CGrenade@@QAEXPAVCBaseEntity@@@Z                               public: void __thiscall CGrenade::C4Touch(class CBaseEntity *)
+22  0x00067550 0x10068150 GLOBAL FUNC 0    mp.dll       ?CallGoDown@CFuncPlat@@QAEXXZ                                           public: void __thiscall CFuncPlat::CallGoDown(void)
+23  0x00067590 0x10068190 GLOBAL FUNC 0    mp.dll       ?CallHitBottom@CFuncPlat@@QAEXXZ                                        public: void __thiscall CFuncPlat::CallHitBottom(void)
+24  0x00067570 0x10068170 GLOBAL FUNC 0    mp.dll       ?CallHitTop@CFuncPlat@@QAEXXZ                                           public: void __thiscall CFuncPlat::CallHitTop(void)
+25  0x00041730 0x10042330 GLOBAL FUNC 0    mp.dll       ?CanThink@CItemSoda@@QAEXXZ                                             public: void __thiscall CItemSoda::CanThink(void)
+26  0x000417d0 0x100423d0 GLOBAL FUNC 0    mp.dll       ?CanTouch@CItemSoda@@QAEXPAVCBaseEntity@@@Z                             public: void __thiscall CItemSoda::CanTouch(class CBaseEntity *)
+27  0x0008e9c0 0x1008f5c0 GLOBAL FUNC 0    mp.dll       ?ChangeFriction@CFrictionModifier@@QAEXPAVCBaseEntity@@@Z               public: void __thiscall CFrictionModifier::ChangeFriction(class CBaseEntity *)
+28  0x0000f9c0 0x100105c0 GLOBAL FUNC 0    mp.dll       ?CorpseFallThink@CBaseMonster@@QAEXXZ                                   public: void __thiscall CBaseMonster::CorpseFallThink(void)
+29  0x00091270 0x10091e70 GLOBAL FUNC 0    mp.dll       ?CounterUse@CBaseTrigger@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z          public: void __thiscall CBaseTrigger::CounterUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+30  0x0003d1e0 0x1003dde0 GLOBAL FUNC 0    mp.dll       ?DamageThink@CLightning@@QAEXXZ                                         public: void __thiscall CLightning::DamageThink(void)
+31  0x0004b2b0 0x1004beb0 GLOBAL FUNC 0    mp.dll       ?DangerSoundThink@CGrenade@@QAEXXZ                                      public: void __thiscall CGrenade::DangerSoundThink(void)
+32  0x0006aaa0 0x1006b6a0 GLOBAL FUNC 0    mp.dll       ?DeadEnd@CFuncTrackTrain@@QAEXXZ                                        public: void __thiscall CFuncTrackTrain::DeadEnd(void)
+33  0x0009ef30 0x1009fb30 GLOBAL FUNC 0    mp.dll       ?DeadEnd@CFuncVehicle@@QAEXXZ                                           public: void __thiscall CFuncVehicle::DeadEnd(void)
+34  0x00004d70 0x10005970 GLOBAL FUNC 0    mp.dll       ?DefaultTouch@CBasePlayerAmmo@@QAEXPAVCBaseEntity@@@Z                   public: void __thiscall CBasePlayerAmmo::DefaultTouch(class CBaseEntity *)
+35  0x000a0e50 0x100a1a50 GLOBAL FUNC 0    mp.dll       ?DefaultTouch@CBasePlayerItem@@QAEXPAVCBaseEntity@@@Z                   public: void __thiscall CBasePlayerItem::DefaultTouch(class CBaseEntity *)
+36  0x0008c7f0 0x1008d3f0 GLOBAL FUNC 0    mp.dll       ?DelayThink@CBaseDelay@@QAEXXZ                                          public: void __thiscall CBaseDelay::DelayThink(void)
+37  0x000a20f0 0x100a2cf0 GLOBAL FUNC 0    mp.dll       ?DestroyItem@CBasePlayerItem@@QAE_NXZ                                   public: bool __thiscall CBasePlayerItem::DestroyItem(void)
+38  0x0004af40 0x1004bb40 GLOBAL FUNC 0    mp.dll       ?Detonate2@CGrenade@@QAEXXZ                                             public: void __thiscall CGrenade::Detonate2(void)
+39  0x0004b060 0x1004bc60 GLOBAL FUNC 0    mp.dll       ?Detonate3@CGrenade@@QAEXXZ                                             public: void __thiscall CGrenade::Detonate3(void)
+40  0x0004aa40 0x1004b640 GLOBAL FUNC 0    mp.dll       ?Detonate@CGrenade@@QAEXXZ                                              public: void __thiscall CGrenade::Detonate(void)
+41  0x0004a9e0 0x1004b5e0 GLOBAL FUNC 0    mp.dll       ?DetonateUse@CGrenade@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z             public: void __thiscall CGrenade::DetonateUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+42  0x00043c00 0x10044800 GLOBAL FUNC 0    mp.dll       ?Die@CBreakable@@QAEXXZ                                                 public: void __thiscall CBreakable::Die(void)
+43  0x0003a120 0x1003ad20 GLOBAL FUNC 0    mp.dll       ?DoorGoDown@CBaseDoor@@QAEXXZ                                           public: void __thiscall CBaseDoor::DoorGoDown(void)
+44  0x00039a20 0x1003a620 GLOBAL FUNC 0    mp.dll       ?DoorGoUp@CBaseDoor@@QAEXXZ                                             public: void __thiscall CBaseDoor::DoorGoUp(void)
+45  0x0003a320 0x1003af20 GLOBAL FUNC 0    mp.dll       ?DoorHitBottom@CBaseDoor@@QAEXXZ                                        public: void __thiscall CBaseDoor::DoorHitBottom(void)
+46  0x00039ef0 0x1003aaf0 GLOBAL FUNC 0    mp.dll       ?DoorHitTop@CBaseDoor@@QAEXXZ                                           public: void __thiscall CBaseDoor::DoorHitTop(void)
+47  0x000397c0 0x1003a3c0 GLOBAL FUNC 0    mp.dll       ?DoorTouch@CBaseDoor@@QAEXPAVCBaseEntity@@@Z                            public: void __thiscall CBaseDoor::DoorTouch(class CBaseEntity *)
+48  0x000937d0 0x100943d0 GLOBAL FUNC 0    mp.dll       ?EndSectionTouch@CTriggerEndSection@@QAEXPAVCBaseEntity@@@Z             public: void __thiscall CTriggerEndSection::EndSectionTouch(class CBaseEntity *)
+49  0x000936a0 0x100942a0 GLOBAL FUNC 0    mp.dll       ?EndSectionUse@CTriggerEndSection@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z public: void __thiscall CTriggerEndSection::EndSectionUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+50  0x00093100 0x10093d00 GLOBAL FUNC 0    mp.dll       ?EscapeTouch@CEscapeZone@@QAEXPAVCBaseEntity@@@Z                        public: void __thiscall CEscapeZone::EscapeTouch(class CBaseEntity *)
+51  0x00091b20 0x10092720 GLOBAL FUNC 0    mp.dll       ?ExecuteChangeLevel@CChangeLevel@@QAEXXZ                                public: void __thiscall CChangeLevel::ExecuteChangeLevel(void)
+52  0x0003ef50 0x1003fb50 GLOBAL FUNC 0    mp.dll       ?ExpandThink@CSprite@@QAEXXZ                                            public: void __thiscall CSprite::ExpandThink(void)
+53  0x0004b120 0x1004bd20 GLOBAL FUNC 0    mp.dll       ?ExplodeTouch@CGrenade@@QAEXPAVCBaseEntity@@@Z                          public: void __thiscall CGrenade::ExplodeTouch(class CBaseEntity *)
+54  0x000a0b90 0x100a1790 GLOBAL FUNC 0    mp.dll       ?FallThink@CBasePlayerItem@@QAEXXZ                                      public: void __thiscall CBasePlayerItem::FallThink(void)
+55  0x00057d90 0x10058990 GLOBAL FUNC 0    mp.dll       ?FieldUse@CFuncMortarField@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z        public: void __thiscall CFuncMortarField::FieldUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+56  0x0006be30 0x1006ca30 GLOBAL FUNC 0    mp.dll       ?Find@CFuncTrackChange@@QAEXXZ                                          public: void __thiscall CFuncTrackChange::Find(void)
+57  0x0006ad30 0x1006b930 GLOBAL FUNC 0    mp.dll       ?Find@CFuncTrackTrain@@QAEXXZ                                           public: void __thiscall CFuncTrackTrain::Find(void)
+58  0x0006b750 0x1006c350 GLOBAL FUNC 0    mp.dll       ?Find@CFuncTrainControls@@QAEXXZ                                        public: void __thiscall CFuncTrainControls::Find(void)
+59  0x0009f1c0 0x1009fdc0 GLOBAL FUNC 0    mp.dll       ?Find@CFuncVehicle@@QAEXXZ                                              public: void __thiscall CFuncVehicle::Find(void)
+60  0x0009fc30 0x100a0830 GLOBAL FUNC 0    mp.dll       ?Find@CFuncVehicleControls@@QAEXXZ                                      public: void __thiscall CFuncVehicleControls::Find(void)
+61  0x0003b9c0 0x1003c5c0 GLOBAL FUNC 0    mp.dll       ?FizzThink@CBubbling@@QAEXXZ                                            public: void __thiscall CBubbling::FizzThink(void)
+62  0x000943c0 0x10094fc0 GLOBAL FUNC 0    mp.dll       ?FollowTarget@CTriggerCamera@@QAEXXZ                                    public: void __thiscall CTriggerCamera::FollowTarget(void)
+63  0x0006c440 0x1006d040 GLOBAL FUNC 0    mp.dll       ?GoDown@CFuncTrackChange@@UAEXXZ                                        public virtual: void __thiscall CFuncTrackChange::GoDown(void)
+64  0x0006c510 0x1006d110 GLOBAL FUNC 0    mp.dll       ?GoUp@CFuncTrackChange@@UAEXXZ                                          public virtual: void __thiscall CFuncTrackChange::GoUp(void)
+65  0x000939e0 0x100945e0 GLOBAL FUNC 0    mp.dll       ?GravityTouch@CTriggerGravity@@QAEXPAVCBaseEntity@@@Z                   public: void __thiscall CTriggerGravity::GravityTouch(class CBaseEntity *)
+66  0x00092fc0 0x10093bc0 GLOBAL FUNC 0    mp.dll       ?HostageRescueTouch@CHostageRescue@@QAEXPAVCBaseEntity@@@Z              public: void __thiscall CHostageRescue::HostageRescueTouch(class CBaseEntity *)
+67  0x00090ae0 0x100916e0 GLOBAL FUNC 0    mp.dll       ?HurtTouch@CBaseTrigger@@QAEXPAVCBaseEntity@@@Z                         public: void __thiscall CBaseTrigger::HurtTouch(class CBaseEntity *)
+68  0x000110b0 0x10011cb0 GLOBAL FUNC 0    mp.dll       ?HurtTouch@CFuncRotating@@QAEXPAVCBaseEntity@@@Z                        public: void __thiscall CFuncRotating::HurtTouch(class CBaseEntity *)
+69  0x000d53e0 0x100d5fe0 GLOBAL FUNC 0    mp.dll       ?IdleThink@CHostage@@QAEXXZ                                             public: void __thiscall CHostage::IdleThink(void)
+70  0x000532d0 0x10053ed0 GLOBAL FUNC 0    mp.dll       ?ItemTouch@CItem@@QAEXPAVCBaseEntity@@@Z                                public: void __thiscall CItem::ItemTouch(class CBaseEntity *)
+71  0x000a3840 0x100a4440 GLOBAL FUNC 0    mp.dll       ?Kill@CWeaponBox@@QAEXXZ                                                public: void __thiscall CWeaponBox::Kill(void)
+72  0x0008cb50 0x1008d750 GLOBAL FUNC 0    mp.dll       ?LinearMoveDone@CBaseToggle@@QAEXXZ                                     public: void __thiscall CBaseToggle::LinearMoveDone(void)
+73  0x00086db0 0x100879b0 GLOBAL FUNC 0    mp.dll       ?LoadThink@CRevertSaved@@QAEXXZ                                         public: void __thiscall CRevertSaved::LoadThink(void)
+74  0x0008f420 0x10090020 GLOBAL FUNC 0    mp.dll       ?ManagerThink@CMultiManager@@QAEXXZ                                     public: void __thiscall CMultiManager::ManagerThink(void)
+75  0x0008f590 0x10090190 GLOBAL FUNC 0    mp.dll       ?ManagerUse@CMultiManager@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z         public: void __thiscall CMultiManager::ManagerUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+76  0x00004cf0 0x100058f0 GLOBAL FUNC 0    mp.dll       ?Materialize@CBasePlayerAmmo@@QAEXXZ                                    public: void __thiscall CBasePlayerAmmo::Materialize(void)
+77  0x000a0c40 0x100a1840 GLOBAL FUNC 0    mp.dll       ?Materialize@CBasePlayerItem@@QAEXXZ                                    public: void __thiscall CBasePlayerItem::Materialize(void)
+78  0x00053480 0x10054080 GLOBAL FUNC 0    mp.dll       ?Materialize@CItem@@QAEXXZ                                              public: void __thiscall CItem::Materialize(void)
+79  0x00086d20 0x10087920 GLOBAL FUNC 0    mp.dll       ?MessageThink@CRevertSaved@@QAEXXZ                                      public: void __thiscall CRevertSaved::MessageThink(void)
+80  0x00058170 0x10058d70 GLOBAL FUNC 0    mp.dll       ?MortarExplode@CMortar@@QAEXXZ                                          public: void __thiscall CMortar::MortarExplode(void)
+81  0x00001680 0x10002280 GLOBAL FUNC 0    mp.dll       ?MoveUp@CItemAirBox@@IAEXXZ                                             protected: void __thiscall CItemAirBox::MoveUp(void)
+82  0x00090e90 0x10091a90 GLOBAL FUNC 0    mp.dll       ?MultiTouch@CBaseTrigger@@QAEXPAVCBaseEntity@@@Z                        public: void __thiscall CBaseTrigger::MultiTouch(class CBaseEntity *)
+83  0x00091250 0x10091e50 GLOBAL FUNC 0    mp.dll       ?MultiWaitOver@CBaseTrigger@@QAEXXZ                                     public: void __thiscall CBaseTrigger::MultiWaitOver(void)
+84  0x0006af60 0x1006bb60 GLOBAL FUNC 0    mp.dll       ?NearestPath@CFuncTrackTrain@@QAEXXZ                                    public: void __thiscall CFuncTrackTrain::NearestPath(void)
+85  0x0009f3f0 0x1009fff0 GLOBAL FUNC 0    mp.dll       ?NearestPath@CFuncVehicle@@QAEXXZ                                       public: void __thiscall CFuncVehicle::NearestPath(void)
+86  0x0006a410 0x1006b010 GLOBAL FUNC 0    mp.dll       ?Next@CFuncTrackTrain@@QAEXXZ                                           public: void __thiscall CFuncTrackTrain::Next(void)
+87  0x00068fb0 0x10069bb0 GLOBAL FUNC 0    mp.dll       ?Next@CFuncTrain@@QAEXXZ                                                public: void __thiscall CFuncTrain::Next(void)
+88  0x0009e580 0x1009f180 GLOBAL FUNC 0    mp.dll       ?Next@CFuncVehicle@@QAEXXZ                                              public: void __thiscall CFuncVehicle::Next(void)
+89  0x0006d1e0 0x1006dde0 GLOBAL FUNC 0    mp.dll       ?Next@CGunTarget@@QAEXXZ                                                public: void __thiscall CGunTarget::Next(void)
+90  0x00023c40 0x10024840 GLOBAL FUNC 0    mp.dll       ?Off@CMomentaryRotButton@@QAEXXZ                                        public: void __thiscall CMomentaryRotButton::Off(void)
+91  0x000515b0 0x100521b0 GLOBAL FUNC 0    mp.dll       ?Off@CRecharge@@QAEXXZ                                                  public: void __thiscall CRecharge::Off(void)
+92  0x000509f0 0x100515f0 GLOBAL FUNC 0    mp.dll       ?Off@CWallHealth@@QAEXXZ                                                public: void __thiscall CWallHealth::Off(void)
+93  0x00011ed0 0x10012ad0 GLOBAL FUNC 0    mp.dll       ?PendulumUse@CPendulum@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z            public: void __thiscall CPendulum::PendulumUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+94  0x00067ab0 0x100686b0 GLOBAL FUNC 0    mp.dll       ?PlatUse@CFuncPlat@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z                public: void __thiscall CFuncPlat::PlatUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+95  0x00075c20 0x10076820 GLOBAL FUNC 0    mp.dll       ?PlayerDeathThink@CBasePlayer@@QAEXXZ                                   public: void __thiscall CBasePlayer::PlayerDeathThink(void)
+96  0x0004aa10 0x1004b610 GLOBAL FUNC 0    mp.dll       ?PreDetonate@CGrenade@@QAEXXZ                                           public: void __thiscall CGrenade::PreDetonate(void)
+97  0x00090810 0x10091410 GLOBAL FUNC 0    mp.dll       ?RadiationThink@CTriggerHurt@@QAEXXZ                                    public: void __thiscall CTriggerHurt::RadiationThink(void)
+98  0x000888f0 0x100894f0 GLOBAL FUNC 0    mp.dll       ?RampThink@CAmbientGeneric@@QAEXXZ                                      public: void __thiscall CAmbientGeneric::RampThink(void)
+99  0x00002870 0x10003470 GLOBAL FUNC 0    mp.dll       ?RandomThink@CTriggerRandom@@IAEXXZ                                     protected: void __thiscall CTriggerRandom::RandomThink(void)
+100 0x00051550 0x10052150 GLOBAL FUNC 0    mp.dll       ?Recharge@CRecharge@@QAEXXZ                                             public: void __thiscall CRecharge::Recharge(void)
+101 0x00050960 0x10051560 GLOBAL FUNC 0    mp.dll       ?Recharge@CWallHealth@@QAEXXZ                                           public: void __thiscall CWallHealth::Recharge(void)
+102 0x00021730 0x10022330 GLOBAL FUNC 0    mp.dll       ?Register@CMultiSource@@QAEXXZ                                          public: void __thiscall CMultiSource::Register(void)
+103 0x000d5bb0 0x100d67b0 GLOBAL FUNC 0    mp.dll       ?Remove@CHostage@@QAEXXZ                                                public: void __thiscall CHostage::Remove(void)
+104 0x00023cc0 0x100248c0 GLOBAL FUNC 0    mp.dll       ?Return@CMomentaryRotButton@@QAEXXZ                                     public: void __thiscall CMomentaryRotButton::Return(void)
+105 0x000123b0 0x10012fb0 GLOBAL FUNC 0    mp.dll       ?RopeTouch@CPendulum@@QAEXPAVCBaseEntity@@@Z                            public: void __thiscall CPendulum::RopeTouch(class CBaseEntity *)
+106 0x000117e0 0x100123e0 GLOBAL FUNC 0    mp.dll       ?Rotate@CFuncRotating@@QAEXXZ                                           public: void __thiscall CFuncRotating::Rotate(void)
+107 0x00011810 0x10012410 GLOBAL FUNC 0    mp.dll       ?RotatingUse@CFuncRotating@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z        public: void __thiscall CFuncRotating::RotatingUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+108 0x0004ab00 0x1004b700 GLOBAL FUNC 0    mp.dll       ?SG_Detonate@CGrenade@@QAEXXZ                                           public: void __thiscall CGrenade::SG_Detonate(void)
+109 0x0004a720 0x1004b320 GLOBAL FUNC 0    mp.dll       ?SG_Smoke@CGrenade@@QAEXXZ                                              public: void __thiscall CGrenade::SG_Smoke(void)
+110 0x0004b850 0x1004c450 GLOBAL FUNC 0    mp.dll       ?SG_TumbleThink@CGrenade@@QAEXXZ                                        public: void __thiscall CGrenade::SG_TumbleThink(void)
+111 0x000124a0 0x100130a0 GLOBAL FUNC 0    mp.dll       ?SUB_CallUseToggle@CBaseEntity@@QAEXXZ                                  public: void __thiscall CBaseEntity::SUB_CallUseToggle(void)
+112 0x00029440 0x1002a040 GLOBAL FUNC 0    mp.dll       ?SUB_DoNothing@CBaseEntity@@QAEXXZ                                      public: void __thiscall CBaseEntity::SUB_DoNothing(void)
+113 0x00029270 0x10029e70 GLOBAL FUNC 0    mp.dll       ?SUB_FadeOut@CBaseEntity@@QAEXXZ                                        public: void __thiscall CBaseEntity::SUB_FadeOut(void)
+114 0x0008c0e0 0x1008cce0 GLOBAL FUNC 0    mp.dll       ?SUB_Remove@CBaseEntity@@QAEXXZ                                         public: void __thiscall CBaseEntity::SUB_Remove(void)
+115 0x000291f0 0x10029df0 GLOBAL FUNC 0    mp.dll       ?SUB_StartFadeOut@CBaseEntity@@QAEXXZ                                   public: void __thiscall CBaseEntity::SUB_StartFadeOut(void)
+116 0x00093530 0x10094130 GLOBAL FUNC 0    mp.dll       ?SaveTouch@CTriggerSave@@QAEXPAVCBaseEntity@@@Z                         public: void __thiscall CTriggerSave::SaveTouch(class CBaseEntity *)
+117 0x0003f610 0x10040210 GLOBAL FUNC 0    mp.dll       ?ShootThink@CGibShooter@@QAEXXZ                                         public: void __thiscall CGibShooter::ShootThink(void)
+118 0x0004b590 0x1004c190 GLOBAL FUNC 0    mp.dll       ?SlideTouch@CGrenade@@QAEXPAVCBaseEntity@@@Z                            public: void __thiscall CGrenade::SlideTouch(class CBaseEntity *)
+119 0x00029440 0x1002a040 GLOBAL FUNC 0    mp.dll       ?Smack@CKnife@@QAEXXZ                                                   public: void __thiscall CKnife::Smack(void)
+120 0x0004a460 0x1004b060 GLOBAL FUNC 0    mp.dll       ?Smoke2@CGrenade@@QAEXXZ                                                public: void __thiscall CGrenade::Smoke2(void)
+121 0x0004a300 0x1004af00 GLOBAL FUNC 0    mp.dll       ?Smoke3_A@CGrenade@@QAEXXZ                                              public: void __thiscall CGrenade::Smoke3_A(void)
+122 0x0004a180 0x1004ad80 GLOBAL FUNC 0    mp.dll       ?Smoke3_B@CGrenade@@QAEXXZ                                              public: void __thiscall CGrenade::Smoke3_B(void)
+123 0x00049ff0 0x1004abf0 GLOBAL FUNC 0    mp.dll       ?Smoke3_C@CGrenade@@QAEXXZ                                              public: void __thiscall CGrenade::Smoke3_C(void)
+124 0x000428b0 0x100434b0 GLOBAL FUNC 0    mp.dll       ?Smoke@CEnvExplosion@@QAEXXZ                                            public: void __thiscall CEnvExplosion::Smoke(void)
+125 0x0004a5c0 0x1004b1c0 GLOBAL FUNC 0    mp.dll       ?Smoke@CGrenade@@QAEXXZ                                                 public: void __thiscall CGrenade::Smoke(void)
+126 0x000241b0 0x10024db0 GLOBAL FUNC 0    mp.dll       ?SparkStart@CEnvSpark@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z             public: void __thiscall CEnvSpark::SparkStart(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+127 0x00024200 0x10024e00 GLOBAL FUNC 0    mp.dll       ?SparkStop@CEnvSpark@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z              public: void __thiscall CEnvSpark::SparkStop(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+128 0x00024160 0x10024d60 GLOBAL FUNC 0    mp.dll       ?SparkThink@CEnvSpark@@QAEXXZ                                           public: void __thiscall CEnvSpark::SparkThink(void)
+129 0x0008b720 0x1008c320 GLOBAL FUNC 0    mp.dll       ?SpeakerThink@CSpeaker@@QAEXXZ                                          public: void __thiscall CSpeaker::SpeakerThink(void)
+130 0x000115c0 0x100121c0 GLOBAL FUNC 0    mp.dll       ?SpinDown@CFuncRotating@@QAEXXZ                                         public: void __thiscall CFuncRotating::SpinDown(void)
+131 0x00011390 0x10011f90 GLOBAL FUNC 0    mp.dll       ?SpinUp@CFuncRotating@@QAEXXZ                                           public: void __thiscall CFuncRotating::SpinUp(void)
+132 0x0006d1b0 0x1006ddb0 GLOBAL FUNC 0    mp.dll       ?Start@CGunTarget@@QAEXXZ                                               public: void __thiscall CGunTarget::Start(void)
+133 0x000a63c0 0x100a6fc0 GLOBAL FUNC 0    mp.dll       ?StaticDecal@CDecal@@QAEXXZ                                             public: void __thiscall CDecal::StaticDecal(void)
+134 0x0004f480 0x10050080 GLOBAL FUNC 0    mp.dll       ?StickyGibTouch@CGib@@QAEXPAVCBaseEntity@@@Z                            public: void __thiscall CGib::StickyGibTouch(class CBaseEntity *)
+135 0x00011ff0 0x10012bf0 GLOBAL FUNC 0    mp.dll       ?Stop@CPendulum@@QAEXXZ                                                 public: void __thiscall CPendulum::Stop(void)
+136 0x000c1960 0x100c2560 GLOBAL FUNC 0    mp.dll       ?StopSound@CPushable@@QAEXXZ                                            public: void __thiscall CPushable::StopSound(void)
+137 0x0003e430 0x1003f030 GLOBAL FUNC 0    mp.dll       ?StrikeThink@CLaser@@QAEXXZ                                             public: void __thiscall CLaser::StrikeThink(void)
+138 0x0003cad0 0x1003d6d0 GLOBAL FUNC 0    mp.dll       ?StrikeThink@CLightning@@QAEXXZ                                         public: void __thiscall CLightning::StrikeThink(void)
+139 0x0003c980 0x1003d580 GLOBAL FUNC 0    mp.dll       ?StrikeUse@CLightning@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z             public: void __thiscall CLightning::StrikeUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+140 0x00012070 0x10012c70 GLOBAL FUNC 0    mp.dll       ?Swing@CPendulum@@QAEXXZ                                                public: void __thiscall CPendulum::Swing(void)
+141 0x000ea460 0x100eb060 GLOBAL FUNC 0    mp.dll       ?SwingAgain@CKnife@@QAEXXZ                                              public: void __thiscall CKnife::SwingAgain(void)
+142 0x000047f0 0x100053f0 GLOBAL FUNC 0    mp.dll       ?TankThink@CAirtank@@QAEXXZ                                             public: void __thiscall CAirtank::TankThink(void)
+143 0x00004820 0x10005420 GLOBAL FUNC 0    mp.dll       ?TankTouch@CAirtank@@QAEXPAVCBaseEntity@@@Z                             public: void __thiscall CAirtank::TankTouch(class CBaseEntity *)
+144 0x000927e0 0x100933e0 GLOBAL FUNC 0    mp.dll       ?TeleportTouch@CBaseTrigger@@QAEXPAVCBaseEntity@@@Z                     public: void __thiscall CBaseTrigger::TeleportTouch(class CBaseEntity *)
+145 0x0003feb0 0x10040ab0 GLOBAL FUNC 0    mp.dll       ?TestThink@CTestEffect@@QAEXXZ                                          public: void __thiscall CTestEffect::TestThink(void)
+146 0x00089020 0x10089c20 GLOBAL FUNC 0    mp.dll       ?ToggleUse@CAmbientGeneric@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z        public: void __thiscall CAmbientGeneric::ToggleUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+147 0x00090a80 0x10091680 GLOBAL FUNC 0    mp.dll       ?ToggleUse@CBaseTrigger@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z           public: void __thiscall CBaseTrigger::ToggleUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+148 0x0003c850 0x1003d450 GLOBAL FUNC 0    mp.dll       ?ToggleUse@CLightning@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z             public: void __thiscall CLightning::ToggleUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+149 0x0008b960 0x1008c560 GLOBAL FUNC 0    mp.dll       ?ToggleUse@CSpeaker@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z               public: void __thiscall CSpeaker::ToggleUse(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+150 0x000748e0 0x100754e0 GLOBAL FUNC 0    mp.dll       ?Touch@CWShield@@UAEXPAVCBaseEntity@@@Z                                 public virtual: void __thiscall CWShield::Touch(class CBaseEntity *)
+151 0x00091e40 0x10092a40 GLOBAL FUNC 0    mp.dll       ?TouchChangeLevel@CChangeLevel@@QAEXPAVCBaseEntity@@@Z                  public: void __thiscall CChangeLevel::TouchChangeLevel(class CBaseEntity *)
+152 0x00022b80 0x10023780 GLOBAL FUNC 0    mp.dll       ?TriggerAndWait@CBaseButton@@QAEXXZ                                     public: void __thiscall CBaseButton::TriggerAndWait(void)
+153 0x000a6260 0x100a6e60 GLOBAL FUNC 0    mp.dll       ?TriggerDecal@CDecal@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z              public: void __thiscall CDecal::TriggerDecal(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+154 0x0003be20 0x1003ca20 GLOBAL FUNC 0    mp.dll       ?TriggerTouch@CBeam@@QAEXPAVCBaseEntity@@@Z                             public: void __thiscall CBeam::TriggerTouch(class CBaseEntity *)
+155 0x0004b700 0x1004c300 GLOBAL FUNC 0    mp.dll       ?TumbleThink@CGrenade@@QAEXXZ                                           public: void __thiscall CGrenade::TumbleThink(void)
+156 0x00091c10 0x10092810 GLOBAL FUNC 0    mp.dll       ?UseChangeLevel@CChangeLevel@@QAEXPAVCBaseEntity@@0W4USE_TYPE@@M@Z      public: void __thiscall CChangeLevel::UseChangeLevel(class CBaseEntity *, class CBaseEntity *, enum USE_TYPE, float)
+157 0x00093310 0x10093f10 GLOBAL FUNC 0    mp.dll       ?VIP_SafetyTouch@CVIP_SafetyZone@@QAEXPAVCBaseEntity@@@Z                public: void __thiscall CVIP_SafetyZone::VIP_SafetyTouch(class CBaseEntity *)
+158 0x00068c30 0x10069830 GLOBAL FUNC 0    mp.dll       ?Wait@CFuncTrain@@QAEXXZ                                                public: void __thiscall CFuncTrain::Wait(void)
+159 0x0006d310 0x1006df10 GLOBAL FUNC 0    mp.dll       ?Wait@CGunTarget@@QAEXXZ                                                public: void __thiscall CGunTarget::Wait(void)
+160 0x0004f7a0 0x100503a0 GLOBAL FUNC 0    mp.dll       ?WaitTillLand@CGib@@QAEXXZ                                              public: void __thiscall CGib::WaitTillLand(void)
+161 0x001af1a8 0x101b0ba8 GLOBAL FUNC 0    mp.dll       ?g_pGameRules@@3PAVCGameRules@@A                                        class CGameRules * g_pGameRules
+162 0x0002acd0 0x1002b8d0 GLOBAL FUNC 0    mp.dll       CountTeamPlayers
+163 0x0002a8d0 0x1002b4d0 GLOBAL FUNC 0    mp.dll       CountTeams
+164 0x000c15c0 0x100c21c0 GLOBAL FUNC 0    mp.dll       CreateInterface
+165 0x0008c460 0x1008d060 GLOBAL FUNC 0    mp.dll       DelayedUse
+166 0x00025aa0 0x100266a0 GLOBAL FUNC 0    mp.dll       GetEntityAPI
+167 0x00025c20 0x10026820 GLOBAL FUNC 0    mp.dll       GetNewDLLFunctions
+168 0x00006530 0x10007130 GLOBAL FUNC 0    mp.dll       Server_GetBlendingInterface
+169 0x00088270 0x10088e70 GLOBAL FUNC 0    mp.dll       ambient_generic
+170 0x000055f0 0x100061f0 GLOBAL FUNC 0    mp.dll       ammo_338magnum
+171 0x00005810 0x10006410 GLOBAL FUNC 0    mp.dll       ammo_357sig
+172 0x000053d0 0x10005fd0 GLOBAL FUNC 0    mp.dll       ammo_45acp
+173 0x000054e0 0x100060e0 GLOBAL FUNC 0    mp.dll       ammo_50ae
+174 0x000050a0 0x10005ca0 GLOBAL FUNC 0    mp.dll       ammo_556nato
+175 0x000051b0 0x10005db0 GLOBAL FUNC 0    mp.dll       ammo_556natobox
+176 0x00005700 0x10006300 GLOBAL FUNC 0    mp.dll       ammo_57mm
+177 0x000052c0 0x10005ec0 GLOBAL FUNC 0    mp.dll       ammo_762nato
+178 0x00004e80 0x10005a80 GLOBAL FUNC 0    mp.dll       ammo_9mm
+179 0x00004f90 0x10005b90 GLOBAL FUNC 0    mp.dll       ammo_buckshot
+180 0x000a4c30 0x100a5830 GLOBAL FUNC 0    mp.dll       armoury_entity
+181 0x0003bab0 0x1003c6b0 GLOBAL FUNC 0    mp.dll       beam
+182 0x000a65a0 0x100a71a0 GLOBAL FUNC 0    mp.dll       bodyque
+183 0x000c1970 0x100c2570 GLOBAL FUNC 0    mp.dll       bot
+184 0x00024220 0x10024e20 GLOBAL FUNC 0    mp.dll       button_target
+185 0x00051780 0x10052380 GLOBAL FUNC 0    mp.dll       cycler
+186 0x00051820 0x10052420 GLOBAL FUNC 0    mp.dll       cycler_prdroid
+187 0x00051fb0 0x10052bb0 GLOBAL FUNC 0    mp.dll       cycler_sprite
+188 0x00052460 0x10053060 GLOBAL FUNC 0    mp.dll       cycler_weapon
+189 0x00052860 0x10053460 GLOBAL FUNC 0    mp.dll       cycler_wreckage
+190 0x0003bfc0 0x1003cbc0 GLOBAL FUNC 0    mp.dll       env_beam
+191 0x00041440 0x10042040 GLOBAL FUNC 0    mp.dll       env_beverage
+192 0x00040360 0x10040f60 GLOBAL FUNC 0    mp.dll       env_blood
+193 0x0003e7b0 0x1003f3b0 GLOBAL FUNC 0    mp.dll       env_bombglow
+194 0x0003b5a0 0x1003c1a0 GLOBAL FUNC 0    mp.dll       env_bubbles
+195 0x00023df0 0x100249f0 GLOBAL FUNC 0    mp.dll       env_debris
+196 0x000423c0 0x10042fc0 GLOBAL FUNC 0    mp.dll       env_explosion
+197 0x00040b30 0x10041730 GLOBAL FUNC 0    mp.dll       env_fade
+198 0x00094b10 0x10095710 GLOBAL FUNC 0    mp.dll       env_fog
+199 0x00041270 0x10041e70 GLOBAL FUNC 0    mp.dll       env_funnel
+200 0x00020f30 0x10021b30 GLOBAL FUNC 0    mp.dll       env_global
+201 0x0003e500 0x1003f100 GLOBAL FUNC 0    mp.dll       env_glow
+202 0x0003daa0 0x1003e6a0 GLOBAL FUNC 0    mp.dll       env_laser
+203 0x0003bfc0 0x1003cbc0 GLOBAL FUNC 0    mp.dll       env_lightning
+204 0x00040db0 0x100419b0 GLOBAL FUNC 0    mp.dll       env_message
+205 0x000949f0 0x100955f0 GLOBAL FUNC 0    mp.dll       env_rain
+206 0x0008f710 0x10090310 GLOBAL FUNC 0    mp.dll       env_render
+207 0x00040870 0x10041470 GLOBAL FUNC 0    mp.dll       env_shake
+208 0x0003f8c0 0x100404c0 GLOBAL FUNC 0    mp.dll       env_shooter
+209 0x000949f0 0x100955f0 GLOBAL FUNC 0    mp.dll       env_snow
+210 0x00089ad0 0x1008a6d0 GLOBAL FUNC 0    mp.dll       env_sound
+211 0x00023df0 0x100249f0 GLOBAL FUNC 0    mp.dll       env_spark
+212 0x0003ea30 0x1003f630 GLOBAL FUNC 0    mp.dll       env_sprite
+213 0x000915f0 0x100921f0 GLOBAL FUNC 0    mp.dll       fireanddie
+214 0x00092cc0 0x100938c0 GLOBAL FUNC 0    mp.dll       func_bomb_target
+215 0x00042a70 0x10043670 GLOBAL FUNC 0    mp.dll       func_breakable
+216 0x00021f70 0x10022b70 GLOBAL FUNC 0    mp.dll       func_button
+217 0x00092b30 0x10093730 GLOBAL FUNC 0    mp.dll       func_buyzone
+218 0x00010320 0x10010f20 GLOBAL FUNC 0    mp.dll       func_conveyor
+219 0x00039000 0x10039c00 GLOBAL FUNC 0    mp.dll       func_door
+220 0x0003a8d0 0x1003b4d0 GLOBAL FUNC 0    mp.dll       func_door_rotating
+221 0x00093040 0x10093c40 GLOBAL FUNC 0    mp.dll       func_escapezone
+222 0x0008e810 0x1008f410 GLOBAL FUNC 0    mp.dll       func_friction
+223 0x0008dad0 0x1008e6d0 GLOBAL FUNC 0    mp.dll       func_grencatch
+224 0x0006ce90 0x1006da90 GLOBAL FUNC 0    mp.dll       func_guntarget
+225 0x00050380 0x10050f80 GLOBAL FUNC 0    mp.dll       func_healthcharger
+226 0x00092f00 0x10093b00 GLOBAL FUNC 0    mp.dll       func_hostage_rescue
+227 0x00010510 0x10011110 GLOBAL FUNC 0    mp.dll       func_illusionary
+228 0x00092330 0x10092f30 GLOBAL FUNC 0    mp.dll       func_ladder
+229 0x000106a0 0x100112a0 GLOBAL FUNC 0    mp.dll       func_monsterclip
+230 0x00057a00 0x10058600 GLOBAL FUNC 0    mp.dll       func_mortar_field
+231 0x00011ae0 0x100126e0 GLOBAL FUNC 0    mp.dll       func_pendulum
+232 0x000675b0 0x100681b0 GLOBAL FUNC 0    mp.dll       func_plat
+233 0x00068150 0x10068d50 GLOBAL FUNC 0    mp.dll       func_platrot
+234 0x00044380 0x10044f80 GLOBAL FUNC 0    mp.dll       func_pushable
+235 0x000949f0 0x100955f0 GLOBAL FUNC 0    mp.dll       func_rain
+236 0x00050e00 0x10051a00 GLOBAL FUNC 0    mp.dll       func_recharge
+237 0x00023030 0x10023c30 GLOBAL FUNC 0    mp.dll       func_rot_button
+238 0x00010790 0x10011390 GLOBAL FUNC 0    mp.dll       func_rotating
+239 0x000949f0 0x100955f0 GLOBAL FUNC 0    mp.dll       func_snow
+240 0x00046d10 0x10047910 GLOBAL FUNC 0    mp.dll       func_tank
+241 0x00047b00 0x10048700 GLOBAL FUNC 0    mp.dll       func_tankcontrols
+242 0x00046f30 0x10047b30 GLOBAL FUNC 0    mp.dll       func_tanklaser
+243 0x00047870 0x10048470 GLOBAL FUNC 0    mp.dll       func_tankmortar
+244 0x00047690 0x10048290 GLOBAL FUNC 0    mp.dll       func_tankrocket
+245 0x0006cb20 0x1006d720 GLOBAL FUNC 0    mp.dll       func_trackautochange
+246 0x0006b9f0 0x1006c5f0 GLOBAL FUNC 0    mp.dll       func_trackchange
+247 0x00069ac0 0x1006a6c0 GLOBAL FUNC 0    mp.dll       func_tracktrain
+248 0x000688b0 0x100694b0 GLOBAL FUNC 0    mp.dll       func_train
+249 0x0006b6b0 0x1006c2b0 GLOBAL FUNC 0    mp.dll       func_traincontrols
+250 0x0009cea0 0x1009daa0 GLOBAL FUNC 0    mp.dll       func_vehicle
+251 0x0009fb90 0x100a0790 GLOBAL FUNC 0    mp.dll       func_vehiclecontrols
+252 0x00093250 0x10093e50 GLOBAL FUNC 0    mp.dll       func_vip_safetyzone
+253 0x0000ffa0 0x10010ba0 GLOBAL FUNC 0    mp.dll       func_wall
+254 0x00010110 0x10010d10 GLOBAL FUNC 0    mp.dll       func_wall_toggle
+255 0x00039000 0x10039c00 GLOBAL FUNC 0    mp.dll       func_water
+256 0x0008e1f0 0x1008edf0 GLOBAL FUNC 0    mp.dll       func_weaponcheck
+257 0x00056e70 0x10057a70 GLOBAL FUNC 0    mp.dll       game_counter
+258 0x00057110 0x10057d10 GLOBAL FUNC 0    mp.dll       game_counter_set
+259 0x000559e0 0x100565e0 GLOBAL FUNC 0    mp.dll       game_end
+260 0x00057290 0x10057e90 GLOBAL FUNC 0    mp.dll       game_player_equip
+261 0x00056cb0 0x100578b0 GLOBAL FUNC 0    mp.dll       game_player_hurt
+262 0x000576e0 0x100582e0 GLOBAL FUNC 0    mp.dll       game_player_team
+263 0x00055830 0x10056430 GLOBAL FUNC 0    mp.dll       game_score
+264 0x00056230 0x10056e30 GLOBAL FUNC 0    mp.dll       game_team_master
+265 0x00056610 0x10057210 GLOBAL FUNC 0    mp.dll       game_team_set
+266 0x00055ad0 0x100566d0 GLOBAL FUNC 0    mp.dll       game_text
+267 0x000567a0 0x100573a0 GLOBAL FUNC 0    mp.dll       game_zone_player
+268 0x0004e5d0 0x1004f1d0 GLOBAL FUNC 0    mp.dll       gib
+269 0x0003f1c0 0x1003fdc0 GLOBAL FUNC 0    mp.dll       gibshooter
+270 0x00049100 0x10049d00 GLOBAL FUNC 0    mp.dll       grenade
+271 0x000d4c70 0x100d5870 GLOBAL FUNC 0    mp.dll       hostage_entity
+272 0x0008c010 0x1008cc10 GLOBAL FUNC 0    mp.dll       info_bomb_target
+273 0x0008c010 0x1008cc10 GLOBAL FUNC 0    mp.dll       info_hostage_rescue
+274 0x00041930 0x10042530 GLOBAL FUNC 0    mp.dll       info_intermission
+275 0x0008c010 0x1008cc10 GLOBAL FUNC 0    mp.dll       info_landmark
+276 0x000555b0 0x100561b0 GLOBAL FUNC 0    mp.dll       info_map_parameters
+277 0x0008bf50 0x1008cb50 GLOBAL FUNC 0    mp.dll       info_null
+278 0x0008bff0 0x1008cbf0 GLOBAL FUNC 0    mp.dll       info_player_deathmatch
+279 0x0008c010 0x1008cc10 GLOBAL FUNC 0    mp.dll       info_player_start
+280 0x0008c010 0x1008cc10 GLOBAL FUNC 0    mp.dll       info_target
+281 0x0008c010 0x1008cc10 GLOBAL FUNC 0    mp.dll       info_teleport_destination
+282 0x0008bff0 0x1008cbf0 GLOBAL FUNC 0    mp.dll       info_vip_start
+283 0x000a6140 0x100a6d40 GLOBAL FUNC 0    mp.dll       infodecal
+284 0x00000d00 0x10001900 GLOBAL FUNC 0    mp.dll       item_airbox
+285 0x00004490 0x10005090 GLOBAL FUNC 0    mp.dll       item_airtank
+286 0x00053a90 0x10054690 GLOBAL FUNC 0    mp.dll       item_antidote
+287 0x000543d0 0x10054fd0 GLOBAL FUNC 0    mp.dll       item_assaultsuit
+288 0x000538d0 0x100544d0 GLOBAL FUNC 0    mp.dll       item_battery
+289 0x0004ffc0 0x10050bc0 GLOBAL FUNC 0    mp.dll       item_healthkit
+290 0x00054100 0x10054d00 GLOBAL FUNC 0    mp.dll       item_kevlar
+291 0x00053e50 0x10054a50 GLOBAL FUNC 0    mp.dll       item_longjump
+292 0x00053c00 0x10054800 GLOBAL FUNC 0    mp.dll       item_security
+293 0x000415f0 0x100421f0 GLOBAL FUNC 0    mp.dll       item_sodacan
+294 0x000535d0 0x100541d0 GLOBAL FUNC 0    mp.dll       item_suit
+295 0x000546d0 0x100552d0 GLOBAL FUNC 0    mp.dll       item_thighpack
+296 0x00054950 0x10055550 GLOBAL FUNC 0    mp.dll       light
+297 0x00054d20 0x10055920 GLOBAL FUNC 0    mp.dll       light_environment
+298 0x00054950 0x10055550 GLOBAL FUNC 0    mp.dll       light_spot
+299 0x0003ad30 0x1003b930 GLOBAL FUNC 0    mp.dll       momentary_door
+300 0x00023400 0x10024000 GLOBAL FUNC 0    mp.dll       momentary_rot_button
+301 0x000801d0 0x10080dd0 GLOBAL FUNC 0    mp.dll       monster_hevsuit_dead
+302 0x00058050 0x10058c50 GLOBAL FUNC 0    mp.dll       monster_mortar
+303 0x000d4c70 0x100d5870 GLOBAL FUNC 0    mp.dll       monster_scientist
+304 0x0008f0b0 0x1008fcb0 GLOBAL FUNC 0    mp.dll       multi_manager
+305 0x00021290 0x10021e90 GLOBAL FUNC 0    mp.dll       multisource
+306 0x00065fc0 0x10066bc0 GLOBAL FUNC 0    mp.dll       path_corner
+307 0x00066240 0x10066e40 GLOBAL FUNC 0    mp.dll       path_track
+308 0x0006d790 0x1006e390 GLOBAL FUNC 0    mp.dll       player
+309 0x000869f0 0x100875f0 GLOBAL FUNC 0    mp.dll       player_loadsaved
+310 0x00080430 0x10081030 GLOBAL FUNC 0    mp.dll       player_weaponstrip
+311 0x00001d10 0x10002910 GLOBAL FUNC 0    mp.dll       point_clientcommand
+312 0x00001ef0 0x10002af0 GLOBAL FUNC 0    mp.dll       point_servercommand
+313 0x0008bb20 0x1008c720 GLOBAL FUNC 0    mp.dll       soundent
+314 0x00041f30 0x10042b30 GLOBAL FUNC 0    mp.dll       spark_shower
+315 0x0008b4a0 0x1008c0a0 GLOBAL FUNC 0    mp.dll       speaker
+316 0x00090300 0x10090f00 GLOBAL FUNC 0    mp.dll       target_cdaudio
+317 0x0003fdd0 0x100409d0 GLOBAL FUNC 0    mp.dll       test_effect
+318 0x0008fc60 0x10090860 GLOBAL FUNC 0    mp.dll       trigger
+319 0x0008ea80 0x1008f680 GLOBAL FUNC 0    mp.dll       trigger_auto
+320 0x00093440 0x10094040 GLOBAL FUNC 0    mp.dll       trigger_autosave
+321 0x00093c40 0x10094840 GLOBAL FUNC 0    mp.dll       trigger_camera
+322 0x000900d0 0x10090cd0 GLOBAL FUNC 0    mp.dll       trigger_cdaudio
+323 0x00091740 0x10092340 GLOBAL FUNC 0    mp.dll       trigger_changelevel
+324 0x00093a20 0x10094620 GLOBAL FUNC 0    mp.dll       trigger_changetarget
+325 0x00091400 0x10092000 GLOBAL FUNC 0    mp.dll       trigger_counter
+326 0x00093600 0x10094200 GLOBAL FUNC 0    mp.dll       trigger_endsection
+327 0x00093920 0x10094520 GLOBAL FUNC 0    mp.dll       trigger_gravity
+328 0x00090620 0x10091220 GLOBAL FUNC 0    mp.dll       trigger_hurt
+329 0x0008fed0 0x10090ad0 GLOBAL FUNC 0    mp.dll       trigger_monsterjump
+330 0x00090ce0 0x100918e0 GLOBAL FUNC 0    mp.dll       trigger_multiple
+331 0x00090dc0 0x100919c0 GLOBAL FUNC 0    mp.dll       trigger_once
+332 0x000924c0 0x100930c0 GLOBAL FUNC 0    mp.dll       trigger_push
+333 0x00002380 0x10002f80 GLOBAL FUNC 0    mp.dll       trigger_random
+334 0x00002380 0x10002f80 GLOBAL FUNC 0    mp.dll       trigger_random_time
+335 0x00002380 0x10002f80 GLOBAL FUNC 0    mp.dll       trigger_random_unique
+336 0x0008ee00 0x1008fa00 GLOBAL FUNC 0    mp.dll       trigger_relay
+337 0x00002c20 0x10003820 GLOBAL FUNC 0    mp.dll       trigger_setorigin
+338 0x00092a70 0x10093670 GLOBAL FUNC 0    mp.dll       trigger_teleport
+339 0x000914e0 0x100920e0 GLOBAL FUNC 0    mp.dll       trigger_transition
+340 0x000e1f10 0x100e2b10 GLOBAL FUNC 0    mp.dll       weapon_ak47
+341 0x000e27c0 0x100e33c0 GLOBAL FUNC 0    mp.dll       weapon_aug
+342 0x000e3120 0x100e3d20 GLOBAL FUNC 0    mp.dll       weapon_awp
+343 0x000e3a90 0x100e4690 GLOBAL FUNC 0    mp.dll       weapon_c4
+344 0x000e4840 0x100e5440 GLOBAL FUNC 0    mp.dll       weapon_deagle
+345 0x000e50d0 0x100e5cd0 GLOBAL FUNC 0    mp.dll       weapon_elite
+346 0x000e59d0 0x100e65d0 GLOBAL FUNC 0    mp.dll       weapon_famas
+347 0x000e62f0 0x100e6ef0 GLOBAL FUNC 0    mp.dll       weapon_fiveseven
+348 0x000e6ba0 0x100e77a0 GLOBAL FUNC 0    mp.dll       weapon_flashbang
+349 0x000e7630 0x100e8230 GLOBAL FUNC 0    mp.dll       weapon_g3sg1
+350 0x000e7ee0 0x100e8ae0 GLOBAL FUNC 0    mp.dll       weapon_galil
+351 0x000e8730 0x100e9330 GLOBAL FUNC 0    mp.dll       weapon_glock18
+352 0x000e92c0 0x100e9ec0 GLOBAL FUNC 0    mp.dll       weapon_hegrenade
+353 0x000e9c70 0x100ea870 GLOBAL FUNC 0    mp.dll       weapon_knife
+354 0x000eb3a0 0x100ebfa0 GLOBAL FUNC 0    mp.dll       weapon_m249
+355 0x000ebbf0 0x100ec7f0 GLOBAL FUNC 0    mp.dll       weapon_m3
+356 0x000ec320 0x100ecf20 GLOBAL FUNC 0    mp.dll       weapon_m4a1
+357 0x000ece10 0x100eda10 GLOBAL FUNC 0    mp.dll       weapon_mac10
+358 0x000ed5e0 0x100ee1e0 GLOBAL FUNC 0    mp.dll       weapon_mp5navy
+359 0x000edda0 0x100ee9a0 GLOBAL FUNC 0    mp.dll       weapon_p228
+360 0x000ee590 0x100ef190 GLOBAL FUNC 0    mp.dll       weapon_p90
+361 0x000eedd0 0x100ef9d0 GLOBAL FUNC 0    mp.dll       weapon_scout
+362 0x000ef6b0 0x100f02b0 GLOBAL FUNC 0    mp.dll       weapon_sg550
+363 0x000eff50 0x100f0b50 GLOBAL FUNC 0    mp.dll       weapon_sg552
+364 0x000747d0 0x100753d0 GLOBAL FUNC 0    mp.dll       weapon_shield
+365 0x000f0800 0x100f1400 GLOBAL FUNC 0    mp.dll       weapon_smokegrenade
+366 0x000f11c0 0x100f1dc0 GLOBAL FUNC 0    mp.dll       weapon_tmp
+367 0x000f1960 0x100f2560 GLOBAL FUNC 0    mp.dll       weapon_ump45
+368 0x000f2110 0x100f2d10 GLOBAL FUNC 0    mp.dll       weapon_usp
+369 0x000f2c00 0x100f3800 GLOBAL FUNC 0    mp.dll       weapon_xm1014
+370 0x000a32d0 0x100a3ed0 GLOBAL FUNC 0    mp.dll       weaponbox
+371 0x00052fd0 0x10053bd0 GLOBAL FUNC 0    mp.dll       world_items
+372 0x000a6640 0x100a7240 GLOBAL FUNC 0    mp.dll       worldspawn
+1   0x00114e00 0x10116000 NONE   FUNC 0    KERNEL32.dll imp.QueryPerformanceFrequency
+2   0x00114e04 0x10116004 NONE   FUNC 0    KERNEL32.dll imp.QueryPerformanceCounter
+3   0x00114e08 0x10116008 NONE   FUNC 0    KERNEL32.dll imp.GetProcAddress
+4   0x00114e0c 0x1011600c NONE   FUNC 0    KERNEL32.dll imp.LoadLibraryA
+5   0x00114e10 0x10116010 NONE   FUNC 0    KERNEL32.dll imp.FreeLibrary
+6   0x00114e14 0x10116014 NONE   FUNC 0    KERNEL32.dll imp.DebugBreak
+7   0x00114e18 0x10116018 NONE   FUNC 0    KERNEL32.dll imp.CloseHandle
+8   0x00114e1c 0x1011601c NONE   FUNC 0    KERNEL32.dll imp.EnterCriticalSection
+9   0x00114e20 0x10116020 NONE   FUNC 0    KERNEL32.dll imp.LeaveCriticalSection
+10  0x00114e24 0x10116024 NONE   FUNC 0    KERNEL32.dll imp.InitializeCriticalSectionAndSpinCount
+11  0x00114e28 0x10116028 NONE   FUNC 0    KERNEL32.dll imp.DeleteCriticalSection
+12  0x00114e2c 0x1011602c NONE   FUNC 0    KERNEL32.dll imp.SetEvent
+13  0x00114e30 0x10116030 NONE   FUNC 0    KERNEL32.dll imp.ResetEvent
+14  0x00114e34 0x10116034 NONE   FUNC 0    KERNEL32.dll imp.WaitForSingleObjectEx
+15  0x00114e38 0x10116038 NONE   FUNC 0    KERNEL32.dll imp.CreateEventW
+16  0x00114e3c 0x1011603c NONE   FUNC 0    KERNEL32.dll imp.GetModuleHandleW
+17  0x00114e40 0x10116040 NONE   FUNC 0    KERNEL32.dll imp.UnhandledExceptionFilter
+18  0x00114e44 0x10116044 NONE   FUNC 0    KERNEL32.dll imp.SetUnhandledExceptionFilter
+19  0x00114e48 0x10116048 NONE   FUNC 0    KERNEL32.dll imp.GetCurrentProcess
+20  0x00114e4c 0x1011604c NONE   FUNC 0    KERNEL32.dll imp.TerminateProcess
+21  0x00114e50 0x10116050 NONE   FUNC 0    KERNEL32.dll imp.IsProcessorFeaturePresent
+22  0x00114e54 0x10116054 NONE   FUNC 0    KERNEL32.dll imp.IsDebuggerPresent
+23  0x00114e58 0x10116058 NONE   FUNC 0    KERNEL32.dll imp.GetStartupInfoW
+24  0x00114e5c 0x1011605c NONE   FUNC 0    KERNEL32.dll imp.GetCurrentProcessId
+25  0x00114e60 0x10116060 NONE   FUNC 0    KERNEL32.dll imp.GetCurrentThreadId
+26  0x00114e64 0x10116064 NONE   FUNC 0    KERNEL32.dll imp.GetSystemTimeAsFileTime
+27  0x00114e68 0x10116068 NONE   FUNC 0    KERNEL32.dll imp.InitializeSListHead
+28  0x00114e6c 0x1011606c NONE   FUNC 0    KERNEL32.dll imp.RtlUnwind
+29  0x00114e70 0x10116070 NONE   FUNC 0    KERNEL32.dll imp.RaiseException
+30  0x00114e74 0x10116074 NONE   FUNC 0    KERNEL32.dll imp.InterlockedFlushSList
+31  0x00114e78 0x10116078 NONE   FUNC 0    KERNEL32.dll imp.GetLastError
+32  0x00114e7c 0x1011607c NONE   FUNC 0    KERNEL32.dll imp.SetLastError
+33  0x00114e80 0x10116080 NONE   FUNC 0    KERNEL32.dll imp.EncodePointer
+34  0x00114e84 0x10116084 NONE   FUNC 0    KERNEL32.dll imp.TlsAlloc
+35  0x00114e88 0x10116088 NONE   FUNC 0    KERNEL32.dll imp.TlsGetValue
+36  0x00114e8c 0x1011608c NONE   FUNC 0    KERNEL32.dll imp.TlsSetValue
+37  0x00114e90 0x10116090 NONE   FUNC 0    KERNEL32.dll imp.TlsFree
+38  0x00114e94 0x10116094 NONE   FUNC 0    KERNEL32.dll imp.LoadLibraryExW
+39  0x00114e98 0x10116098 NONE   FUNC 0    KERNEL32.dll imp.ExitProcess
+40  0x00114e9c 0x1011609c NONE   FUNC 0    KERNEL32.dll imp.GetModuleHandleExW
+41  0x00114ea0 0x101160a0 NONE   FUNC 0    KERNEL32.dll imp.WriteFile
+42  0x00114ea4 0x101160a4 NONE   FUNC 0    KERNEL32.dll imp.GetConsoleOutputCP
+43  0x00114ea8 0x101160a8 NONE   FUNC 0    KERNEL32.dll imp.GetConsoleMode
+44  0x00114eac 0x101160ac NONE   FUNC 0    KERNEL32.dll imp.CreateFileW
+45  0x00114eb0 0x101160b0 NONE   FUNC 0    KERNEL32.dll imp.GetFileType
+46  0x00114eb4 0x101160b4 NONE   FUNC 0    KERNEL32.dll imp.GetModuleFileNameW
+47  0x00114eb8 0x101160b8 NONE   FUNC 0    KERNEL32.dll imp.HeapFree
+48  0x00114ebc 0x101160bc NONE   FUNC 0    KERNEL32.dll imp.HeapAlloc
+49  0x00114ec0 0x101160c0 NONE   FUNC 0    KERNEL32.dll imp.GetStdHandle
+50  0x00114ec4 0x101160c4 NONE   FUNC 0    KERNEL32.dll imp.HeapReAlloc
+51  0x00114ec8 0x101160c8 NONE   FUNC 0    KERNEL32.dll imp.WideCharToMultiByte
+52  0x00114ecc 0x101160cc NONE   FUNC 0    KERNEL32.dll imp.SetStdHandle
+53  0x00114ed0 0x101160d0 NONE   FUNC 0    KERNEL32.dll imp.SetFilePointerEx
+54  0x00114ed4 0x101160d4 NONE   FUNC 0    KERNEL32.dll imp.ReadFile
+55  0x00114ed8 0x101160d8 NONE   FUNC 0    KERNEL32.dll imp.ReadConsoleW
+56  0x00114edc 0x101160dc NONE   FUNC 0    KERNEL32.dll imp.MultiByteToWideChar
+57  0x00114ee0 0x101160e0 NONE   FUNC 0    KERNEL32.dll imp.LCMapStringW
+58  0x00114ee4 0x101160e4 NONE   FUNC 0    KERNEL32.dll imp.SetEndOfFile
+59  0x00114ee8 0x101160e8 NONE   FUNC 0    KERNEL32.dll imp.FindClose
+60  0x00114eec 0x101160ec NONE   FUNC 0    KERNEL32.dll imp.FindFirstFileExW
+61  0x00114ef0 0x101160f0 NONE   FUNC 0    KERNEL32.dll imp.FindNextFileW
+62  0x00114ef4 0x101160f4 NONE   FUNC 0    KERNEL32.dll imp.IsValidCodePage
+63  0x00114ef8 0x101160f8 NONE   FUNC 0    KERNEL32.dll imp.GetACP
+64  0x00114efc 0x101160fc NONE   FUNC 0    KERNEL32.dll imp.GetOEMCP
+65  0x00114f00 0x10116100 NONE   FUNC 0    KERNEL32.dll imp.GetCPInfo
+66  0x00114f04 0x10116104 NONE   FUNC 0    KERNEL32.dll imp.GetCommandLineA
+67  0x00114f08 0x10116108 NONE   FUNC 0    KERNEL32.dll imp.GetCommandLineW
+68  0x00114f0c 0x1011610c NONE   FUNC 0    KERNEL32.dll imp.GetEnvironmentStringsW
+69  0x00114f10 0x10116110 NONE   FUNC 0    KERNEL32.dll imp.FreeEnvironmentStringsW
+70  0x00114f14 0x10116114 NONE   FUNC 0    KERNEL32.dll imp.GetProcessHeap
+71  0x00114f18 0x10116118 NONE   FUNC 0    KERNEL32.dll imp.GetStringTypeW
+72  0x00114f1c 0x1011611c NONE   FUNC 0    KERNEL32.dll imp.GetFileSizeEx
+73  0x00114f20 0x10116120 NONE   FUNC 0    KERNEL32.dll imp.FlushFileBuffers
+74  0x00114f24 0x10116124 NONE   FUNC 0    KERNEL32.dll imp.WriteConsoleW
+75  0x00114f28 0x10116128 NONE   FUNC 0    KERNEL32.dll imp.HeapSize
+76  0x00114f2c 0x1011612c NONE   FUNC 0    KERNEL32.dll imp.DecodePointer
+nth vaddr      bind type lib          name
+------------------------------------------
+1   0x10116000 NONE FUNC KERNEL32.dll QueryPerformanceFrequency
+2   0x10116004 NONE FUNC KERNEL32.dll QueryPerformanceCounter
+3   0x10116008 NONE FUNC KERNEL32.dll GetProcAddress
+4   0x1011600c NONE FUNC KERNEL32.dll LoadLibraryA
+5   0x10116010 NONE FUNC KERNEL32.dll FreeLibrary
+6   0x10116014 NONE FUNC KERNEL32.dll DebugBreak
+7   0x10116018 NONE FUNC KERNEL32.dll CloseHandle
+8   0x1011601c NONE FUNC KERNEL32.dll EnterCriticalSection
+9   0x10116020 NONE FUNC KERNEL32.dll LeaveCriticalSection
+10  0x10116024 NONE FUNC KERNEL32.dll InitializeCriticalSectionAndSpinCount
+11  0x10116028 NONE FUNC KERNEL32.dll DeleteCriticalSection
+12  0x1011602c NONE FUNC KERNEL32.dll SetEvent
+13  0x10116030 NONE FUNC KERNEL32.dll ResetEvent
+14  0x10116034 NONE FUNC KERNEL32.dll WaitForSingleObjectEx
+15  0x10116038 NONE FUNC KERNEL32.dll CreateEventW
+16  0x1011603c NONE FUNC KERNEL32.dll GetModuleHandleW
+17  0x10116040 NONE FUNC KERNEL32.dll UnhandledExceptionFilter
+18  0x10116044 NONE FUNC KERNEL32.dll SetUnhandledExceptionFilter
+19  0x10116048 NONE FUNC KERNEL32.dll GetCurrentProcess
+20  0x1011604c NONE FUNC KERNEL32.dll TerminateProcess
+21  0x10116050 NONE FUNC KERNEL32.dll IsProcessorFeaturePresent
+22  0x10116054 NONE FUNC KERNEL32.dll IsDebuggerPresent
+23  0x10116058 NONE FUNC KERNEL32.dll GetStartupInfoW
+24  0x1011605c NONE FUNC KERNEL32.dll GetCurrentProcessId
+25  0x10116060 NONE FUNC KERNEL32.dll GetCurrentThreadId
+26  0x10116064 NONE FUNC KERNEL32.dll GetSystemTimeAsFileTime
+27  0x10116068 NONE FUNC KERNEL32.dll InitializeSListHead
+28  0x1011606c NONE FUNC KERNEL32.dll RtlUnwind
+29  0x10116070 NONE FUNC KERNEL32.dll RaiseException
+30  0x10116074 NONE FUNC KERNEL32.dll InterlockedFlushSList
+31  0x10116078 NONE FUNC KERNEL32.dll GetLastError
+32  0x1011607c NONE FUNC KERNEL32.dll SetLastError
+33  0x10116080 NONE FUNC KERNEL32.dll EncodePointer
+34  0x10116084 NONE FUNC KERNEL32.dll TlsAlloc
+35  0x10116088 NONE FUNC KERNEL32.dll TlsGetValue
+36  0x1011608c NONE FUNC KERNEL32.dll TlsSetValue
+37  0x10116090 NONE FUNC KERNEL32.dll TlsFree
+38  0x10116094 NONE FUNC KERNEL32.dll LoadLibraryExW
+39  0x10116098 NONE FUNC KERNEL32.dll ExitProcess
+40  0x1011609c NONE FUNC KERNEL32.dll GetModuleHandleExW
+41  0x101160a0 NONE FUNC KERNEL32.dll WriteFile
+42  0x101160a4 NONE FUNC KERNEL32.dll GetConsoleOutputCP
+43  0x101160a8 NONE FUNC KERNEL32.dll GetConsoleMode
+44  0x101160ac NONE FUNC KERNEL32.dll CreateFileW
+45  0x101160b0 NONE FUNC KERNEL32.dll GetFileType
+46  0x101160b4 NONE FUNC KERNEL32.dll GetModuleFileNameW
+47  0x101160b8 NONE FUNC KERNEL32.dll HeapFree
+48  0x101160bc NONE FUNC KERNEL32.dll HeapAlloc
+49  0x101160c0 NONE FUNC KERNEL32.dll GetStdHandle
+50  0x101160c4 NONE FUNC KERNEL32.dll HeapReAlloc
+51  0x101160c8 NONE FUNC KERNEL32.dll WideCharToMultiByte
+52  0x101160cc NONE FUNC KERNEL32.dll SetStdHandle
+53  0x101160d0 NONE FUNC KERNEL32.dll SetFilePointerEx
+54  0x101160d4 NONE FUNC KERNEL32.dll ReadFile
+55  0x101160d8 NONE FUNC KERNEL32.dll ReadConsoleW
+56  0x101160dc NONE FUNC KERNEL32.dll MultiByteToWideChar
+57  0x101160e0 NONE FUNC KERNEL32.dll LCMapStringW
+58  0x101160e4 NONE FUNC KERNEL32.dll SetEndOfFile
+59  0x101160e8 NONE FUNC KERNEL32.dll FindClose
+60  0x101160ec NONE FUNC KERNEL32.dll FindFirstFileExW
+61  0x101160f0 NONE FUNC KERNEL32.dll FindNextFileW
+62  0x101160f4 NONE FUNC KERNEL32.dll IsValidCodePage
+63  0x101160f8 NONE FUNC KERNEL32.dll GetACP
+64  0x101160fc NONE FUNC KERNEL32.dll GetOEMCP
+65  0x10116100 NONE FUNC KERNEL32.dll GetCPInfo
+66  0x10116104 NONE FUNC KERNEL32.dll GetCommandLineA
+67  0x10116108 NONE FUNC KERNEL32.dll GetCommandLineW
+68  0x1011610c NONE FUNC KERNEL32.dll GetEnvironmentStringsW
+69  0x10116110 NONE FUNC KERNEL32.dll FreeEnvironmentStringsW
+70  0x10116114 NONE FUNC KERNEL32.dll GetProcessHeap
+71  0x10116118 NONE FUNC KERNEL32.dll GetStringTypeW
+72  0x1011611c NONE FUNC KERNEL32.dll GetFileSizeEx
+73  0x10116120 NONE FUNC KERNEL32.dll FlushFileBuffers
+74  0x10116124 NONE FUNC KERNEL32.dll WriteConsoleW
+75  0x10116128 NONE FUNC KERNEL32.dll HeapSize
+76  0x1011612c NONE FUNC KERNEL32.dll DecodePointer
