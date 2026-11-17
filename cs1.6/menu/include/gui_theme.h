@@ -74,11 +74,11 @@ namespace gui
 
         inline float ICON_SIZE  = 46.0f;   // ширина (совпала с REF 1:1)
         inline float ICON_STEP  = 64.08f;  // шаг по Y (центры 50.7, 114.8 ... 499.3)
-        inline float ICON_X     = 43.2f;   // центр иконки по X
+        inline float ICON_X     = 43.7f;   // центр иконки по X
         // Вертикальный сжим иконок: в REF высота ink на 2-3px МЕНЬШЕ ширины
         // (спрайт 48x48, а ink 38x34). Подобрано по 8 иконкам.
         inline float ICON_ASPECT = 0.945f;
-        inline float ICON_Y0    = 52.7f;   // центр ПЕРВОЙ иконки по Y
+        inline float ICON_Y0    = 53.2f;   // центр ПЕРВОЙ иконки по Y
 
         inline float CHECK_SIZE = 6.0f;
         inline float CHECK_X    = 123.0f;  // абсолютный x чекбокса (123..128)
@@ -115,8 +115,8 @@ namespace gui
             COL_PAD         = 10.0f  * s;
             ICON_SIZE       = 46.0f   * s;
             ICON_STEP       = 64.08f  * s;
-            ICON_X          = 41.7f   * s;
-            ICON_Y0         = 50.7f   * s;
+            ICON_X          = 42.2f   * s;
+            ICON_Y0         = 52.1f   * s;
             CHECK_SIZE      = 6.0f   * s;
             CHECK_X         = 122.0f * s;
             LABEL_X         = 143.0f * s;

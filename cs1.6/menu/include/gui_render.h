@@ -263,12 +263,21 @@ namespace render
         const ImU32 bg = 0xff0c0c0c, fg = 0xff141414;
         const int ix0 = std::max(0, (int)x0), iy0 = std::max(0, (int)y0);
         const int ix1 = std::min(img.w, (int)x1), iy1 = std::min(img.h, (int)y1);
+        // Точный паттерн референса (снят по 2D-карте на двух зонах):
+        //   чётные строки: #141414 при x%4 == 1 или 3
+        //   нечётные      : чередование по периоду 4 —
+        //                   y%4==1 -> x%4==1,  y%4==3 -> x%4==0,1,3
+        // Это даёт вертикальные полосы 3px #141414 + 1px #0C0C0C.
         for (int y = iy0; y < iy1; ++y)
         {
-            const int off = ((y & 2) ? 2 : 0);
+            const int ym = y & 3;
             for (int x = ix0; x < ix1; ++x)
             {
-                const bool on = ((((x - off) % 4) + 4) % 4 < 2) && ((y & 1) == 0);
+                const int xm = x & 3;
+                bool on;
+                if ((y & 1) == 0)          on = (xm == 1 || xm == 3);
+                else if (ym == 1)          on = (xm == 1 || xm == 2 || xm == 3);
+                else                       on = (xm == 0 || xm == 1 || xm == 3);
                 img.px[(size_t)y * img.w + x] = on ? fg : bg;
             }
         }
@@ -281,8 +290,8 @@ namespace render
     //  - правый отступ (x 706..724)
     inline void dither_menu_background(Image& img, float WX, float WY, float W, float H)
     {
-        dither_rect(img, WX + 1, WY + 10, WX + W - 1, WY + 30);
-        dither_rect(img, WX + 1, WY + 592, WX + W - 1, WY + 610);
+        dither_rect(img, WX + 1, WY + 11, WX + W - 1, WY + 30);
+        dither_rect(img, WX + 6, WY + 593, WX + W - 6, WY + 611);   // в REF y=593 уже дизеринг
         dither_rect(img, WX + 81, WY + 31, WX + 100, WY + 591);
         dither_rect(img, WX + 393, WY + 31, WX + 414, WY + 591);
         dither_rect(img, WX + 706, WY + 31, WX + 725, WY + 591);

@@ -161,7 +161,7 @@ int main(int argc, char** argv)
     // (в референсе ink подписи 16px, т.е. ~22px кегль). ImGui не масштабирует
     // глифы, поэтому нужен отдельный бейк.
     ImFontConfig big_cfg = cfg;
-    big_cfg.SizePixels = 24.0f * ui_scale;
+    big_cfg.SizePixels = 25.0f * ui_scale;
     ImFont* big_font = io.Fonts->AddFontFromFileTTF(font_path, big_cfg.SizePixels, &big_cfg);
     gui::SetBigFont(big_font);
     io.Fonts->Build();
@@ -207,11 +207,12 @@ int main(int argc, char** argv)
     printf("[*] рендер %dx%d, draw lists: %d, вершин: %d\n",
            W, H, dd->CmdListsCount, dd->TotalVtxCount);
 
-    // фон меню: дизеринг под окном
-    render::dither_menu_background(img, gui::geo::WINDOW_X, gui::geo::WINDOW_Y,
-                                   gui::geo::WINDOW_W, gui::geo::WINDOW_H);
+    // Фон меню: дизеринг рисуется ПОСЛЕ кадра — окно заливает свой фон
+    // в draw-list, поэтому шахматку надо накладывать поверх, а не до.
     render::backend_update_textures(dd);
     render::render_draw_data(img, dd);
+    render::dither_menu_background(img, gui::geo::WINDOW_X, gui::geo::WINDOW_Y,
+                                   gui::geo::WINDOW_W, gui::geo::WINDOW_H);
 
     if (!stbi_write_png(out_path, W, H, 4, img.px.data(), W * 4))
     {

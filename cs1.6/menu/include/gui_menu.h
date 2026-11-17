@@ -303,7 +303,7 @@ namespace gui
         // фон окна
         dl->AddRectFilled(wp, ImVec2(wp.x + W, wp.y + H), col::BG);
 
-        // (дизеринг рисуется растеризатором как фон окна)
+        // (дизеринг рисуется растеризатором/бэкендом как фон окна)
 
         // --- рамка (снято пиксель-в-пиксель с референса) ---
         //  y=0      : #0C0C0C (фон окна)
@@ -324,9 +324,7 @@ namespace gui
             dl->AddRectFilled(ImVec2(x0 + 2, y0 + 2), ImVec2(x0 + 5, y0 + H - 11), frame_lo);
             dl->AddRectFilled(ImVec2(x0 + 5, y0 + 5), ImVec2(x0 + W - 5, y0 + 6), frame_hi);
 
-            // нижний блок (y=593 в референсе — одиночная линия #141414)
-            dl->AddRectFilled(ImVec2(x0 + 1, y0 + H - 24), ImVec2(x0 + W - 1, y0 + H - 23),
-                              IM_COL32(20, 20, 20, 255));
+            // нижний блок (y=593 в референсе — уже дизеринг, линию не рисуем)
             dl->AddRectFilled(ImVec2(x0 + 1, y0 + H - 6), ImVec2(x0 + W - 1, y0 + H - 5), frame_hi);
             dl->AddRectFilled(ImVec2(x0 + 2, y0 + H - 5), ImVec2(x0 + W - 2, y0 + H - 2), frame_lo);
             dl->AddRectFilled(ImVec2(x0 + 2, y0 + H - 2), ImVec2(x0 + W - 2, y0 + H - 1), frame_hi);
@@ -439,7 +437,8 @@ namespace gui
         {
             // ICON_X/ICON_Y0 — ЦЕНТР иконки (регрессия по референсу), бокс
             // для InvisibleButton откладываем от центра на половину размера.
-            const float sz = geo::ICON_SIZE * K;
+            // Шестерёнки (3) в референсе на 1px крупнее остальных.
+            const float sz = geo::ICON_SIZE * K * (i == 3 ? 1.022f : 1.0f);
             const ImVec2 ctr(wp.x + geo::ICON_X * K,
                              wp.y + (geo::ICON_Y0 + geo::ICON_STEP * i) * K);
             const ImVec2 p(ctr.x - sz * 0.5f, ctr.y - sz * 0.5f);
@@ -469,8 +468,8 @@ namespace gui
         // воспроизводим это 1:1. ink в референсе: x 26..59, y 557..572 (16px).
         {
             const char* nm = (s.active_tab == 5) ? "Lua" : active_name(s.active_tab);
-            DrawTextSpaced(dl, ImVec2(wp.x + 25 * K, wp.y + 552.0f * K),
-                           col::TEXT_WHITE, nm, 24.0f * K, 0.0f,
+            DrawTextSpaced(dl, ImVec2(wp.x + 25 * K, wp.y + 551.0f * K),
+                           col::TEXT_WHITE, nm, 25.0f * K, 0.5f * K,
                            BigFont() ? BigFont() : ImGui::GetFont());
         }
 
