@@ -1,4 +1,5 @@
 #include "../../include/sh_features.h"
+#include "../../include/sh_hitmarker.h"
 
 sh_msg_state_t g_msgs;
 
@@ -157,6 +158,72 @@ static i32 __cdecl sh_cb_cur_weapon(const char *name, i32 size, i32 read)
     return 1;
 }
 
+static i32 g_last_health = -1;
+static i32 g_last_armor = -1;
+static f32 g_damage_done_time = -1.0f;
+
+static i32 __cdecl sh_cb_health(const char *name, i32 size, i32 read)
+{
+    (void)size;
+
+    if (read < 1 || !name)
+        return 1;
+
+    i32 hp = (u8)name[0];
+
+    if (g_last_health >= 0 && hp < g_last_health && hp > 0)
+    {
+        i32 dmg = g_last_health - hp;
+
+        if (g_last_health > 0 && dmg > 0)
+        {
+            sh_hitmarker_on_hit(0, dmg);
+            g_damage_done_time = g_pmove ? g_pmove->time : 0.0f;
+        }
+    }
+
+    g_last_health = hp;
+
+    return 1;
+}
+
+static i32 __cdecl sh_cb_armor(const char *name, i32 size, i32 read)
+{
+    (void)size;
+
+    if (read < 1 || !name)
+        return 1;
+
+    g_last_armor = (u8)name[0];
+
+    return 1;
+}
+
+static i32 __cdecl sh_cb_damage(const char *name, i32 size, i32 read)
+{
+    (void)size;
+
+    if (read < 4 || !name)
+        return 1;
+
+    const u8 *p = (const u8 *)name;
+
+    f32 t = g_pmove ? g_pmove->time : 0.0f;
+
+    if (t - g_damage_done_time < 0.05f)
+        return 1;
+
+    f32 dmg = (f32)p[2] + (f32)p[3] * 256.0f;
+
+    if (dmg > 0.0f && dmg < 200.0f)
+    {
+        sh_hitmarker_on_hit(0, (i32)dmg);
+        g_damage_done_time = t;
+    }
+
+    return 1;
+}
+
 static i32 __cdecl sh_cb_score_attrib(const char *name, i32 size, i32 read)
 {
     (void)size;
@@ -190,6 +257,9 @@ void sh_msgs_register(void)
 
     g_engfuncs->pfnHookUserMsg("WeaponList", sh_cb_weapon_list);
     g_engfuncs->pfnHookUserMsg("CurWeapon", sh_cb_cur_weapon);
+    g_engfuncs->pfnHookUserMsg("Health", sh_cb_health);
+    g_engfuncs->pfnHookUserMsg("Armor", sh_cb_armor);
+    g_engfuncs->pfnHookUserMsg("Damage", sh_cb_damage);
     g_engfuncs->pfnHookUserMsg("ScoreAttrib", sh_cb_score_attrib);
     g_engfuncs->pfnHookUserMsg("RoundTime", sh_cb_round_time);
 }
