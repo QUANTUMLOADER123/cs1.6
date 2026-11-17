@@ -117,6 +117,7 @@ i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
     sh_players_collect();
 
     sh_rage_run(cmd);
+    sh_rage_apply_recoil(cmd);
 
     if (g_cfg.antiaim.enabled)
         sh_antiaim_run(cmd);

@@ -4,6 +4,8 @@
 
 static f32 g_prev_time;
 static f32 g_spin_accum;
+static qbool g_jitter_flip;
+static qbool g_desync_flip;
 static qbool g_sideways_flip;
 static u32 g_jitter_seed = 12345u;
 
@@ -133,10 +135,16 @@ void sh_antiaim_apply_yaw(sh_usercmd_t *cmd, f32 time)
     }
     case sh_yaw_jitter:
     {
-        i32 r = sh_rand_range(1, 100);
+        f32 jitter = g_cfg.antiaim.yaw_jitter;
 
-        if (r < 10)
-            cmd->viewangles.y = base + 180.0f;
+        if (jitter <= 0.0f)
+            jitter = 35.0f;
+
+        if (jitter > 90.0f)
+            jitter = 90.0f;
+
+        cmd->viewangles.y = base + ((g_jitter_flip) ? jitter : -jitter);
+        g_jitter_flip = !g_jitter_flip;
 
         break;
     }
@@ -205,6 +213,33 @@ void sh_antiaim_run(sh_usercmd_t *cmd)
 
     sh_antiaim_apply_pitch(cmd, time);
     sh_antiaim_apply_yaw(cmd, time);
+
+    if (g_cfg.antiaim.desync)
+    {
+        f32 amount = g_cfg.antiaim.desync_amount;
+
+        if (amount <= 0.0f)
+            amount = 60.0f;
+
+        if (amount > 90.0f)
+            amount = 90.0f;
+
+        cmd->viewangles.y += (g_desync_flip) ? amount : -amount;
+        g_desync_flip = !g_desync_flip;
+    }
+
+    if (g_cfg.antiaim.fake_duck && g_pmove && g_pmove->onground != -1)
+        cmd->buttons |= 4;
+
+    if (g_cfg.antiaim.micro_move && g_pmove)
+    {
+        f32 speed = g_cfg.antiaim.micro_move_speed;
+
+        if (speed <= 0.0f)
+            speed = 1.5f;
+
+        cmd->forwardmove = speed;
+    }
 
     sh_antiaim_movement_fix(cmd, &old_angles);
 }

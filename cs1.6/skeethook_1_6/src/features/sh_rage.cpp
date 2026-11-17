@@ -212,3 +212,28 @@ void sh_rage_run(sh_usercmd_t *cmd)
 
     sh_rage_apply(cmd, &g_rage);
 }
+
+void sh_rage_apply_recoil(sh_usercmd_t *cmd)
+{
+    if (!cmd || !g_pmove)
+        return;
+
+    if (!g_cfg.misc.no_recoil && !g_cfg.misc.no_spread)
+        return;
+
+    if (g_cfg.misc.no_recoil)
+    {
+        cmd->viewangles.x -= g_pmove->punchangle.x;
+        cmd->viewangles.y -= g_pmove->punchangle.y;
+    }
+
+    if (g_cfg.misc.no_spread)
+    {
+        cmd->viewangles.z -= g_pmove->punchangle.z;
+
+        if (cmd->viewangles.z > 180.0f)
+            cmd->viewangles.z -= 360.0f;
+        if (cmd->viewangles.z < -180.0f)
+            cmd->viewangles.z += 360.0f;
+    }
+}
