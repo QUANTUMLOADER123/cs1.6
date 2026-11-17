@@ -9,7 +9,6 @@
 static sh_studio_api_t *g_studio;
 static sh_bones_draw_orig_fn g_draw_orig;
 static sh_bone_snapshot_t g_bones[SH_MAX_ENTITIES];
-static i32 g_capture_index;
 
 static const char *g_bone_names[sh_bone_count] = {
     "Bip01 Head",
@@ -64,11 +63,6 @@ void sh_bones_studio_set(sh_studio_api_t *api)
     g_studio = api;
 }
 
-void sh_bones_set_capture_index(i32 index)
-{
-    g_capture_index = index;
-}
-
 void sh_bones_clear(void)
 {
     for (i32 i = 0; i < SH_MAX_ENTITIES; ++i)
@@ -90,6 +84,21 @@ i32 sh_minhook_create(void *target, void *detour, void **orig)
         return 0;
 
     return 1;
+}
+
+static void sh_bones_fallback_map(sh_bone_snapshot_t *snap, i32 n)
+{
+    static const i32 def[sh_bone_count] = {
+        9, 8, 7, 6, 5, 4, 14, 15, 16, 17,
+        38, 39, 40, 41, 50, 51, 52, 53, 54, 55
+    };
+
+    for (i32 b = 0; b < sh_bone_count; ++b)
+    {
+        i32 v = def[b];
+
+        snap->map[b] = (v < n) ? v : -1;
+    }
 }
 
 static void sh_bones_build_map(sh_bone_snapshot_t *snap,
@@ -139,29 +148,8 @@ const sh_studio_header_t *sh_bones_current_header(void)
     return (const sh_studio_header_t *)g_studio->mod_extradata(model);
 }
 
-void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
+static i32 sh_bones_fill(sh_bone_snapshot_t *snap, void ***raw, i32 n)
 {
-    if (!g_studio || !g_studio->studio_get_bone_transform)
-        return;
-
-    if (index <= 0 || index >= SH_MAX_ENTITIES)
-        return;
-
-    void ***raw = (void ***)g_studio->studio_get_bone_transform();
-
-    if (!raw)
-        return;
-
-    sh_bone_snapshot_t *snap = &g_bones[index];
-
-    if (hdr && !snap->valid)
-        sh_bones_build_map(snap, hdr);
-
-    i32 n = snap->count;
-
-    if (n <= 0)
-        return;
-
     i32 got = 0;
 
     for (i32 b = 0; b < sh_bone_count; ++b)
@@ -183,7 +171,47 @@ void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
         ++got;
     }
 
+    return got;
+}
+
+void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
+{
+    if (!g_studio || !g_studio->studio_get_bone_transform)
+        return;
+
+    if (index <= 0 || index >= SH_MAX_ENTITIES || !hdr)
+        return;
+
+    if (hdr->numbones <= 0 || hdr->boneindex <= 0)
+        return;
+
+    void ***raw = (void ***)g_studio->studio_get_bone_transform();
+
+    if (!raw)
+        return;
+
+    sh_bone_snapshot_t *snap = &g_bones[index];
+
+    if (!snap->valid || snap->model != (const void *)hdr)
+    {
+        sh_bones_build_map(snap, hdr);
+        snap->model = (const void *)hdr;
+    }
+
+    i32 n = snap->count;
+
+    if (n <= 0)
+        return;
+
+    i32 got = sh_bones_fill(snap, raw, n);
+
     if (got < 8)
+    {
+        sh_bones_fallback_map(snap, n);
+        got = sh_bones_fill(snap, raw, n);
+    }
+
+    if (got < 6)
         return;
 
     snap->index = index;
@@ -220,11 +248,11 @@ static i32 sh_bones_draw_player(i32 flags, sh_entity_state_t *pplayer)
     if (g_draw_orig)
         r = g_draw_orig(flags, pplayer);
 
-    if (pplayer && g_capture_index > 0 && pplayer->number == g_capture_index)
+    if (pplayer && pplayer->number > 0)
     {
         const sh_studio_header_t *hdr = sh_bones_current_header();
 
-        sh_bones_capture(g_capture_index, hdr);
+        sh_bones_capture(pplayer->number, hdr);
     }
 
     return r;

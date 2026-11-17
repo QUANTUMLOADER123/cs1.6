@@ -318,8 +318,6 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent)
     if (!ent)
         return result;
 
-    if (type == 0 && ent->player > 0 && ent->player <= 32)
-        sh_bones_set_capture_index(ent->player);
 
     if (type != 0)
     {

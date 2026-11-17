@@ -37,6 +37,7 @@ typedef struct sh_bone_snapshot_s
     qbool valid;
     f32 born;
     i32 map[sh_bone_count];
+    const void *model;
     vec3_t pos[sh_bone_count];
 } sh_bone_snapshot_t;
 
@@ -44,7 +45,6 @@ typedef i32 (*sh_bones_draw_orig_fn)(i32 flags, sh_entity_state_t *pplayer);
 
 void sh_bones_studio_set(sh_studio_api_t *api);
 void sh_bones_hook_iface(sh_studio_iface_t *iface);
-void sh_bones_set_capture_index(i32 index);
 void sh_bones_capture(i32 index);
 const sh_bone_snapshot_t *sh_bones_get(i32 index);
 void sh_bones_clear(void);
