@@ -220,6 +220,26 @@ void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm)
         cmd->forwardmove += power * 40.0f;
 }
 
+void sh_tick_control(sh_usercmd_t *cmd)
+{
+    if (!g_cfg.movement.tick_control || !cmd || !g_pmove)
+        return;
+
+    f32 ft = g_pmove->frametime;
+
+    if (ft <= 0.0f)
+        return;
+
+    f32 target = g_cfg.movement.tick_ms;
+
+    if (target < 1.0f)
+        target = 1.0f;
+    if (target > 100.0f)
+        target = 100.0f;
+
+    cmd->msec = (u8)target;
+}
+
 void sh_movement_run(sh_usercmd_t *cmd)
 {
     sh_playermove_t *pm = g_pmove;
@@ -229,8 +249,11 @@ void sh_movement_run(sh_usercmd_t *cmd)
 
     if (g_cfg.movement.autostrafe)
         sh_autostrafe(cmd, pm);
+
     else if (g_cfg.movement.quick_stop)
         sh_quick_stop(cmd, pm);
+
+    sh_tick_control(cmd);
 
     sh_bhop(cmd, pm);
     sh_auto_jump_hold(cmd, pm);

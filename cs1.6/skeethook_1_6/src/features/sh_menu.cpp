@@ -491,6 +491,13 @@ static void sh_menu_draw_movement(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "bunny hop", &g_cfg.movement.bhop);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "tick control", &g_cfg.movement.tick_control);
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "tick ms", &g_cfg.movement.tick_ms, 1.0f, 50.0f, "%.0f");
+    cy += row;
     sh_menu_checkbox(x + colw, cy, "auto jump", &g_cfg.movement.auto_jump);
     cy += row + 8.0f * s;
 
@@ -595,7 +602,7 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 430.0f, 330.0f, 330.0f };
+    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 430.0f, 380.0f, 330.0f };
 
     f32 w = 560.0f * s;
     f32 h = tab_h[g_tab] * s;

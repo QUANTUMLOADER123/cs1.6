@@ -146,6 +146,8 @@ typedef struct sh_movement_cfg
     qbool bhop;
     qbool auto_jump;
     qbool super_toss;
+    qbool tick_control;
+    f32 tick_ms;
     f32 super_toss_power;
 } sh_movement_cfg;
 

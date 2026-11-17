@@ -35,6 +35,8 @@ void sh_config_defaults(void)
     g_cfg.movement.bhop = (qbool)1;
     g_cfg.movement.auto_jump = (qbool)1;
     g_cfg.movement.super_toss = (qbool)0;
+    g_cfg.movement.tick_control = (qbool)0;
+    g_cfg.movement.tick_ms = 10.0f;
     g_cfg.movement.super_toss_power = 50.0f;
 
     g_cfg.visuals.nightmode = (qbool)0;
