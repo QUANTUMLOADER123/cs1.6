@@ -66,24 +66,24 @@ namespace gui
         inline float SIDEBAR_BORDER = 48.0f; // цвет рамки сайдбара
 
         inline float COL_X_A    = 101.0f;  // рамка колонки A
-        inline float COL_X_B    = 415.0f;  // рамка колонки B
-        inline float COL_W      = 292.0f;  // 101..392 включительно (рамка + 290 тела)
+        inline float COL_X_B    = 414.0f;  // рамка колонки B (REF: 414..705)
+        inline float COL_W      = 293.0f;  // правая граница = pos.x + W - 1
         inline float COL_Y      = 31.0f;
-        inline float COL_H      = 560.0f;  // 31..590 (591 — нижняя граница)
+        inline float COL_H      = 562.0f;  // 31..591 (нижняя граница колонок)
         inline float COL_PAD    = 10.0f;   // контент от x=111 / y=41
 
         inline float ICON_SIZE  = 46.0f;   // ширина (совпала с REF 1:1)
-        inline float ICON_STEP  = 64.08f;  // шаг по Y (центры 50.7, 114.8 ... 499.3)
+        inline float ICON_STEP  = 64.15f;  // шаг по Y (регрессия по центрам иконок REF)
         inline float ICON_X     = 43.7f;   // центр иконки по X
         // Вертикальный сжим иконок: в REF высота ink на 2-3px МЕНЬШЕ ширины
         // (спрайт 48x48, а ink 38x34). Подобрано по 8 иконкам.
         inline float ICON_ASPECT = 0.945f;
-        inline float ICON_Y0    = 53.2f;   // центр ПЕРВОЙ иконки по Y
+        inline float ICON_Y0    = 50.6f;  // центр ПЕРВОЙ иконки (регрессия по REF)
 
         inline float CHECK_SIZE = 6.0f;
         inline float CHECK_X    = 123.0f;  // абсолютный x чекбокса (123..128)
         inline float LABEL_X    = 143.0f;  // абсолютный x текста после чекбокса
-        inline float FIELD_X    = 153.0f;  // абсолютный x дропдауна/поля
+        inline float FIELD_X    = 142.0f;  // левый бордер поля (REF: 142..334)
         inline float ITEM_H     = 18.0f;   // шаг строк (52,70,88,...)
         inline float CONTENT_Y0 = 53.0f;  // ink-top первой строки
         inline float TEXT_SIZE  = 8.0f;   // Verdana Bold 8px (как в gamesense)
@@ -108,19 +108,19 @@ namespace gui
             SIDEBAR_W       = 97.0f  * s;
             SIDEBAR_BORDER  = 48.0f  * s;
             COL_X_A         = 101.0f * s;
-            COL_X_B         = 415.0f * s;
-            COL_W           = 292.0f * s;
+            COL_X_B         = 414.0f * s;
+            COL_W           = 293.0f * s;
             COL_Y           = 31.0f  * s;
-            COL_H           = 560.0f * s;
+            COL_H           = 562.0f * s;
             COL_PAD         = 10.0f  * s;
             ICON_SIZE       = 46.0f   * s;
-            ICON_STEP       = 64.08f  * s;
+            ICON_STEP       = 64.15f  * s;
             ICON_X          = 42.2f   * s;
-            ICON_Y0         = 52.1f   * s;
+            ICON_Y0         = 50.6f   * s;
             CHECK_SIZE      = 6.0f   * s;
             CHECK_X         = 122.0f * s;
             LABEL_X         = 143.0f * s;
-            FIELD_X         = 153.0f * s;
+            FIELD_X         = 142.0f * s;
             ITEM_H          = 18.0f  * s;
             CONTENT_Y0      = 53.0f  * s;
             TEXT_SIZE       = 11.0f   * s;

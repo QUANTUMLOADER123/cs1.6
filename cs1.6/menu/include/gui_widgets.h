@@ -163,7 +163,7 @@ namespace gui
         // y=60 бордер; x=122 бордер, x=123..128 заливка, x=129 бордер.
         {
             const int x0 = (int)ImFloor(cpos.x), y0 = (int)ImFloor(cpos.y);
-            const int n = 9;      // 1 бордер + 6 заливки + 1 бордер + 1 запас снизу
+            const int n = 8;      // 1 бордер + 6 + 1 бордер = 8 (REF) 
             const ImU32 bd = col::CHECK_BORDER;
             dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)(x0 + n), (float)(y0 + 1)), bd);
             dl->AddRectFilled(ImVec2((float)x0, (float)(y0 + 7)), ImVec2((float)(x0 + n), (float)(y0 + 8)), bd);
@@ -260,7 +260,7 @@ namespace gui
         // ink-top текста поля -> верх поля ровно +12px (референс: текст 89, поле 101)
         const float y = col_pos.y + row_y * geo::SCALE + 14.0f * geo::SCALE;
         const float fh = 20.0f * geo::SCALE;   // бордер 1px + 18px градиента + бордер 1px
-        const float w = 181.0f * geo::SCALE;   // x 153..333
+        const float w = 193.0f * geo::SCALE;   // x 142..334 (REF)
         const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
         const ImVec2 q(p.x + w, p.y + fh);
 
@@ -277,16 +277,17 @@ namespace gui
         else
         {
             const float px = ImFloor(p.x), pw = ImFloor(q.x) - px;
-            // бордеры поля: 1px #0C0C0C сверху и снизу (REF: y=100 и y=119)
-            dl->AddRectFilled(ImVec2(px, ImFloor(p.y)), ImVec2(px + pw, ImFloor(p.y) + 1),
-                              col::CHECK_BORDER);
-            dl->AddRectFilled(ImVec2(px, ImFloor(p.y) + 19), ImVec2(px + pw, ImFloor(p.y) + 20),
-                              col::CHECK_BORDER);
+            const float py = ImFloor(p.y);
+            // Рамка поля 1px #0C0C0C по кругу (REF: x=142 и x=334, y=100 и y=119)
+            dl->AddRectFilled(ImVec2(px, py), ImVec2(px + pw, py + 1), col::CHECK_BORDER);
+            dl->AddRectFilled(ImVec2(px, py + 19), ImVec2(px + pw, py + 20), col::CHECK_BORDER);
+            dl->AddRectFilled(ImVec2(px, py), ImVec2(px + 1, py + 20), col::CHECK_BORDER);
+            dl->AddRectFilled(ImVec2(px + pw - 1, py), ImVec2(px + pw, py + 20), col::CHECK_BORDER);
             // 18 ступеней градиента — снято с референса y=101..118
             static const int ramp[18] = {31,31,32,32,32,32,33,33,33,34,34,34,34,35,35,35,36,36};
             for (int i = 0; i < 18; ++i)
-                dl->AddRectFilled(ImVec2(px, ImFloor(p.y) + 1 + i),
-                                  ImVec2(px + pw, ImFloor(p.y) + 2 + i),
+                dl->AddRectFilled(ImVec2(px + 1, py + 1 + i),
+                                  ImVec2(px + pw - 1, py + 2 + i),
                                   IM_COL32(ramp[i], ramp[i], ramp[i], 255));
         }
 
@@ -336,18 +337,18 @@ namespace gui
         ImDrawList* dl = ImGui::GetWindowDrawList();
         // та же привязка, что у дропдауна: бордер поля = row_y + 14
         const float y = col_pos.y + row_y * geo::SCALE + 14.0f * geo::SCALE;
-        const float fh = 20.0f * geo::SCALE;   // бордер 1px + 18px + бордер 1px
-        const float w = 181.0f * geo::SCALE;   // x 153..333
+        const float fh = 20.0f * geo::SCALE;   // как у дропдауна: 20px
+        const float w = 193.0f * geo::SCALE;   // как у дропдауна
         const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
         const ImVec2 q(p.x + w, p.y + fh);
 
         // плашка поля — как у дропдауна
         VGradient(dl, p, q, col::FIELD_TOP, col::FIELD_BOT);
-        const float px = ImFloor(p.x), pw = ImFloor(q.x) - px;
-        dl->AddRectFilled(ImVec2(px, ImFloor(p.y)), ImVec2(px + pw, ImFloor(p.y) + 1),
-                          col::CHECK_BORDER);
-        dl->AddRectFilled(ImVec2(px, ImFloor(p.y) + 19), ImVec2(px + pw, ImFloor(p.y) + 20),
-                          col::CHECK_BORDER);
+        const float px = ImFloor(p.x), pw = ImFloor(q.x) - px, py = ImFloor(p.y);
+        dl->AddRectFilled(ImVec2(px, py), ImVec2(px + pw, py + 1), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2(px, py + 19), ImVec2(px + pw, py + 20), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2(px, py), ImVec2(px + 1, py + 20), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2(px + pw - 1, py), ImVec2(px + pw, py + 20), col::CHECK_BORDER);
 
         ImGui::SetCursorScreenPos(p);
         ImGui::InvisibleButton(id, ImVec2(w, fh));
@@ -356,8 +357,9 @@ namespace gui
 
         // ЗАЛИВКА трека градиентом #99C427 -> #699404 (как в gamesense),
         // строго внутри бордеров: x 154..332, y 101..118.
+        // при t=1 заливка должна дойти ровно до правого бордера (x=pw-2 включительно)
         const int fx0 = (int)px + 1;
-        const int fy0 = (int)ImFloor(p.y) + 1;
+        const int fy0 = (int)py + 1;
         const int fw = (int)pw - 2;
         const int fill_w = (int)std::floor(fw * t + 0.5f);
         for (int i = 0; i < 18; ++i)
@@ -390,10 +392,11 @@ namespace gui
             float tw = 0.0f;
             if (bk)
                 for (const char* c = buf; *c; ++c) tw += bk->GetCharAdvance((ImWchar)*c);
-            // подложка под числом — только если заливка до него доходит
-            if (fill_w > (int)(pw - tw - 16))
-                dl->AddRectFilled(ImVec2(px + pw - tw - 13, ImFloor(p.y) + 1),
-                                  ImVec2(px + pw - 7, ImFloor(p.y) + 19), col::FIELD_BOT);
+            // Подложка под числом — как в оригинале: значение всегда на тёмной
+            // плашке, а заливка под ней обрезается, иначе справа торчит зелёный хвост.
+            const int share_x = (int)(px + pw) - (int)tw - 13;
+            dl->AddRectFilled(ImVec2((float)share_x, ImFloor(p.y) + 1),
+                              ImVec2(px + pw - 1, ImFloor(p.y) + 19), col::FIELD_BOT);
             DrawTextSpaced(dl, ImVec2(ImFloor(px + pw - tw - 11), ty),
                            col::TEXT, buf, geo::TEXT_SIZE, 0.5f * geo::SCALE);
         }

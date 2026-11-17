@@ -89,7 +89,9 @@ namespace gui
         ColCtx c;
         c.pos = ImVec2(geo::WINDOW_X + x * geo::SCALE, geo::WINDOW_Y + geo::COL_Y * geo::SCALE);
         c.y = 0.0f;
-        DrawColumnFrame(c.pos, ImVec2(geo::COL_W * geo::SCALE, geo::COL_H * geo::SCALE), letter);
+        // Рамки в референсе: A x=101..392, B x=414..705. Правая = pos.x + W - 1.
+        const float cw = (x >= 400.0f) ? 293.0f : geo::COL_W;
+        DrawColumnFrame(c.pos, ImVec2(cw * geo::SCALE, geo::COL_H * geo::SCALE), letter);
         return c;
     }
 
@@ -378,15 +380,29 @@ namespace gui
             }
         }
 
-        // --- сайдбар: внутренняя рамка иконок x 0..80, снизу до y 530 ---
+        // --- Сайдбар: зона иконок занимает ВСЮ левую полосу ---
+        // Снято с референса по x=80 (граница) и x=79 (чёрный зазор):
+        //   x=79  -> #000000                 (чёрная линия-зазор)
+        //   x=80  -> #303030 (48)            (светлая граница)
+        //   x=81+ -> дизеринг                (фон между сайдбаром и колонкой A)
+        // Внутри сайдбара (x 2..78) — свой дизеринг #0C0C0C/#141414.
         const float sbx1 = 80 * K;
-        dl->AddLine(ImVec2(wp.x + sbx1, wp.y + 11 * K), ImVec2(wp.x + sbx1, wp.y + 530 * K),
-                    col::BOX_BORDER);
-        // разделители подписи
-        dl->AddLine(ImVec2(wp.x + 6 * K, wp.y + 531 * K), ImVec2(wp.x + 80 * K, wp.y + 531 * K),
-                    col::BOX_BORDER);
-        dl->AddLine(ImVec2(wp.x + 6 * K, wp.y + 596 * K), ImVec2(wp.x + 80 * K, wp.y + 596 * K),
-                    col::BOX_BORDER);
+        // 1px линии — только AddRectFilled: AddLine со сглаживанием даёт
+        // полупрозрачные пиксели (26/29 вместо чётких 0/48), из-за чего
+        // границы выглядели «грязными».
+        auto vline = [&](float x, float y0, float y1, ImU32 c) {
+            dl->AddRectFilled(ImVec2(ImFloor(wp.x + x), ImFloor(wp.y + y0)),
+                              ImVec2(ImFloor(wp.x + x) + 1, ImFloor(wp.y + y1)), c);
+        };
+        auto hline = [&](float x0, float x1, float y, ImU32 c) {
+            dl->AddRectFilled(ImVec2(ImFloor(wp.x + x0), ImFloor(wp.y + y)),
+                              ImVec2(ImFloor(wp.x + x1), ImFloor(wp.y + y) + 1), c);
+        };
+        vline(79 * K, 11 * K, 597 * K, IM_COL32(0, 0, 0, 255));      // чёрный зазор
+        vline(sbx1,   11 * K, 597 * K, col::BOX_BORDER);              // светлая граница
+        hline(6 * K, sbx1, 530 * K, IM_COL32(0, 0, 0, 255));          // над подписью
+        hline(6 * K, sbx1, 531 * K, col::BOX_BORDER);
+        hline(6 * K, sbx1, 596 * K, col::BOX_BORDER);                 // под подписью
     }
 
     // ------------------------------------------------------------------
