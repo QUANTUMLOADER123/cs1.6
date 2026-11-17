@@ -363,7 +363,7 @@ void sh_players_track_anim(void)
         if (prev == 0 || anim == prev)
             continue;
 
-        if (p->weapon_id == 9 && anim == 6)
+        if (p->weapon_id == 9 && anim == 2)
             sh_smoke_add(&p->origin);
     }
 }
