@@ -185,6 +185,14 @@ static void sh_menu_section(const char *title, f32 x, f32 y)
     sh_draw_rect(x, y + 12.0f * s, 200.0f * s, 1.0f, (col4_t)SH_COL_RGBA(45, 45, 45, 255));
 }
 
+static const char *g_hitbox_items[] = {
+    "head", "neck", "chest", "stomach", "pelvis", "legs"
+};
+
+static const char *g_priority_items[] = {
+    "distance", "fov", "damage", "low health"
+};
+
 static void sh_menu_draw_rage(f32 x, f32 y)
 {
     f32 s = sh_scale();
@@ -203,12 +211,31 @@ static void sh_menu_draw_rage(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "penetration", &g_cfg.aimbot.penetration);
-    cy += row + 6.0f * s;
+    sh_menu_checkbox(x + colw, cy, "double tap", &g_cfg.aimbot.double_tap);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "auto stop", &g_cfg.aimbot.auto_stop);
+    sh_menu_checkbox(x + colw, cy, "visible check", &g_cfg.aimbot.visible_check);
+    cy += row + 4.0f * s;
+
+    sh_menu_section("target", x, cy);
+    cy += 20.0f * s;
+
+    sh_menu_combo(x, cy, colw, "hitbox", &g_cfg.aimbot.hitbox, g_hitbox_items, 6);
+    cy += row;
+
+    sh_menu_combo(x, cy, colw, "priority", &g_cfg.aimbot.priority, g_priority_items, 4);
+    cy += row + 4.0f * s;
+
+    sh_menu_section("tuning", x, cy);
+    cy += 20.0f * s;
 
     sh_menu_slider(x, cy, colw, "fov", &g_cfg.aimbot.fov, 1.0f, 180.0f, "");
     cy += row + 6.0f * s;
+
     sh_menu_slider(x, cy, colw, "smooth", &g_cfg.aimbot.smooth, 1.0f, 20.0f, "");
     cy += row + 6.0f * s;
+
     sh_menu_slider(x, cy, colw, "min damage", &g_cfg.aimbot.min_damage, 1.0f, 100.0f, "");
 }
 
@@ -473,7 +500,7 @@ void sh_menu_draw(void)
 
     f32 s = sh_scale();
     f32 w = 560.0f * s;
-    f32 h = 400.0f * s;
+    f32 h = 330.0f * s;
     f32 ox = ((f32)sh_screen_width() - w) * 0.5f;
     f32 oy = ((f32)sh_screen_height() - h) * 0.5f;
 
