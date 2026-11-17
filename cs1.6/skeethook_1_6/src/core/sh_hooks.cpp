@@ -35,6 +35,43 @@ typedef i32(__cdecl *player_move_fn)(sh_playermove_t *pmove, i32 server);
 typedef i32(__cdecl *hook_user_msg_fn)(const char *name, i32 size);
 typedef i32(__cdecl *add_entity_fn)(i32 type, sh_cl_entity_t *ent);
 
+typedef void(__cdecl *camera_offset_fn)(f32 *ofs);
+typedef i32(__cdecl *is_thirdperson_fn)(void);
+
+static camera_offset_fn g_camera_offset_orig;
+static is_thirdperson_fn g_is_thirdperson_orig;
+
+void __cdecl sh_camera_offset_hook(f32 *ofs)
+{
+    if (g_camera_offset_orig)
+        g_camera_offset_orig(ofs);
+
+    if (!ofs || !g_cfg.visuals.thirdperson)
+        return;
+
+    f32 dist = g_cfg.visuals.thirdperson_dist;
+
+    if (dist < 32.0f)
+        dist = 32.0f;
+    if (dist > 200.0f)
+        dist = 200.0f;
+
+    ofs[2] = dist;
+}
+
+i32 __cdecl sh_is_thirdperson_hook(void)
+{
+    i32 r = 0;
+
+    if (g_is_thirdperson_orig)
+        r = g_is_thirdperson_orig();
+
+    if (g_cfg.visuals.thirdperson)
+        return 1;
+
+    return r;
+}
+
 typedef i32(__cdecl *studio_iface_fn)(i32 version, void **ppinterface,
                                      sh_studio_api_t *pstudio);
 
@@ -243,8 +280,6 @@ i32 __cdecl sh_player_move_hook(sh_playermove_t *pmove, i32 server)
     if (pmove && g_cfg.misc.no_fall_damage)
         sh_fall_predict(pmove);
 
-    if (pmove)
-        sh_visuals_thirdperson_apply(pmove);
 
     return 0;
 }
@@ -352,6 +387,22 @@ qbool sh_hooks_install(void)
         if (MH_CreateHook(hud_redraw, (void *)sh_hud_redraw_hook,
                           (void **)&g_hud_redraw_orig) == MH_OK)
             MH_EnableHook(hud_redraw);
+    }
+
+    void *cam = sh_find_export_body("client.dll", "CL_CameraOffset");
+    if (cam)
+    {
+        if (MH_CreateHook(cam, (void *)sh_camera_offset_hook,
+                          (void **)&g_camera_offset_orig) == MH_OK)
+            MH_EnableHook(cam);
+    }
+
+    void *tpp = sh_find_export_body("client.dll", "CL_IsThirdPerson");
+    if (tpp)
+    {
+        if (MH_CreateHook(tpp, (void *)sh_is_thirdperson_hook,
+                          (void **)&g_is_thirdperson_orig) == MH_OK)
+            MH_EnableHook(tpp);
     }
 
     void *studio = sh_find_export_body("client.dll", "HUD_GetStudioModelInterface");

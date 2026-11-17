@@ -238,49 +238,6 @@ void sh_visuals_restore(void)
     g_saved_rendermode = -1;
 }
 
-static vec3_t g_saved_view_ofs;
-static qbool g_tp_active;
-
-void sh_visuals_thirdperson_apply(sh_playermove_t *pm)
-{
-    if (!pm)
-        return;
-
-    if (!g_cfg.visuals.thirdperson)
-    {
-        if (g_tp_active)
-        {
-            pm->view_ofs = g_saved_view_ofs;
-            g_tp_active = 0;
-        }
-
-        return;
-    }
-
-    if (!g_tp_active)
-    {
-        g_saved_view_ofs = pm->view_ofs;
-        g_tp_active = 1;
-    }
-
-    f32 dist = g_cfg.visuals.thirdperson_dist;
-
-    if (dist < 32.0f)
-        dist = 32.0f;
-    if (dist > 200.0f)
-        dist = 200.0f;
-
-    vec3_t fwd, right, up;
-    sh_angle_vectors(&pm->angles, &fwd, &right, &up);
-
-    pm->view_ofs.x -= fwd.x * dist;
-    pm->view_ofs.y -= fwd.y * dist;
-    pm->view_ofs.z -= fwd.z * dist;
-
-    if (pm->view_ofs.z < 4.0f)
-        pm->view_ofs.z = 4.0f;
-}
-
 void sh_grenade_path_draw(void)
 {
     if (!g_cfg.misc.grenade_predict || !g_pmove)
