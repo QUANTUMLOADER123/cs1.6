@@ -202,19 +202,45 @@ void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (!g_cfg.movement.super_toss || !cmd || !pm)
         return;
 
-    if (pm->onground != -1)
+    if (!(cmd->buttons & 2))
         return;
 
-    if (!(cmd->buttons & 1))
+    f32 pitch = cmd->viewangles.x;
+
+    f32 ang = pitch;
+
+    if (ang < 0.0f)
+        ang = -10.0f + ang * (80.0f / 90.0f);
+    else
+        ang = -10.0f + ang * (100.0f / 90.0f);
+
+    f32 vel = (90.0f - ang) * 6.0f;
+
+    if (vel >= 750.0f)
         return;
 
-    f32 power = g_cfg.movement.super_toss_power / 100.0f;
+    f32 want = g_cfg.movement.super_toss_power;
 
-    if (pm->velocity.z < 0.0f)
-        cmd->buttons |= 2;
+    if (want <= 0.0f)
+        want = 100.0f;
 
-    if (power > 0.0f && pm->velocity.z > 0.0f)
-        cmd->forwardmove += power * 40.0f;
+    if (want > 100.0f)
+        want = 100.0f;
+
+    f32 target_vel = 540.0f + (750.0f - 540.0f) * (want / 100.0f);
+    f32 want_ang = 90.0f - target_vel / 6.0f;
+
+    f32 want_pitch;
+
+    if (want_ang < -10.0f)
+        want_pitch = (want_ang + 10.0f) / (80.0f / 90.0f);
+    else
+        want_pitch = (want_ang + 10.0f) / (100.0f / 90.0f);
+
+    if (want_pitch < -89.0f)
+        want_pitch = -89.0f;
+
+    cmd->viewangles.x = want_pitch;
 }
 
 void sh_tick_control(sh_usercmd_t *cmd)
