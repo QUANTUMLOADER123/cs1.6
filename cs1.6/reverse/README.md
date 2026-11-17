@@ -24,6 +24,7 @@
 | [`15-antiaim.md`](15-antiaim.md) | **magic pitch 1620**, movement fix, fake lag, правда про desync |
 | [`16-feature-map.md`](16-feature-map.md) | **карта всех фич**: что работает, чем, почему нет остального |
 | [`17-svc-protocol.md`](17-svc-protocol.md) | **59 opcodes `svc_*`** в точном порядке протокола |
+| [`18-weapon-timers.md`](18-weapon-timers.md) | `GetNextAttackDelay`, attack creep, fast reload |
 | [`SIGNATURES.md`](SIGNATURES.md) | таблица сигнатур — все адреса без хардкода |
 
 Полные таблицы экспорта: [`exports/`](exports/) — 323 у `hw.dll`,

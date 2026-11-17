@@ -121,7 +121,10 @@ static void sh_auto_pistol(sh_usercmd_t *cmd)
     if (!g_pmove)
         return;
 
-    if (g_pmove->next_primary_attack > g_pmove->time)
+    f32 now = g_pmove->time;
+    f32 margin = g_pmove->frametime * 0.5f;
+
+    if (g_pmove->next_primary_attack > now + margin)
         return;
 
     cmd->buttons |= sh_in_attack;
