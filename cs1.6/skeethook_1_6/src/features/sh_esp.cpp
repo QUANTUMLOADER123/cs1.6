@@ -269,6 +269,17 @@ void sh_esp_draw_player(const sh_player_t *p)
     if (g_cfg.visuals.visible_only && !p->visible)
         return;
 
+    if (g_cfg.visuals.team_check)
+    {
+        sh_player_t *local = sh_player_local();
+
+        if (local && local->team && p->team == local->team && p->index != local->index)
+            return;
+    }
+
+    if (p->index == g_local_player && !g_cfg.esp.show_local)
+        return;
+
     sh_box_t box;
     if (!sh_make_box(p, &box) || !box.valid)
         return;

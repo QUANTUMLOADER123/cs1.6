@@ -323,7 +323,9 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "snaplines", &g_cfg.visuals.snaplines);
+    sh_menu_checkbox(x + colw, cy, "show local", &g_cfg.esp.show_local);
     sh_menu_checkbox(x + colw, cy, "visible only", &g_cfg.visuals.visible_only);
+    cy += row;
     cy += row + 6.0f * s;
 
     sh_menu_slider(x, cy, colw, "max distance", &g_cfg.visuals.max_distance,
@@ -338,6 +340,7 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "team colors", &g_cfg.visuals.chams_team_color);
+    sh_menu_checkbox(x + colw, cy, "team check", &g_cfg.visuals.team_check);
     cy += row + 6.0f * s;
 
     sh_menu_slider(x, cy, colw, "glow amount", &g_cfg.visuals.glow_amount,
