@@ -35,3 +35,5 @@ __pycache__/
 # --- результаты декомпиляции: воспроизводимы scripts (r2_decompile.py) ---
 cs1.6/analysis/*/decomp/
 cs1.6/analysis/*/*.r2proj
+
+# DLL игры в корне — не трекаем повторно (уже в коммите)
