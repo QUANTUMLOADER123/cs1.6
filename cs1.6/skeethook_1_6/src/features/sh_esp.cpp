@@ -330,6 +330,53 @@ static void sh_draw_history(const sh_player_t *p)
     }
 }
 
+static void sh_draw_hitboxes(const sh_player_t *p)
+{
+    if (!g_cfg.visuals.hitboxes)
+        return;
+
+    const sh_bone_snapshot_t *snap = sh_bones_get(p->index);
+
+    if (!snap || !snap->valid)
+        return;
+
+    static const i32 edges[12][2] = {
+        { 0, 1 }, { 1, 3 }, { 3, 2 }, { 2, 0 },
+        { 4, 5 }, { 5, 7 }, { 7, 6 }, { 6, 4 },
+        { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }
+    };
+
+    col4_t c = g_cfg.visuals.col_hitbox;
+
+    for (i32 b = 0; b < snap->bbox_count; ++b)
+    {
+        vec3_t pts[8];
+
+        if (!sh_bones_bbox_corners(snap, b, pts))
+            continue;
+
+        vec2_t sp[8];
+        qbool ok[8];
+
+        for (i32 k = 0; k < 8; ++k)
+            ok[k] = sh_world_to_screen(&pts[k], &sp[k]);
+
+        if (snap->bbox[b].bone == 0 && g_cfg.visuals.col_hitbox_head.a > 0)
+            c = g_cfg.visuals.col_hitbox_head;
+
+        for (i32 e = 0; e < 12; ++e)
+        {
+            i32 a0 = edges[e][0];
+            i32 a1 = edges[e][1];
+
+            if (!ok[a0] || !ok[a1])
+                continue;
+
+            sh_draw_line(sp[a0].x, sp[a0].y, sp[a1].x, sp[a1].y, 1.0f, c);
+        }
+    }
+}
+
 static void sh_draw_fake_marker(const sh_player_t *p, const sh_box_t *b)
 {
     if (!g_cfg.visuals.draw_fakes)
@@ -508,6 +555,7 @@ void sh_esp_draw_player(const sh_player_t *p)
     sh_draw_name(p, &box);
     sh_draw_weapon(p, &box);
     sh_draw_distance(p, &box);
+    sh_draw_hitboxes(p);
     sh_draw_damage(p, &box);
     sh_draw_history(p);
     sh_draw_fake_marker(p, &box);

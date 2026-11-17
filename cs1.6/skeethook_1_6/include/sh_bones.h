@@ -31,6 +31,22 @@ enum sh_bone_id
     sh_bone_count = 20
 };
 
+#define sh_max_bbox 32
+
+typedef struct sh_studio_bbox_s
+{
+    i32 bone;
+    f32 bbmin[3];
+    f32 bbmax[3];
+} sh_studio_bbox_t;
+
+typedef struct sh_bbox_snap_s
+{
+    i32 bone;
+    f32 bbmin[3];
+    f32 bbmax[3];
+} sh_bbox_snap_t;
+
 typedef struct sh_bone_snapshot_s
 {
     i32 index;
@@ -40,6 +56,9 @@ typedef struct sh_bone_snapshot_s
     i32 map[sh_bone_count];
     const void *model;
     vec3_t pos[sh_bone_count];
+    f32 mat[sh_bone_count][3][4];
+    i32 bbox_count;
+    sh_bbox_snap_t bbox[sh_max_bbox];
 } sh_bone_snapshot_t;
 
 typedef i32 (*sh_bones_draw_orig_fn)(i32 flags, sh_entity_state_t *pplayer);
@@ -50,3 +69,4 @@ void sh_bones_capture(i32 index);
 const sh_bone_snapshot_t *sh_bones_get(i32 index);
 void sh_bones_clear(void);
 qbool sh_bones_world_to_screen(const sh_bone_snapshot_t *snap, i32 bone, vec2_t *out);
+i32 sh_bones_bbox_corners(const sh_bone_snapshot_t *snap, i32 box, vec3_t out[8]);

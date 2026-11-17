@@ -168,10 +168,47 @@ static i32 sh_bones_fill(sh_bone_snapshot_t *snap, void ***raw, i32 n)
         snap->pos[b].y = rows[1][3];
         snap->pos[b].z = rows[2][3];
 
+        for (i32 r = 0; r < 3; ++r)
+            for (i32 c = 0; c < 4; ++c)
+                snap->mat[b][r][c] = rows[r][c];
+
         ++got;
     }
 
     return got;
+}
+
+static void sh_bones_read_bbox(sh_bone_snapshot_t *snap,
+                               const sh_studio_header_t *hdr)
+{
+    snap->bbox_count = 0;
+
+    if (!hdr || hdr->numhitboxes <= 0 || hdr->hitboxindex <= 0)
+        return;
+
+    const u8 *base = (const u8 *)hdr + hdr->hitboxindex;
+    i32 n = hdr->numhitboxes;
+
+    if (n > sh_max_bbox)
+        n = sh_max_bbox;
+
+    for (i32 i = 0; i < n; ++i)
+    {
+        const sh_studio_bbox_t *bb = (const sh_studio_bbox_t *)(base + i * sizeof(sh_studio_bbox_t));
+
+        if (bb->bone < 0 || bb->bone >= sh_max_bones)
+            continue;
+
+        snap->bbox[snap->bbox_count].bone = bb->bone;
+
+        for (i32 k = 0; k < 3; ++k)
+        {
+            snap->bbox[snap->bbox_count].bbmin[k] = bb->bbmin[k];
+            snap->bbox[snap->bbox_count].bbmax[k] = bb->bbmax[k];
+        }
+
+        ++snap->bbox_count;
+    }
 }
 
 void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
@@ -195,6 +232,7 @@ void sh_bones_capture(i32 index, const sh_studio_header_t *hdr)
     if (!snap->valid || snap->model != (const void *)hdr)
     {
         sh_bones_build_map(snap, hdr);
+        sh_bones_read_bbox(snap, hdr);
         snap->model = (const void *)hdr;
     }
 
@@ -280,4 +318,47 @@ void sh_bones_hook_iface(sh_studio_iface_t *iface)
         return;
 
     iface->studio_draw_player = sh_bones_draw_player;
+}
+
+i32 sh_bones_bbox_corners(const sh_bone_snapshot_t *snap, i32 box, vec3_t out[8])
+{
+    if (!snap || !out || !snap->valid)
+        return 0;
+
+    if (box < 0 || box >= snap->bbox_count)
+        return 0;
+
+    const sh_bbox_snap_t *bb = &snap->bbox[box];
+
+    i32 bi = -1;
+
+    for (i32 b = 0; b < sh_bone_count; ++b)
+    {
+        if (snap->map[b] == bb->bone)
+        {
+            bi = b;
+            break;
+        }
+    }
+
+    if (bi < 0)
+        return 0;
+
+    const f32(*m)[4] = snap->mat[bi];
+
+    if (m[0][0] == 0.0f && m[1][1] == 0.0f && m[2][2] == 0.0f)
+        return 0;
+
+    for (i32 c = 0; c < 8; ++c)
+    {
+        f32 lx = (c & 1) ? bb->bbmax[0] : bb->bbmin[0];
+        f32 ly = (c & 2) ? bb->bbmax[1] : bb->bbmin[1];
+        f32 lz = (c & 4) ? bb->bbmax[2] : bb->bbmin[2];
+
+        out[c].x = m[0][0] * lx + m[0][1] * ly + m[0][2] * lz + m[0][3];
+        out[c].y = m[1][0] * lx + m[1][1] * ly + m[1][2] * lz + m[1][3];
+        out[c].z = m[2][0] * lx + m[2][1] * ly + m[2][2] * lz + m[2][3];
+    }
+
+    return 1;
 }

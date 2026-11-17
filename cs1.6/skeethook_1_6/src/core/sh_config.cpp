@@ -96,6 +96,9 @@ void sh_config_defaults(void)
     g_cfg.visuals.draw_history = (qbool)0;
     g_cfg.visuals.damage_info = (qbool)0;
     g_cfg.visuals.damage_hitbox = (qbool)1;
+    g_cfg.visuals.hitboxes = (qbool)0;
+    g_cfg.visuals.col_hitbox = (col4_t)SH_COL_RGBA(255, 255, 255, 160);
+    g_cfg.visuals.col_hitbox_head = (col4_t)SH_COL_RGBA(255, 80, 80, 200);
     g_cfg.visuals.model_changer = (qbool)0;
     g_cfg.visuals.model_index = 0;
     g_cfg.visuals.col_chams_vis = (col4_t)SH_COL_RGBA(120, 255, 120, 180);
