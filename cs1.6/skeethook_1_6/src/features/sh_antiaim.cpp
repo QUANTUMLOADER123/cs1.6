@@ -359,7 +359,23 @@ void sh_antiaim_run(sh_usercmd_t *cmd)
         if (speed <= 0.0f)
             speed = 1.5f;
 
-        cmd->forwardmove = speed;
+        if (speed > 30.0f)
+            speed = 30.0f;
+
+        i32 ticks = (i32)(time / 0.015f);
+        i32 phase = ticks & 3;
+
+        cmd->forwardmove = 0.0f;
+        cmd->sidemove = 0.0f;
+
+        if (phase == 0)
+            cmd->forwardmove = speed;
+        else if (phase == 1)
+            cmd->sidemove = speed;
+        else if (phase == 2)
+            cmd->forwardmove = -speed;
+        else
+            cmd->sidemove = -speed;
     }
 
     sh_antiaim_movement_fix(cmd, &old_angles);
