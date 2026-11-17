@@ -284,6 +284,10 @@ void sh_grenade_path_draw(void)
     origin.z += g_pmove->view_ofs.z;
 
     vec3_t angles = g_pmove->angles;
+
+    angles.x += g_pmove->punchangle.x;
+    angles.y += g_pmove->punchangle.y;
+
     vec3_t vel = g_pmove->velocity;
 
     sh_grenade_path_t path;
