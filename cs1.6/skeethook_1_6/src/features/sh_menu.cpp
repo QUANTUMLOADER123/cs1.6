@@ -296,6 +296,31 @@ static void sh_menu_draw_antiaim(f32 x, f32 y)
     g_spin_dbg = g_cfg.antiaim.spin_speed;
     sh_menu_slider(x, cy, colw, "spin speed", &g_spin_dbg, 0.0f, 10.0f, "%.1f");
     g_cfg.antiaim.spin_speed = g_spin_dbg;
+    cy += row + 6.0f * s;
+
+    sh_menu_slider(x, cy, colw, "yaw base", &g_cfg.antiaim.yaw_base, -180.0f, 180.0f, "%.0f");
+    cy += row + 6.0f * s;
+
+    sh_menu_slider(x, cy, colw, "jitter", &g_cfg.antiaim.yaw_jitter, 0.0f, 90.0f, "%.0f");
+    cy += row + 8.0f * s;
+
+    sh_menu_section("desync", x, cy);
+    cy += 20.0f * s;
+
+    sh_menu_checkbox(x, cy, "desync", &g_cfg.antiaim.desync);
+    cy += row + 6.0f * s;
+
+    sh_menu_slider(x, cy, colw, "amount", &g_cfg.antiaim.desync_amount, 0.0f, 90.0f, "%.0f");
+    cy += row + 8.0f * s;
+
+    sh_menu_section("extras", x, cy);
+    cy += 20.0f * s;
+
+    sh_menu_checkbox(x, cy, "fake duck", &g_cfg.antiaim.fake_duck);
+    sh_menu_checkbox(x + colw, cy, "micro move", &g_cfg.antiaim.micro_move);
+    cy += row + 6.0f * s;
+
+    sh_menu_slider(x, cy, colw, "micro speed", &g_cfg.antiaim.micro_move_speed, 0.5f, 5.0f, "%.1f");
 }
 
 static void sh_menu_draw_visuals(f32 x, f32 y)
@@ -566,7 +591,7 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 330.0f, 440.0f, 390.0f, 330.0f, 330.0f };
+    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 400.0f, 330.0f, 330.0f };
 
     f32 w = 560.0f * s;
     f32 h = tab_h[g_tab] * s;
