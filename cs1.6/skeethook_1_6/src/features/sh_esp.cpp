@@ -170,6 +170,126 @@ static void sh_draw_weapon(const sh_player_t *p, const sh_box_t *b)
     }
 }
 
+static qbool sh_esp_trace(void *user, const vec3_t *start, const vec3_t *end, sh_trace_t *out)
+{
+    (void)user;
+
+    if (!out)
+        return 0;
+
+    out->fraction = 1.0f;
+    out->end = *end;
+    out->normal = (vec3_t){ 0.0f, 0.0f, 1.0f };
+    out->hitgroup = 0;
+    out->char_texture = 0;
+    out->entity = -1;
+
+    f32 frac = 1.0f;
+
+    if (sh_trace_fraction(start, end, &frac))
+    {
+        out->char_texture = sh_trace_material(start, end);
+        out->fraction = frac;
+        out->entity = 0;
+
+        out->end.x = start->x + (end->x - start->x) * frac;
+        out->end.y = start->y + (end->y - start->y) * frac;
+        out->end.z = start->z + (end->z - start->z) * frac;
+
+        out->normal.x = start->x - out->end.x;
+        out->normal.y = start->y - out->end.y;
+        out->normal.z = start->z - out->end.z;
+
+        f32 len = sh_sqrt(out->normal.x * out->normal.x
+                        + out->normal.y * out->normal.y
+                        + out->normal.z * out->normal.z);
+
+        if (len > 0.0f)
+        {
+            out->normal.x /= len;
+            out->normal.y /= len;
+            out->normal.z /= len;
+        }
+    }
+
+    return 1;
+}
+
+static f32 sh_player_damage_to(const sh_player_t *p)
+{
+    sh_player_t *local = sh_player_local();
+
+    if (!local || !g_pmove || !p || !p->ent)
+        return 0.0f;
+
+    const sh_weapon_ballistic_t *wb = sh_weapon_ballistic_for(local->weapon_id);
+
+    if (!wb || wb->damage <= 0.0f)
+        return 0.0f;
+
+    vec3_t eye = g_pmove->origin;
+    eye.z += g_pmove->view_ofs.z;
+
+    vec3_t aim = p->origin;
+    aim.z += 44.0f;
+
+    sh_autowall_ctx_t aw;
+    aw.start = eye;
+    aw.end = aim;
+    aw.bullet_id = 1;
+    aw.penetration = wb->penetration;
+    aw.base_damage = wb->damage;
+    aw.range_modifier = wb->range_modifier;
+    aw.penetrate_world = 1;
+    aw.trace = sh_esp_trace;
+    aw.user = 0;
+
+    f32 dmg = sh_autowall_damage(&aw);
+
+    i32 hg = 2;
+
+    if (g_cfg.visuals.damage_hitbox)
+    {
+        switch (g_cfg.aimbot.hitbox)
+        {
+        case 1:
+            hg = 1;
+            break;
+        case 2:
+            hg = 2;
+            break;
+        case 3:
+            hg = 3;
+            break;
+        default:
+            hg = 2;
+            break;
+        }
+    }
+
+    dmg *= (f32)sh_hitgroup_multiplier(hg);
+
+    return dmg;
+}
+
+static void sh_draw_damage(const sh_player_t *p, const sh_box_t *b)
+{
+    if (!g_cfg.visuals.damage_info)
+        return;
+
+    f32 dmg = sh_player_damage_to(p);
+
+    if (dmg < 1.0f)
+        return;
+
+    col4_t c = (dmg >= 100.0f)
+                   ? (col4_t)SH_COL_RGBA(255, 60, 60, 230)
+                   : (col4_t)SH_COL_RGBA(255, 200, 90, 220);
+
+    sh_text(b->right + 4.0f, b->top + sh_text_height() + 2.0f, c,
+                 "-%d", (i32)dmg);
+}
+
 static void sh_draw_history(const sh_player_t *p)
 {
     if (!g_cfg.visuals.draw_history)
@@ -388,6 +508,7 @@ void sh_esp_draw_player(const sh_player_t *p)
     sh_draw_name(p, &box);
     sh_draw_weapon(p, &box);
     sh_draw_distance(p, &box);
+    sh_draw_damage(p, &box);
     sh_draw_history(p);
     sh_draw_fake_marker(p, &box);
     sh_draw_head_dot(p, &box);

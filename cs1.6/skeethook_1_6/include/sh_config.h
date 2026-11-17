@@ -88,6 +88,8 @@ typedef struct sh_visuals_cfg
     qbool draw_fakes;
     qbool penetration_info;
     qbool draw_history;
+    qbool damage_info;
+    qbool damage_hitbox;
     qbool model_changer;
     i32 model_index;
     col4_t col_chams_vis;

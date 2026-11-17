@@ -412,6 +412,10 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "position history", &g_cfg.visuals.draw_history);
+    sh_menu_checkbox(x + colw, cy, "damage info", &g_cfg.visuals.damage_info);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "damage hitbox", &g_cfg.visuals.damage_hitbox);
     cy += row;
 
     {
