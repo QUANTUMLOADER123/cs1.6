@@ -10,9 +10,22 @@ Overlay-меню для теста kiero-хука. Две части:
 
 ## Скриншоты
 
-| Rage | Visuals |
+Все 1920×1080, отрендерены тем же кодом, что крутится в оверлее.
+
+| | |
 | --- | --- |
 | ![Rage](shots/rage.png) | ![Visuals](shots/visuals.png) |
+| ![Misc](shots/misc.png) | ![Settings](shots/settings.png) |
+
+![Skins](shots/skins.png)
+
+Прямые ссылки (открывать с телефона):
+
+- Rage — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/rage.png
+- Visuals — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/visuals.png
+- Misc — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/misc.png
+- Settings — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/settings.png
+- Skins — https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/skins.png
 
 ## Структура
 
