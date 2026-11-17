@@ -454,6 +454,10 @@ static void sh_menu_draw_misc(f32 x, f32 y)
 
     sh_menu_checkbox(x, cy, "thirdperson", &g_cfg.visuals.thirdperson);
     sh_menu_checkbox(x + colw, cy, "spectator list", &g_cfg.visuals.spectator_list);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "grenade path", &g_cfg.misc.grenade_predict);
+    sh_menu_checkbox(x + colw, cy, "hideshot", &g_cfg.misc.hideshot);
     cy += row + 6.0f * s;
 
     sh_menu_slider(x, cy, colw, "thirdperson dist", &g_cfg.visuals.thirdperson_dist,
@@ -591,7 +595,7 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 400.0f, 330.0f, 330.0f };
+    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 430.0f, 330.0f, 330.0f };
 
     f32 w = 560.0f * s;
     f32 h = tab_h[g_tab] * s;
