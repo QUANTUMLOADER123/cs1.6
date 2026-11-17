@@ -344,15 +344,7 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
 
 
     if (type != 0)
-    {
-        if (g_cfg.misc.no_smoke && ent->curstate.renderfx == 20)
-            return 0;
-
-        if (g_cfg.misc.no_flash && ent->curstate.renderfx == 19)
-            return 0;
-
         return result;
-    }
 
     if (g_cfg.misc.hideshot && ent->index == g_local_player)
     {

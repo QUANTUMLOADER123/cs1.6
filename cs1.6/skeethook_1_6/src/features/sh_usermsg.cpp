@@ -307,6 +307,44 @@ static i32 __cdecl sh_cb_round_time(const char *name, i32 size, i32 read)
     return 1;
 }
 
+static i32 __cdecl sh_cb_screen_fade(const char *name, i32 size, i32 read)
+{
+    (void)read;
+
+    if (!name || size < 24)
+        return 1;
+
+    if (!g_cfg.misc.no_flash)
+        return 1;
+
+    const u8 *b = (const u8 *)name;
+
+    f32 fade_speed = *(const f32 *)(b + 0);
+    f32 fade_end = *(const f32 *)(b + 4);
+    f32 fade_reset = *(const f32 *)(b + 12);
+
+    i32 r = b[16];
+    i32 g = b[17];
+    i32 bl = b[18];
+    i32 alpha = b[19];
+
+    i32 flags = *(const i32 *)(b + 20);
+
+    if (alpha < 200)
+        return 1;
+
+    if (r < 180 || g < 180 || bl < 180)
+        return 1;
+
+    if (!(flags & 0x0004))
+        return 1;
+
+    if (fade_speed <= 0.0f || fade_end <= 0.0f || fade_reset <= 0.0f)
+        return 1;
+
+    return 0;
+}
+
 void sh_msgs_register(void)
 {
     if (!g_engfuncs || !g_engfuncs->pfnHookUserMsg)
@@ -319,4 +357,5 @@ void sh_msgs_register(void)
     g_engfuncs->pfnHookUserMsg("Damage", sh_cb_damage);
     g_engfuncs->pfnHookUserMsg("ScoreAttrib", sh_cb_score_attrib);
     g_engfuncs->pfnHookUserMsg("RoundTime", sh_cb_round_time);
+    g_engfuncs->pfnHookUserMsg("ScreenFade", sh_cb_screen_fade);
 }
