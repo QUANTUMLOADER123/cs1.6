@@ -71,7 +71,16 @@ void sh_fakelag_run(sh_usercmd_t *cmd)
     if (!cmd || !g_cfg.antiaim.fake_lag)
         return;
 
-    if (g_pmove && g_pmove->movetype == sh_movetype_fly)
+    if (!g_pmove)
+        return;
+
+    if (g_pmove->movetype == sh_movetype_fly || g_pmove->movetype == sh_movetype_noclip)
+        return;
+
+    if (g_pmove->spectator)
+        return;
+
+    if (g_pmove->deadflag)
         return;
 
     if (!g_next_send_va)
