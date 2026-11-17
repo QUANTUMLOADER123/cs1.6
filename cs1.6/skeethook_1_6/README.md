@@ -5,7 +5,7 @@ SDK + чит для Counter-Strike 1.6. Собран на восстановле
 сканированием по паттернам и проверены на реальном `client.dll`.
 
 ```
-skeethook_1_6.dll   321 KB    32-bit, инжектится в hl.exe / cstrike
+skeethook_1_6.dll   371 KB    32-bit, инжектится в hl.exe / cstrike
 ```
 
 ## Сборка
@@ -22,7 +22,7 @@ skeethook_1_6.dll   321 KB    32-bit, инжектится в hl.exe / cstrike
 | слой | файлы | содержание |
 |---|---|---|
 | ядро | `src/core/sh_scanner.cpp` | сканер паттернов с масками |
-| | `src/core/sh_hooks.cpp` | хуки `CL_CreateMove`, `HUD_Redraw`, `HUD_PlayerMove` |
+| | `src/core/sh_hooks.cpp` | 11 хуков: `CL_CreateMove`, `HUD_Redraw`, `HUD_PlayerMove`, `HUD_AddEntity`, `HUD_TxferLocalOverrides`, `HUD_TxferPredictionData`, `CL_CameraOffset`, `CL_IsThirdPerson`, `HUD_GetStudioModelInterface`, `HUD_StudioEvent`, `HUD_PostRunCmd` |
 | | `src/core/sh_config.cpp` | конфиг, автосохранение |
 | | `src/core/sh_math.cpp` | векторы, углы, `world_to_screen` |
 | SDK | `src/sdk/sh_patterns.cpp` | резолв `gEngfuncs`, `g_pmove` по сигнатурам |
@@ -33,6 +33,10 @@ skeethook_1_6.dll   321 KB    32-bit, инжектится в hl.exe / cstrike
 | | `src/features/sh_movement.cpp` | автострейфер, bhop, quick stop, super toss |
 | | `src/features/sh_fakelag.cpp` | задержка команд по `g_next_send_time` |
 | | `src/features/sh_bones.cpp` | кости через хук `StudioDrawPlayer` |
+| | `src/features/sh_ballistics.cpp` | разброс по формуле оружия, отдача из `KickBack`, материалы стен |
+| | `src/features/sh_events.cpp` | выстрелы через `HUD_StudioEvent` (5001/5011/5021/5031) |
+| | `src/features/sh_visuals.cpp` | трассеры, импакты, ночной режим |
+| | `src/features/sh_autowall.cpp` | пробитие стен с уроном по оружию |
 | | `src/features/sh_icons.cpp` | иконки оружия из `sprites/<wpn>.txt` |
 | | `src/features/sh_surface.cpp` | материал поверхности через `PM_TraceTexture` |
 | | `src/features/sh_esp.cpp` | боксы, скелетон, инфо, радар, спектаторы |
