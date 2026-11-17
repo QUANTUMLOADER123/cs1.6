@@ -196,13 +196,13 @@ namespace gui
     // текст по центру. Ширина — на всю колонку полей (x 153..333).
     // ------------------------------------------------------------------
     inline bool ButtonAbs(ImVec2 col_pos, float& row_y, const char* label,
-                          float w = 181.0f)
+                          float w = 193.0f)
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
         const float y = col_pos.y + row_y * geo::SCALE + 4.0f * geo::SCALE;
         const float h = 22.0f * geo::SCALE;
         const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
-        const ImVec2 q(p.x + w * geo::SCALE, p.y + h);
+        const ImVec2 q(p.x + w * geo::SCALE - 0.0f, p.y + h);
 
         ImGui::SetCursorScreenPos(p);
         ImGui::InvisibleButton(label, ImVec2(q.x - p.x, h));
@@ -335,63 +335,55 @@ namespace gui
                           float lo, float hi, const char* fmt)
     {
         ImDrawList* dl = ImGui::GetWindowDrawList();
-        // Снято с ОРИГИНАЛЬНОГО меню (скит): трек — тонкая полоса 8px
-        // (1px бордер + 6px заливки + 1px бордер), значение рисуется ПРЯМО НА
-        // треке у края заливки, а не отдельной колонкой справа.
-        const float w  = 155.0f * geo::SCALE;   // как поле дропдауна в ските
-        const float th = 8.0f * geo::SCALE;
+        // Оригинал: трек — тонкая полоса высотой 3px, той же ширины, что поле
+        // дропдауна. Значение — на треке у края заливки, '-' и '+' по краям.
+        // вся строка 142..334 (193px); трек короче на место под значение и '+'
+        const float w  = 172.0f * geo::SCALE;
         const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE,
-                       col_pos.y + row_y * geo::SCALE + 16.0f * geo::SCALE);
+                       col_pos.y + row_y * geo::SCALE + 14.0f * geo::SCALE);
 
-        const int x0 = (int)ImFloor(p.x), y0 = (int)ImFloor(p.y);
+        const int x0 = (int)ImFloor(p.x);
+        const int y0 = (int)ImFloor(p.y);
         const int bw = (int)std::lround(w);
-        const int x1 = x0 + bw, y1 = y0 + 8;
+        const int x1 = x0 + bw;
 
-        // Хитбокс на всю строку — тащить удобнее.
-        ImGui::SetCursorScreenPos(ImVec2((float)x0 - 12.0f, (float)y0 - 5.0f));
-        ImGui::InvisibleButton(id, ImVec2((float)bw + 24.0f, 18.0f));
+        // Хитбокс повыше — иначе в 3px мышью не попасть.
+        ImGui::SetCursorScreenPos(ImVec2((float)x0 - 12.0f, (float)y0 - 6.0f));
+        ImGui::InvisibleButton(id, ImVec2((float)bw + 24.0f, 15.0f));
         const bool active = ImGui::IsItemActive();
 
-        // Рамка трека
-        dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)x1, (float)(y0 + 1)), col::CHECK_BORDER);
-        dl->AddRectFilled(ImVec2((float)x0, (float)(y1 - 1)), ImVec2((float)x1, (float)y1), col::CHECK_BORDER);
-        dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)(x0 + 1), (float)y1), col::CHECK_BORDER);
-        dl->AddRectFilled(ImVec2((float)(x1 - 1), (float)y0), ImVec2((float)x1, (float)y1), col::CHECK_BORDER);
-        // Подложка (пустая часть трека)
-        for (int i = 1; i < 7; ++i)
+        // Трек: 1px рамка сверху/снизу, внутри 3 строки.
+        dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)(x1 + 1), (float)(y0 + 1)), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2((float)x0, (float)(y0 + 2)), ImVec2((float)(x1 + 1), (float)(y0 + 3)), col::CHECK_BORDER);
+        for (int i = 0; i < 3; ++i)
         {
-            const int v0 = 48 - i * 3;
-            dl->AddRectFilled(ImVec2((float)(x0 + 1), (float)(y0 + i)),
-                              ImVec2((float)(x1 - 1), (float)(y0 + i + 1)),
+            const int v0 = 46 - i * 3;
+            dl->AddRectFilled(ImVec2((float)x0, (float)(y0 + i)), ImVec2((float)(x1 + 1), (float)(y0 + i + 1)),
                               IM_COL32(v0, v0, v0, 255));
         }
 
-        // Заливка: 6 строк, #99C427 -> #699404 (как в ските: 154/197 -> 104/147)
+        // Заливка #99C427 -> #699404, 3 строки
         const float t = std::clamp((*v - lo) / (hi - lo), 0.0f, 1.0f);
-        const int fw = (x1 - 1) - (x0 + 1);
-        const int fill_w = (int)std::floor((float)fw * t + 0.5f);
-        for (int i = 0; i < 6; ++i)
-        {
-            const float u = (float)i / 5.0f;
-            const int r = (int)std::lround(154 + (104 - 154) * u);
-            const int g = (int)std::lround(197 + (147 - 197) * u);
-            const int b = (int)std::lround(38  + (5   - 38)  * u);
+        const int fill_w = (int)std::floor((float)bw * t + 0.5f);
+        static const int rr[3] = { 153, 137, 121 };
+        static const int gg[3] = { 196, 180, 164 };
+        static const int bb[3] = { 39,  27,  15 };
+        for (int i = 0; i < 3; ++i)
             if (fill_w > 0)
-                dl->AddRectFilled(ImVec2((float)(x0 + 1), (float)(y0 + 1 + i)),
-                                  ImVec2((float)(x0 + 1 + fill_w), (float)(y0 + 2 + i)),
-                                  IM_COL32(r, g, b, 255));
-        }
+                dl->AddRectFilled(ImVec2((float)x0, (float)(y0 + i)),
+                                  ImVec2((float)(x0 + fill_w), (float)(y0 + i + 1)),
+                                  IM_COL32(rr[i], gg[i], bb[i], 255));
 
-        // '-' слева и '+' справа
+        // '-' слева, '+' справа
         {
-            const int cy = y0 + 6;
+            const int cy = y0 + 1;
             const ImU32 sc = col::TEXT_DIM;
             dl->AddRectFilled(ImVec2((float)x0 - 11.0f, (float)cy), ImVec2((float)x0 - 5.0f, (float)cy + 1.0f), sc);
-            dl->AddRectFilled(ImVec2((float)x1 + 5.0f, (float)cy), ImVec2((float)x1 + 11.0f, (float)cy + 1.0f), sc);
-            dl->AddRectFilled(ImVec2((float)x1 + 7.0f, (float)cy - 2.0f), ImVec2((float)x1 + 9.0f, (float)cy + 3.0f), sc);
+            dl->AddRectFilled(ImVec2((float)(x1 + 1) + 9.0f, (float)cy), ImVec2((float)(x1 + 1) + 15.0f, (float)cy + 1.0f), sc);
+            dl->AddRectFilled(ImVec2((float)(x1 + 1) + 11.0f, (float)cy - 2.0f), ImVec2((float)(x1 + 1) + 12.0f, (float)cy + 3.0f), sc);
         }
 
-        // Значение — ПОВЕРХ трека, у края заливки (как в ските: "90°" на стыке).
+        // Значение — над треком справа, чтобы не спорить с 3px полосой.
         char buf[64];
         snprintf(buf, sizeof(buf), fmt, *v);
         {
@@ -400,17 +392,9 @@ namespace gui
             float tw2 = 0.0f;
             if (bk)
                 for (const char* c = buf; *c; ++c) tw2 += bk->GetCharAdvance((ImWchar)*c);
-            const float ty = ImFloor((float)y0 + (8.0f - gh) * 0.5f) - 1.0f;
-            // Число держим ВНУТРИ трека: у края (значение 0 или max) оно
-            // иначе уезжало за "+" — в оригинале оно всегда на треке.
-            float tx = (float)(x0 + 1 + fill_w) - tw2 * 0.5f;
-            const float tx_min = (float)x0 + 3.0f;
-            const float tx_max = (float)(x1 - 3) - tw2;
-            tx = std::clamp(tx, tx_min, std::max(tx_min, tx_max));
-            dl->AddRectFilled(ImVec2(tx - 2.0f, (float)y0 + 1.0f),
-                              ImVec2(tx + tw2 + 2.0f, (float)y1 - 1.0f),
-                              IM_COL32(0, 0, 0, 190));
-            DrawTextSpaced(dl, ImVec2(ImFloor(tx), ty), col::TEXT_WHITE, buf,
+            const float tx = (float)(x1 + 1) + 6.0f - tw2;
+            const float ty = ImFloor((float)y0 + (3.0f - gh) * 0.5f) - 1.0f;
+            DrawTextSpaced(dl, ImVec2(ImFloor(tx), ty), col::TEXT, buf,
                            geo::TEXT_SIZE, 0.5f * geo::SCALE);
         }
 
@@ -418,7 +402,7 @@ namespace gui
         if (active)
         {
             const float mx = ImGui::GetIO().MousePos.x;
-            const float nt = std::clamp((mx - (float)(x0 + 1)) / (float)std::max(1, fw - 1), 0.0f, 1.0f);
+            const float nt = std::clamp((mx - (float)x0) / (float)std::max(1, bw - 1), 0.0f, 1.0f);
             const float nv = lo + (hi - lo) * nt;
             if (nv != *v) { *v = nv; changed = true; }
         }

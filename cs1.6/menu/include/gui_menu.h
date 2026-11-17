@@ -253,7 +253,7 @@ namespace gui
         ColTo(a, 126);
         LabelAbs(a.pos, a.y, "CT model");
         ComboAbs(a.pos, a.y, "##ctmodel", &s.ct_model, models, IM_ARRAYSIZE(models));
-        ColTo(a, 169);
+        ColTo(a, 166);
         CheckboxAbs(a.pos, a.y, "Replace localplayer model", &s.replace_localplayer_model);
         // В референсе это поле идёт почти вплотную к чекбоксу (бордер 184,
         // градиент 185..202), а не через 18px как предыдущие пары.
@@ -287,6 +287,7 @@ namespace gui
         CheckboxAbs(a.pos, a.y, "Show errors", &s.show_errors);
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
+        ColTo(b, 51);   // без этого чекбокс прилипал к верху и лез на букву "B"
         CheckboxAbs(b.pos, b.y, "Allow internet access", &s.save_on_exit);
     }
 
