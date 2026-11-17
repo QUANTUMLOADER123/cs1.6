@@ -8,6 +8,10 @@
 #include "../../include/sh_font.h"
 #include "../../include/sh_nospread.h"
 #include "../../include/sh_modelchanger.h"
+
+qbool sh_soundesp_init(void);
+void sh_soundesp_draw(void);
+void sh_soundesp_tick(void);
 #include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
@@ -287,6 +291,7 @@ static void sh_first_init(void)
     sh_render_init();
     g_render_ready = sh_font_init();
     sh_icons_init();
+    sh_soundesp_init();
     sh_events_reset();
     sh_spread_reset();
     sh_nospread_reset();
@@ -367,6 +372,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
         sh_esp_run();
 
     sh_visuals_effects_draw();
+    sh_soundesp_draw();
     sh_grenade_path_draw();
     sh_hitmarker_draw();
     sh_indicators_draw();

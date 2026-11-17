@@ -396,7 +396,8 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
     sh_menu_section("model changer", x, cy);
     cy += 20.0f * s;
 
-    sh_menu_checkbox(x, cy, "player model", &g_cfg.visuals.model_changer);
+    sh_menu_checkbox(x, cy, "sound esp", &g_cfg.visuals.sound_esp);
+    sh_menu_checkbox(x + colw, cy, "player model", &g_cfg.visuals.model_changer);
     cy += row;
 
     {
