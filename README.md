@@ -1,48 +1,80 @@
-# cs1.6 — песочница для реверса CS 1.6
+# cs1.6 — реверс и меню
 
-Репо с инструментами и исходниками для разбора Counter-Strike 1.6.
+Песочница для разбора Counter-Strike 1.6 и разработки меню в стиле gamesense.
+
+## Релиз
+
+**[v0.1-menu-test](https://github.com/QUANTUMLOADER123/cs1.6/releases/tag/v0.1-menu-test)** — тестовая 32-битная DLL меню.
+
+- DLL: [menu_test_x86.dll](https://github.com/QUANTUMLOADER123/cs1.6/raw/arena/6f730c22-cs1-6/releases/v0.1-menu-test/menu_test_x86.dll) (1.4 МБ, PE32 i386)
+- Все файлы релиза: [releases/v0.1-menu-test/](releases/v0.1-menu-test/)
+
+`INSERT` — меню, `F12` — скриншот. Подробности — [releases/v0.1-menu-test/README.md](releases/v0.1-menu-test/README.md).
+
+## Скриншоты меню
+
+1920×1080, отрендерены тем же кодом, что работает в оверлее.
+
+| Rage | Visuals |
+| --- | --- |
+| ![Rage](cs1.6/menu/shots/rage.png) | ![Visuals](cs1.6/menu/shots/visuals.png) |
+
+| Misc | Settings |
+| --- | --- |
+| ![Misc](cs1.6/menu/shots/misc.png) | ![Settings](cs1.6/menu/shots/settings.png) |
+
+![Skins](cs1.6/menu/shots/skins.png)
+
+Прямые ссылки (для телефона):
+
+- [Rage](https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/rage.png)
+- [Visuals](https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/visuals.png)
+- [Misc](https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/misc.png)
+- [Settings](https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/settings.png)
+- [Skins](https://github.com/QUANTUMLOADER123/cs1.6/blob/arena/6f730c22-cs1-6/cs1.6/menu/shots/skins.png)
 
 ## Что где
 
 ```
-tools/
-  download_ghidra.sh   — качает официальный релиз Ghidra 12.2 с GitHub
-  fetch_deps.sh        — восстанавливает все вендорные исходники (хуки + CS 1.6 SDK)
-  hooks/               — Universal Dear ImGui Hook + Kiero (не в git, см. fetch_deps.sh)
-  ghidra-src/          — исходники Ghidra 12.2 (не в git)
-
-cs1.6-src/
-  ReHLDS/              — открытый серверный движок HL/CS 1.6
-  cs16-client/         — реверс клиента CS 1.6 под Xash3D FWGS
-
-cs1.6/                 — сюда кладётся своя легальная копия игры для реверса в Ghidra
+cs1.6/menu/            меню: исходники, Makefile, build_win.sh, скриншоты
+releases/              собранные версии (DLL + скриншоты + README)
+cs1.6/analysis/        реверс DLL: symbols, vtables, strings, index.json
+cs1.6/REVERSE.md       разбор DLL и найденные точки входа
+tools/analysis/        pe_triage.py (триаж PE), r2_decompile.py (декомпиляция)
+*.dll                  файлы игры: hw, client, mp, Core, DemoPlayer, client_mini, SDL2
 ```
 
-## Быстрый старт
+## Реверс
+
+Все 7 DLL разобраны. Ключевое: `client.dll` экспортирует все `HUD_*` и `CL_*`
+функции — `HUD_Redraw`, `HUD_Frame`, `HUD_AddEntity`, `CL_CreateMove`. Это
+готовые точки входа для софта.
+
+| DLL | функций | декомпилировано |
+| --- | --- | --- |
+| hw.dll | 5630 | 4575 |
+| mp.dll | 3656 | 3656 |
+| client.dll | 3125 | 3125 |
+| Core.dll | 792 | 792 |
+| client_mini.dll | 753 | 753 |
+| DemoPlayer.dll | 402 | 402 |
+
+Тела функций в git не лежат (68 МБ), генерируются за минуту:
 
 ```bash
-./tools/fetch_deps.sh          # ~50 МБ: хуки + cs16-client + ReHLDS
-./tools/download_ghidra.sh     # ~570 МБ: Ghidra 12.2 (нужен JDK)
+python3 tools/analysis/r2_decompile.py hw.dll -o cs1.6/analysis/hw --min-size 16
 ```
 
-## Ghidra: статус
+Подробности — [cs1.6/REVERSE.md](cs1.6/REVERSE.md).
 
-Бинарный релиз Ghidra лежит на `release-assets.githubusercontent.com`, а песочница пускает только на `github.com`, `codeload`, `api.github.com`, `npmjs`, `pypi`. Поэтому ZIP не скачивается — `download_ghidra.sh` запускать на машине с полным интернетом. Исходники Ghidra при этом клонируются нормально.
+## Сборка меню
 
-## CS 1.6: статус
+```bash
+cd cs1.6/menu
+make                        # headless-рендерер (Linux, без GPU)
+./menu.png out.png 2 0      # 2x скейл, вкладка Rage
 
-Саму игру (коммерческий контент Valve) и сборки с `counter-strike.one` не качаю — хост вне allowlist песочницы, плюс это пиратская копия. Вместо этого в репо лежат открытые исходники:
+./build_win.sh              # Windows DLL через zig (без MSVC)
+```
 
-- **ReHLDS** — серверный движок HLDS, переписанный с фиксами. C++/CMake, GPL.
-- **cs16-client** — реверс клиента CS 1.6 (Xash3D FWGS). Есть `cl_dll` (клиентская DLL), `engine`, `dlls` (GameDLL), `common` (SDK-хедеры).
-
-Для реверса конкретных бинарников (`hw.dll`, `client.dll`) нужна твоя легальная копия — кладёшь в `cs1.6/`, открываешь в Ghidra. Детали — `cs1.6/README.md`.
-
-## Рендер и хуки
-
-CS 1.6 (Win32) рендерит через OpenGL 1.x → хук на `wglSwapBuffers`. Оба хука это умеют:
-
-- `Universal-Dear-ImGui-Hook` — один DLL под все API, для 1.6 нужен билд **Win32**, меню на INSERT.
-- `kiero` — в `kiero.h` включить `KIERO_INCLUDE_OPENGL 1`, MinHook в комплекте.
-
-Для ImGui-бэкенда в 1.6 использовать `imgui_impl_opengl2` (legacy pipeline), не `opengl3`.
+Детали — [cs1.6/menu/README.md](cs1.6/menu/README.md).
