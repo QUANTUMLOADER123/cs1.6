@@ -138,8 +138,9 @@ namespace gui
         const float cb = geo::CHECK_SIZE * geo::SCALE;
         // референс: ink текста 52, верх бокса 54 => бокс на 2px ниже
         // референс: бокс 123..128, текст ink 143 (шаг 20 от бокса)
-        const ImVec2 cpos(col_pos.x + (geo::CHECK_X + 1 - geo::COL_X_A) * geo::SCALE + indent,
-                          y + 4 * geo::SCALE);
+        // x=122 (бордер) -> отсюда +1 в CHECK_X даёт ровно 122 при COL_X_A=101
+        const ImVec2 cpos(col_pos.x + (geo::CHECK_X - geo::COL_X_A) * geo::SCALE + indent,
+                          y + 3 * geo::SCALE);
         const ImVec2 tpos(col_pos.x + (geo::LABEL_X - geo::COL_X_A) * geo::SCALE + indent,
                           y);
 
@@ -157,22 +158,82 @@ namespace gui
             changed = true;
         }
 
-        if (*v)
+        // Бокс 9x9 = 1px бордер #0C0C0C со всех сторон + 7x7 заливки.
+        // Снято с референса: y=53 бордер, y=54..59 заливка (6 строк, шаг ~7),
+        // y=60 бордер; x=122 бордер, x=123..128 заливка, x=129 бордер.
         {
-            // включён: вертикальный градиент (156,199,40) -> (122,165,6)
-            const ImU32 top = IM_COL32(156, 199, 40, 255);
-            const ImU32 bot = IM_COL32(122, 165, 6, 255);
-            VGradient(dl, cpos, ImVec2(cpos.x + cb, cpos.y + cb), top, bot);
-        }
-        else
-        {
-            dl->AddRectFilled(cpos, ImVec2(cpos.x + cb, cpos.y + cb),
-                              hovered ? IM_COL32(90, 90, 90, 255) : col::CHECK_OFF);
+            const int x0 = (int)ImFloor(cpos.x), y0 = (int)ImFloor(cpos.y);
+            const int n = 9;      // 1 бордер + 6 заливки + 1 бордер + 1 запас снизу
+            const ImU32 bd = col::CHECK_BORDER;
+            dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)(x0 + n), (float)(y0 + 1)), bd);
+            dl->AddRectFilled(ImVec2((float)x0, (float)(y0 + 7)), ImVec2((float)(x0 + n), (float)(y0 + 8)), bd);
+            dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)(x0 + 1), (float)(y0 + n)), bd);
+            dl->AddRectFilled(ImVec2((float)(x0 + n - 1), (float)y0), ImVec2((float)(x0 + n), (float)(y0 + n)), bd);
+            // 6 ступеней заливки (в REF ровно 6 строк между бордерами)
+            const int rTop = *v ? 156 : 77,  rBot = *v ? 122 : 52;
+            const int gTop = *v ? 199 : 77,  gBot = *v ? 165 : 52;
+            const int bTop = *v ? 40  : 77,  bBot = *v ? 6   : 52;
+            for (int i = 0; i < 6; ++i)
+            {
+                const float u = (float)i / 5.0f;
+                const int r = (int)std::lround(rTop + (rBot - rTop) * u);
+                const int g = (int)std::lround(gTop + (gBot - gTop) * u);
+                const int b = (int)std::lround(bTop + (bBot - bTop) * u);
+                dl->AddRectFilled(ImVec2((float)(x0 + 1), (float)(y0 + 1 + i)),
+                                  ImVec2((float)(x0 + n - 1), (float)(y0 + 2 + i)),
+                                  IM_COL32(r, g, b, 255));
+            }
+            (void)hovered;
         }
 
         DrawTextSpaced(dl, tpos, col::TEXT, label, geo::TEXT_SIZE, 0.5f * geo::SCALE);
         row_y += geo::ITEM_H;
         return changed;
+    }
+
+    // ------------------------------------------------------------------
+    // Кнопка gamesense: 1px бордер #0C0C0C, градиентная плашка 24px,
+    // текст по центру. Ширина — на всю колонку полей (x 153..333).
+    // ------------------------------------------------------------------
+    inline bool ButtonAbs(ImVec2 col_pos, float& row_y, const char* label,
+                          float w = 181.0f)
+    {
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        const float y = col_pos.y + row_y * geo::SCALE + 4.0f * geo::SCALE;
+        const float h = 22.0f * geo::SCALE;
+        const ImVec2 p(col_pos.x + (geo::FIELD_X - geo::COL_X_A) * geo::SCALE, y);
+        const ImVec2 q(p.x + w * geo::SCALE, p.y + h);
+
+        ImGui::SetCursorScreenPos(p);
+        ImGui::InvisibleButton(label, ImVec2(q.x - p.x, h));
+        const bool pressed = ImGui::IsItemClicked();
+        const bool hovered = ImGui::IsItemHovered();
+
+        const int x0 = (int)ImFloor(p.x), y0 = (int)ImFloor(p.y);
+        const int x1 = (int)ImFloor(q.x) - 1, y1 = (int)ImFloor(q.y) - 1;
+        dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)(x1 + 1), (float)(y0 + 1)), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2((float)x0, (float)y1), ImVec2((float)(x1 + 1), (float)(y1 + 1)), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2((float)x0, (float)y0), ImVec2((float)(x0 + 1), (float)(y1 + 1)), col::CHECK_BORDER);
+        dl->AddRectFilled(ImVec2((float)x1, (float)y0), ImVec2((float)(x1 + 1), (float)(y1 + 1)), col::CHECK_BORDER);
+        const int t = hovered ? 52 : 44, bo = hovered ? 52 : 44;
+        for (int i = y0 + 1; i < y1; ++i)
+        {
+            const float u = (float)(i - y0 - 1) / (float)std::max(1, (y1 - y0 - 2));
+            const int v = (int)std::lround(t + (bo - t) * u);
+            dl->AddRectFilled(ImVec2((float)(x0 + 1), (float)i), ImVec2((float)x1, (float)(i + 1)),
+                              IM_COL32(v, v, v, 255));
+        }
+
+        ImFontBaked* bk = ImGui::GetFont()->GetFontBaked(geo::TEXT_SIZE);
+        const float gh = bk ? bk->Size : geo::TEXT_SIZE;
+        float tw = 0.0f;
+        if (bk)
+            for (const char* c = label; *c; ++c) tw += bk->GetCharAdvance((ImWchar)*c);
+        const float tx = ImFloor((p.x + q.x) * 0.5f - tw * 0.5f);
+        const float ty = ImFloor(p.y + (h - gh) * 0.5f) + 1.0f;
+        DrawTextSpaced(dl, ImVec2(tx, ty), col::TEXT, label, geo::TEXT_SIZE, 0.5f * geo::SCALE);
+        // (курсор НЕ двигаем: строку задаёт ColTo у вызывающего кода)
+        return pressed;
     }
 
     // ------------------------------------------------------------------
@@ -309,6 +370,15 @@ namespace gui
                 dl->AddRectFilled(ImVec2((float)fx0, (float)(fy0 + i)),
                                   ImVec2((float)(fx0 + fill_w), (float)(fy0 + i + 1)),
                                   IM_COL32(r, g, b, 255));
+        }
+
+        // Знаки "минус" и "плюс" по краям трека — как в оригинальном меню.
+        {
+            const float cy = ImFloor(p.y) + 10.0f;
+            const ImU32 sc = col::TEXT_DIM;
+            dl->AddRectFilled(ImVec2(ImFloor(p.x) - 14.0f, cy), ImVec2(ImFloor(p.x) - 9.0f, cy + 1.0f), sc);
+            dl->AddRectFilled(ImVec2(ImFloor(q.x) + 7.0f, cy), ImVec2(ImFloor(q.x) + 12.0f, cy + 1.0f), sc);
+            dl->AddRectFilled(ImVec2(ImFloor(q.x) + 9.0f, cy - 2.0f), ImVec2(ImFloor(q.x) + 10.0f, cy + 3.0f), sc);
         }
 
         char buf[64];

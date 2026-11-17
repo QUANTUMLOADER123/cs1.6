@@ -214,6 +214,7 @@ int main(int argc, char** argv)
     render::dither_menu_background(img, gui::geo::WINDOW_X, gui::geo::WINDOW_Y,
                                    gui::geo::WINDOW_W, gui::geo::WINDOW_H);
 
+
     if (!stbi_write_png(out_path, W, H, 4, img.px.data(), W * 4))
     {
         fprintf(stderr, "[!] не записался PNG: %s\n", out_path);

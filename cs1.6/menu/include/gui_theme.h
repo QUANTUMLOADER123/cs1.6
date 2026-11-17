@@ -176,4 +176,16 @@ namespace gui
         c[ImGuiCol_ScrollbarGrab]        = C(IM_COL32(45, 45, 45, 255));
         c[ImGuiCol_ScrollbarGrabHovered] = C(IM_COL32(65, 65, 65, 255));
     }
+        // Подпись активной вкладки рисуется поверх дизеринга, поэтому её
+        // содержимое и позицию запоминаем на время кадра.
+        inline const char*& sidebar_label()
+        {
+            static const char* v = "";
+            return v;
+        }
+        inline ImVec2& sidebar_label_pos()
+        {
+            static ImVec2 v(0.0f, 0.0f);
+            return v;
+        }
 }

@@ -112,6 +112,8 @@ namespace render
                 if (td->TexID == ImTextureID_Invalid)
                 {
                     td->SetTexID(FONT_ATLAS_TEX_ID);
+                    // Статус НЕ ставим OK вручную: ImGui 1.93 печёт глифы лениво
+                    // и сам переводит страницу в WantUpdates, когда допишет их.
                     td->SetStatus(ImTextureStatus_OK);
                     continue;
                 }
@@ -258,7 +260,8 @@ namespace render
     // Фон меню gamesense: шахматный дизеринг #0C0C0C/#141414.
     // Рисуется напрямую в кадр (ImDrawList не тянет 60k прямоугольников:
     // лимит 16-битных индексов), координаты — экранные, 1:1.
-    inline void dither_rect(Image& img, float x0, float y0, float x1, float y1)
+    inline void dither_rect(Image& img, float x0, float y0, float x1, float y1,
+                            bool keep_text = false)
     {
         const ImU32 bg = 0xff0c0c0c, fg = 0xff141414;
         const int ix0 = std::max(0, (int)x0), iy0 = std::max(0, (int)y0);
@@ -278,7 +281,12 @@ namespace render
         {
             const unsigned char* trow = kTile[y & 3];
             for (int x = ix0; x < ix1; ++x)
+            {
+                // keep_text: не затираем уже нарисованный текст (подпись вкладки
+                // рисуется до дизеринга, а он идёт после кадра).
+                if (keep_text && img.px[(size_t)y * img.w + x] > 0xff1a1a1au) continue;
                 img.px[(size_t)y * img.w + x] = trow[x & 3] ? fg : bg;
+            }
         }
     }
 
@@ -297,7 +305,51 @@ namespace render
         dither_rect(img, WX + 82, WY + 33,  WX + 99,  WY + 590);   // сайдбар / колонка A
         dither_rect(img, WX + 394, WY + 33, WX + 413, WY + 590);   // между колонками
         dither_rect(img, WX + 707, WY + 33, WX + 724, WY + 590);   // правый отступ
-        dither_rect(img, WX + 7,  WY + 533, WX + 80,  WY + 596);   // бокс подписи вкладки
+        // Бокс подписи: дизерим, но НЕ затираем уже нарисованный текст "Lua"
+        // (подпись рисуется ImDrawList-ом, а дизеринг идёт после кадра).
+        dither_rect(img, WX + 7,  WY + 533, WX + 80,  WY + 596, true);
+    }
+
+    // Текст поверх растра: нужен для подписи активной вкладки, т.к. бокс
+    // дизерится уже после кадра и затирает всё, что нарисовал ImDrawList.
+    inline void draw_text_cpu(Image& img, ImFont* font, float size, ImVec2 pos,
+                              ImU32 color, const char* text, float extra)
+    {
+        if (!font || !g_atlas.valid) return;
+        ImFontBaked* bk = font->GetFontBaked(size);
+        if (!bk) return;
+        const uint32_t cr = color & 0xff, cg = (color >> 8) & 0xff, cb = (color >> 16) & 0xff;
+        float x = pos.x;
+        for (const char* p = text; *p; ++p)
+        {
+            const unsigned char ch = (unsigned char)*p;
+            if (ch == ' ') { x += bk->GetCharAdvance(' ') + extra; continue; }
+            const ImFontGlyph* g = bk->FindGlyph((ImWchar)ch);
+            if (!g) continue;
+            const float gx0 = ImFloor(x + g->X0), gy0 = ImFloor(pos.y + g->Y0);
+            const int gw = (int)(g->X1 - g->X0), gh = (int)(g->Y1 - g->Y0);
+            const int ax0 = (int)ImFloor(g->U0 * g_atlas.w);
+            const int ay0 = (int)ImFloor(g->V0 * g_atlas.h);
+            for (int ty = 0; ty < gh; ++ty)
+            {
+                const int iy = (int)gy0 + ty;
+                if (iy < 0 || iy >= img.h) continue;
+                const int sy = std::clamp(ay0 + ty, 0, g_atlas.h - 1);
+                for (int tx = 0; tx < gw; ++tx)
+                {
+                    const int ix = (int)gx0 + tx;
+                    if (ix < 0 || ix >= img.w) continue;
+                    const int sx = std::clamp(ax0 + tx, 0, g_atlas.w - 1);
+                    const uint32_t af = g_atlas.pixels[(size_t)sy * g_atlas.w + sx];
+                    if (!af) continue;
+                    const uint32_t a8 = (af * (color >> 24)) / 255u;
+                    const uint32_t c = (a8 << 24) | ((cb * a8 / 255u) << 16) |
+                                       ((cg * a8 / 255u) << 8) | (cr * a8 / 255u);
+                    img.px[(size_t)iy * img.w + ix] = blend(img.px[(size_t)iy * img.w + ix], c);
+                }
+            }
+            x += g->AdvanceX + extra;
+        }
     }
 
     inline void render_draw_data(Image& img, ImDrawData* draw_data)

@@ -52,6 +52,7 @@ namespace gui
         bool replace_localplayer_model = false, stattrak = false;
         int  t_model = 0, ct_model = 0, local_model = 0;
         int  knife = 0, ak = 0, m4 = 0, awp = 0;
+        int  preset = 0;
         bool coin_changer = false, private_rank = false, music_kit = false;
 
         // Players
@@ -222,13 +223,18 @@ namespace gui
         ComboAbs(a.pos, a.y, "##accent", &s.accent, accents, IM_ARRAYSIZE(accents));
 
         ColCtx b = BeginCol(geo::COL_X_B, "B");
-        ColTo(b, 51);
-        LabelAbs(b.pos, b.y, "Config name");
-        CheckboxAbs(b.pos, b.y, "Load on start", &s.lua_autorun);
-        ColTo(b, 105);
-        LabelAbs(b.pos, b.y, "Menu key");
+        // Панель Presets — как в оригинальном меню: дропдаун + 4 кнопки.
+        ColTo(b, 36);
+        ComboAbs(b.pos, b.y, "##preset", &s.preset,
+                 (const char* const[]){ "Legit", "Rage", "HvH", "Custom" }, 4);
+        ColTo(b, 71);
+        ButtonAbs(b.pos, b.y, "Load");
+        ColTo(b, 97);
+        ButtonAbs(b.pos, b.y, "Save");
         ColTo(b, 123);
-        CheckboxAbs(b.pos, b.y, "Insert", &s.menu_open);
+        ButtonAbs(b.pos, b.y, "Reset");
+        ColTo(b, 149);
+        ButtonAbs(b.pos, b.y, "Unload");
     }
 
     inline void TabSkins(Settings& s)
@@ -456,9 +462,11 @@ namespace gui
         // ВАЖНО (снято с референса): там контент от Skins, а подпись — "Lua".
         // В оригинале подпись берётся из другого индекса, чем контент;
         // воспроизводим это 1:1. ink в референсе: x 26..59, y 557..572 (16px).
+        // Подпись активной вкладки. Дизеринг бокса идёт после кадра, поэтому
+        // dither_rect(..., keep_text=true) не затирает эти пиксели.
         {
             const char* nm = (s.active_tab == 5) ? "Lua" : active_name(s.active_tab);
-            DrawTextSpaced(dl, ImVec2(wp.x + 25 * K, wp.y + 551.0f * K),
+            DrawTextSpaced(dl, ImVec2(wp.x + 26 * K, wp.y + 552.0f * K),
                            col::TEXT_WHITE, nm, 25.0f * K, 0.5f * K,
                            BigFont() ? BigFont() : ImGui::GetFont());
         }
