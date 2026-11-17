@@ -2,6 +2,8 @@
 #include "../../include/sh_config.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_math.h"
+#include "../../include/sh_grenade.h"
+#include "../../include/sh_features.h"
 
 typedef struct sh_tracer_s
 {
@@ -256,4 +258,61 @@ void sh_visuals_thirdperson(sh_usercmd_t *cmd)
 
     if (g_engfuncs && g_engfuncs->pfnSetViewAngles)
         g_engfuncs->pfnSetViewAngles((f32 *)&cmd->viewangles);
+}
+
+void sh_grenade_path_draw(void)
+{
+    if (!g_cfg.misc.grenade_predict || !g_pmove)
+        return;
+
+    i32 wpn = 0;
+
+    sh_player_t *local = sh_player_local();
+
+    if (local)
+        wpn = local->weapon_id;
+
+    if (wpn != 4 && wpn != 9 && wpn != 11 && wpn != 13 && wpn != 25)
+        return;
+
+    vec3_t origin = g_pmove->origin;
+    origin.z += g_pmove->view_ofs.z;
+
+    vec3_t angles = g_pmove->angles;
+    vec3_t vel = g_pmove->velocity;
+
+    sh_grenade_path_t path;
+    sh_grenade_predict(&origin, &angles, &vel, &path);
+
+    if (path.count < 2)
+        return;
+
+    for (i32 i = 0; i < path.count - 1; ++i)
+    {
+        vec2_t a, b;
+
+        if (!sh_world_to_screen(&path.points[i], &a))
+            continue;
+        if (!sh_world_to_screen(&path.points[i + 1], &b))
+            continue;
+
+        f32 f = (f32)i / (f32)path.count;
+        col4_t c = { 190, 235, 60, (u8)(230.0f * (1.0f - f * 0.6f)) };
+
+        sh_draw_line(a.x, a.y, b.x, b.y, 1.5f, c);
+    }
+
+    if (path.hit)
+    {
+        vec2_t sp;
+
+        if (sh_world_to_screen(&path.impact, &sp))
+        {
+            f32 r = 6.0f * sh_scale();
+
+            col4_t c = { 255, 90, 90, 220 };
+            sh_draw_line(sp.x - r, sp.y, sp.x + r, sp.y, 2.0f, c);
+            sh_draw_line(sp.x, sp.y - r, sp.x, sp.y + r, 2.0f, c);
+        }
+    }
 }

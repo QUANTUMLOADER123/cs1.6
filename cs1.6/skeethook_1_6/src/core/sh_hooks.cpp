@@ -175,6 +175,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
         sh_esp_run();
 
     sh_visuals_effects_draw();
+    sh_grenade_path_draw();
     sh_hitmarker_draw();
     sh_indicators_draw();
 
