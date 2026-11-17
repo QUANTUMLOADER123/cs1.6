@@ -139,23 +139,24 @@ void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (pm->onground == -1)
         return;
 
-    static i32 g_drop_frame;
+    static i32 g_release_frames;
 
-    if (g_drop_frame)
+    if (g_release_frames > 0)
     {
         cmd->buttons &= ~sh_in_jump;
-        g_drop_frame = 0;
+        --g_release_frames;
         return;
     }
 
-    if ((pm->oldbuttons & sh_in_jump) && (cmd->buttons & sh_in_jump))
+    if (pm->oldbuttons & sh_in_jump)
     {
         cmd->buttons &= ~sh_in_jump;
-        g_drop_frame = 1;
+        g_release_frames = 1;
         return;
     }
 
     cmd->buttons |= sh_in_jump;
+    g_release_frames = 2;
 }
 
 void sh_auto_jump_hold(sh_usercmd_t *cmd, sh_playermove_t *pm)
