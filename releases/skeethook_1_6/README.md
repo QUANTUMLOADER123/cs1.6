@@ -31,6 +31,14 @@ SDK + чит для CS 1.6. Все адреса — по сигнатурам, �
 | add_entity | `0x01945F10` | chams / glow / no-flash |
 | process_state | `0x01946010` | |
 | txfer_overrides | `0x01945FC0` | |
+| chams_model | `0x01D869E0` | хук отрисовки модели, GL-проходы |
+| chams_light | `0x01D83DE0` | хук освещения вершины, rim |
+| chams_alpha | `0x01D88200` | `+34` → `float*` альфы |
+| world_transform | `0x01D7E080` | `+0xC` → матрица вида |
+| screen | `0x01D458F0` | `+2/+7/+0xD/+0x15` → размеры |
+| viewport | `0x01D450F1` | `+2/+0xC` → viewport |
+| load_skys | `0x01D4F9C2` | мгновенная смена неба |
+| load_skys_name | `0x01D4FA51` | `+2` → буфер имени |
 
 ## Хуки (9 через MinHook + 1 в интерфейсе)
 
