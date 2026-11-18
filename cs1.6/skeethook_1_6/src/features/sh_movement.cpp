@@ -591,7 +591,9 @@ void sh_ground_strafe(sh_usercmd_t *cmd, sh_playermove_t *pm)
 
     if (pm->onground == -1)
     {
-        sh_autostrafe(cmd, pm);
+        if (pm->maxspeed > 0.0f)
+            sh_autostrafe(cmd, pm);
+
         return;
     }
 
@@ -604,7 +606,10 @@ void sh_ground_strafe(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (pm->movetype == sh_movetype_fly || pm->movetype == sh_movetype_noclip)
         return;
 
-    if (!(cmd->buttons & (sh_in_forward | sh_in_back | sh_in_moveleft | sh_in_moveright)))
+    f32 fm = cmd->forwardmove;
+    f32 sm = cmd->sidemove;
+
+    if (fm == 0.0f && sm == 0.0f)
         return;
 
     f32 vx = pm->velocity.x;
@@ -612,37 +617,51 @@ void sh_ground_strafe(sh_usercmd_t *cmd, sh_playermove_t *pm)
 
     f32 speed = sh_sqrt(vx * vx + vy * vy);
 
-    if (speed < 200.0f)
+    if (speed < pm->maxspeed * 0.9f)
         return;
 
-    f32 maxs = g_cfg.movement.ground_strafe_max;
+    static i32 g_gs_ticks;
 
-    if (maxs < 200.0f)
-        maxs = 200.0f;
-    if (maxs > 2000.0f)
-        maxs = 2000.0f;
+    ++g_gs_ticks;
 
-    if (speed > maxs)
-        return;
-
-    static i32 g_gs_phase;
-    static f32 g_gs_last;
-
-    f32 now = pm->time;
-
-    if (now - g_gs_last < 0.03f)
-    {
-        if (g_gs_phase)
-            cmd->buttons |= sh_in_duck;
-
-        return;
-    }
-
-    g_gs_last = now;
-    g_gs_phase = !g_gs_phase;
-
-    if (g_gs_phase)
+    if (g_gs_ticks == 1 || g_gs_ticks == 2)
         cmd->buttons |= sh_in_duck;
     else
         cmd->buttons &= ~sh_in_duck;
+
+    if (g_gs_ticks >= 3)
+        g_gs_ticks = 0;
+
+    f32 vel_yaw = sh_atan2_deg(vy, vx);
+
+    f32 fx = sh_cos_deg(cmd->viewangles.y);
+    f32 fy = sh_sin_deg(cmd->viewangles.y);
+    f32 rx = fy;
+    f32 ry = -fx;
+
+    f32 wish_x = fx * fm + rx * sm;
+    f32 wish_y = fy * fm + ry * sm;
+
+    f32 wish_yaw = sh_atan2_deg(wish_y, wish_x);
+
+    f32 delta = wish_yaw - vel_yaw;
+
+    while (delta > 180.0f)
+        delta -= 360.0f;
+    while (delta < -180.0f)
+        delta += 360.0f;
+
+    if (delta > -1.0f && delta < 1.0f)
+        return;
+
+    f32 strafe_yaw = vel_yaw + (delta >= 0.0f ? 90.0f : -90.0f);
+    f32 angle = cmd->viewangles.y - strafe_yaw;
+
+    f32 move = pm->maxspeed;
+
+    if (move < 1.0f)
+        move = 250.0f;
+
+    cmd->forwardmove = sh_cos_deg(angle) * move;
+    cmd->sidemove = sh_sin_deg(angle) * move;
 }
