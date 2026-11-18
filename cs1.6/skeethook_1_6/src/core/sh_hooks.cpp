@@ -18,6 +18,9 @@ void sh_hitbox_scan_draw(void);
 void sh_viewmodel_tick(void);
 void sh_fov_apply(void);
 void sh_aspect_init(void);
+void sh_nightmode_init(void);
+void sh_nightmode_poll(void);
+qbool sh_nightmode_ready(void);
 void sh_aspect_poll(void);
 void sh_aspect_shutdown(void);
 qbool sh_aspect_ready(void);
@@ -403,6 +406,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_viewmodel_tick();
     sh_fov_apply();
     sh_aspect_poll();
+    sh_nightmode_poll();
     sh_remove_bob();
     sh_visuals_apply_nightmode();
     sh_worldfx_tick();
@@ -762,6 +766,7 @@ qbool sh_hooks_install(void)
         return false;
 
     sh_aspect_init();
+    sh_nightmode_init();
 
     if (create_move)
     {

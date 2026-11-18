@@ -584,6 +584,16 @@ static void sh_menu_draw_misc(f32 x, f32 y)
 
     sh_menu_slider(x, cy, colw, "smoke alpha", &g_cfg.visuals.smoke_alpha, 0.05f, 1.0f, "%.2f");
     cy += row;
+
+    sh_menu_checkbox(x, cy, "lightmap night", &g_cfg.visuals.lightmap_mode);
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "lm red", &g_cfg.visuals.lightmap_r, 0.05f, 2.0f, "%.2f");
+    sh_menu_slider(x + colw, cy, colw, "lm green", &g_cfg.visuals.lightmap_g, 0.05f, 2.0f, "%.2f");
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "lm blue", &g_cfg.visuals.lightmap_b, 0.05f, 2.0f, "%.2f");
+    cy += row;
     cy += row;
 
     sh_menu_checkbox(x, cy, "hide hud", &g_cfg.misc.hide_hud);
