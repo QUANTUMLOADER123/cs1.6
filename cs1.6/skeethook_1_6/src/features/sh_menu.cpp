@@ -32,6 +32,9 @@
 #include "../../include/sh_imgui.h"
 
 static qbool g_menu_visible;
+
+/* масштаб интерфейса от высоты экрана (база 480p) */
+static f32 g_ui_scale = 1.0f;
 static i32 g_cur_tab;
 
 static void sh_menu_release_mouse(qbool release);
@@ -446,18 +449,50 @@ void sh_menu_draw(void)
     if (!g_menu_visible)
         return;
 
-    /* окно ImGui: перетаскивание и скролл - его собственные */
-    ImGui::SetNextWindowSize(ImVec2(640.0f, 470.0f), ImGuiCond_FirstUseEver);
+    /* РАЗМЕР И МАСШТАБ ОТ РАЗРЕШЕНИЯ.
 
-    ImGui::Begin("skeethook", 0,
+       На 1920x1080 окно 640x470 - это треть экрана, а шрифт 14px
+       при таком размере читается как точки. Отсюда "огромная,
+       и нихуя не видно": окно большое, содержимое мелкое.
+
+       Считаем масштаб от высоты экрана, как принято в читах:
+       база 480p (в GoldSrc это исходное разрешение интерфейса).
+       Множитель ограничиваем 0.85..1.6, чтобы на 4K окно не
+       разрослось во весь экран. */
+    {
+        f32 sh = (f32)sh_screen_height();
+
+        g_ui_scale = sh / 480.0f;
+
+        if (g_ui_scale < 0.85f)
+            g_ui_scale = 0.85f;
+
+        if (g_ui_scale > 1.6f)
+            g_ui_scale = 1.6f;
+    }
+
+    /* шрифт пересобирается только при смене масштаба */
+    sh_imgui_scale_font(g_ui_scale);
+
+    ImGui::SetNextWindowSize(ImVec2(760.0f * g_ui_scale,
+                                    520.0f * g_ui_scale),
+                             ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSizeConstraints(
+        ImVec2(560.0f * g_ui_scale, 360.0f * g_ui_scale),
+        ImVec2(1100.0f * g_ui_scale, 900.0f * g_ui_scale));
+
+    ImGui::Begin("skeethook##main", 0,
                  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 
-    ImGui::BeginChild("##tabs", ImVec2(120.0f, 0.0f), 1);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+                        ImVec2(7.0f * g_ui_scale, 4.0f * g_ui_scale));
+
+    ImGui::BeginChild("##tabs", ImVec2(132.0f * g_ui_scale, 0.0f), 1);
 
     for (i32 i = 0; i < 6; ++i)
     {
         if (ImGui::Selectable(g_tab_names[i], g_cur_tab == i, 0,
-                              ImVec2(0.0f, 24.0f)))
+                              ImVec2(0.0f, 26.0f * g_ui_scale)))
             g_cur_tab = i;
     }
 
@@ -466,6 +501,11 @@ void sh_menu_draw(void)
     ImGui::SameLine();
 
     ImGui::BeginChild("##content", ImVec2(0.0f, 0.0f), 1);
+
+    /* виджеты чуть просторнее: при мелком шрифте плотная сетка
+       сливается в кашу */
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+                        ImVec2(7.0f * g_ui_scale, 4.0f * g_ui_scale));
 
     switch (g_cur_tab)
     {
@@ -477,6 +517,11 @@ void sh_menu_draw(void)
     default: sh_menu_tab_settings(); break;
     }
 
+    ImGui::PopStyleVar();
+
     ImGui::EndChild();
+
+    ImGui::PopStyleVar();
+
     ImGui::End();
 }

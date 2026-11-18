@@ -14,3 +14,6 @@ void sh_imgui_begin(i32 width, i32 height, qbool menu_visible);
 void sh_imgui_end(void);
 
 void *sh_imgui_font(void);
+
+/* пересобрать атлас под масштаб (вызывается при смене разрешения) */
+void sh_imgui_scale_font(f32 scale);

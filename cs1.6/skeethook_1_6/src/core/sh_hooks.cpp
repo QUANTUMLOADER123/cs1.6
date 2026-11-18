@@ -557,10 +557,17 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 
         if (sh_imgui_ready())
         {
-            /* закрываем наш самописный проход, чтобы GL-состояние
-               было предсказуемым для ImGui */
-            sh_render_end();
+            /* sh_render_end() здесь НЕ вызываем.
 
+               Раньше он стоял до ImGui и после - "чтобы состояние
+               было предсказуемым". На деле он ВКЛЮЧАЛ GL_TEXTURE_2D
+               и ВЫКЛЮЧАЛ блендинг: ImGui получал GL без
+               GL_BLEND, и вся прозрачность (а с ней и альфа
+               шрифта) шла мимо - текст рисовался полностью
+               прозрачным, то есть невидимым.
+
+               Бэкенд ImGui сам выставляет нужное состояние:
+               glEnable(GL_BLEND) + glBlendFunc + сброс прочего. */
             sh_imgui_begin(w, h, sh_menu_visible_now());
             sh_menu_draw();
             sh_imgui_end();
@@ -568,10 +575,10 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
         else
         {
             sh_menu_draw();
+
+            sh_render_end();
         }
     }
-
-    sh_render_end();
 
     return result;
 }

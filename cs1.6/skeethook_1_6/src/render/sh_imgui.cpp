@@ -34,6 +34,16 @@
 static qbool g_init;
 static qbool g_frame_open;
 static HWND g_window;
+static f32 g_font_scale = -1.0f;
+static f32 g_draw_w = 640.0f;
+static f32 g_draw_h = 480.0f;
+
+/* Tahoma есть на любой Windows с 2000; остальные - фолбэк */
+static const char *g_font_paths[3] = {
+    "C:\\Windows\\Fonts\\tahoma.ttf",
+    "C:\\Windows\\Fonts\\segoeui.ttf",
+    "C:\\Windows\\Fonts\\verdana.ttf"
+};
 
 static i32 g_prev_keys[256];
 static i32 g_prev_mouse[3];
@@ -134,15 +144,93 @@ static void sh_imgui_style(void)
     c[ImGuiCol_TextSelectedBg] = ImVec4(0.745f, 0.922f, 0.235f, 0.35f);
 }
 
+/* Пересобрать атлас под масштаб.
+
+   Почему пересборка, а не FontGlobalScale: глобальный масштаб просто
+   растягивает уже отрисованные глифы, и на 1080p текст мылится.
+   Пересборка даёт чёткие буквы нужного кегля.
+
+   Стоит дорого (растеризация сотен глифов), а вызывается из
+   HUD_Redraw, поэтому пересобираем ТОЛЬКО при смене масштаба -
+   сравнение с шагом 0.1. */
+void sh_imgui_scale_font(f32 scale)
+{
+    ImGuiIO *io;
+    /* ImFontConfig по умолчанию сконструирован корректно, но если
+       в нём окажется мусор (OversampleH/V=0), атлас выйдет пустым.
+       Выставляем явно то, что влияет на растеризацию. */
+    ImFontConfig cfg;
+
+    cfg.OversampleH = 1;
+    cfg.OversampleV = 1;
+    cfg.PixelSnapH = 1;
+    cfg.RasterizerDensity = 1.0f;
+
+    qbool loaded = 0;
+    i32 px;
+
+    if (!g_init)
+        return;
+
+    if (scale < 0.5f)
+        scale = 0.5f;
+
+    if (scale > 2.5f)
+        scale = 2.5f;
+
+    {
+        f32 q = (f32)(i32)(scale * 10.0f + 0.5f) / 10.0f;
+
+        if (q == g_font_scale)
+            return;
+
+        scale = q;
+    }
+
+    g_font_scale = scale;
+
+    px = (i32)(14.0f * scale + 0.5f);
+
+    if (px < 10)
+        px = 10;
+
+    io = &ImGui::GetIO();
+
+    io->Fonts->Clear();
+    io->FontGlobalScale = 1.0f;
+
+    for (i32 i = 0; i < 3 && !loaded; ++i)
+    {
+        if (GetFileAttributesA(g_font_paths[i]) == INVALID_FILE_ATTRIBUTES)
+            continue;
+
+        if (io->Fonts->AddFontFromFileTTF(g_font_paths[i], (f32)px, &cfg,
+                                          io->Fonts->GetGlyphRangesCyrillic()))
+            loaded = 1;
+    }
+
+    if (!loaded)
+        io->Fonts->AddFontDefault();
+
+    io->Fonts->Build();
+
+    ImGui_ImplOpenGL_RefreshFontTexture();
+}
+
 qbool sh_imgui_init(void *game_window)
 {
     ImGuiIO *io;
+    /* ImFontConfig по умолчанию сконструирован корректно, но если
+       в нём окажется мусор (OversampleH/V=0), атлас выйдет пустым.
+       Выставляем явно то, что влияет на растеризацию. */
     ImFontConfig cfg;
-    const char *font_paths[3] = {
-        "C:\\Windows\\Fonts\\tahoma.ttf",
-        "C:\\Windows\\Fonts\\segoeui.ttf",
-        "C:\\Windows\\Fonts\\verdana.ttf"
-    };
+
+    cfg.OversampleH = 1;
+    cfg.OversampleV = 1;
+    cfg.PixelSnapH = 1;
+    cfg.RasterizerDensity = 1.0f;
+
+    qbool loaded = 0;
 
     if (g_init)
         return 1;
@@ -158,29 +246,28 @@ qbool sh_imgui_init(void *game_window)
     io->IniFilename = 0;   /* не пишем imgui.ini рядом с игрой */
     io->LogFilename = 0;
 
+    /* ВАЖНО: шрифт добавляется ДО Init(). Бэкенд в Init() заливает
+       атлас в текстуру; если добавить шрифт после, атлас уйдёт
+       пустым и весь текст будет невидим. */
+    for (i32 i = 0; i < 3 && !loaded; ++i)
+    {
+        if (GetFileAttributesA(g_font_paths[i]) == INVALID_FILE_ATTRIBUTES)
+            continue;
+
+        if (io->Fonts->AddFontFromFileTTF(g_font_paths[i], 16.0f, &cfg,
+                                          io->Fonts->GetGlyphRangesCyrillic()))
+            loaded = 1;
+    }
+
+    if (!loaded)
+        io->Fonts->AddFontDefault();
+
+    io->Fonts->Build();
+
     if (!ImGui_ImplOpenGL_Init())
     {
         ImGui::DestroyContext();
         return 0;
-    }
-
-    {
-        qbool loaded = 0;
-
-        for (i32 i = 0; i < 3 && !loaded; ++i)
-        {
-            if (GetFileAttributesA(font_paths[i]) == INVALID_FILE_ATTRIBUTES)
-                continue;
-
-            if (io->Fonts->AddFontFromFileTTF(font_paths[i], 14.0f, &cfg,
-                                              io->Fonts->GetGlyphRangesCyrillic()))
-                loaded = 1;
-        }
-
-        if (!loaded)
-            io->Fonts->AddFontDefault();
-
-        io->Fonts->Build();
     }
 
     g_init = 1;
@@ -207,6 +294,8 @@ void sh_imgui_begin(i32 width, i32 height, qbool menu_visible)
     io = &ImGui::GetIO();
 
     io->DisplaySize = ImVec2((f32)width, (f32)height);
+    g_draw_w = (f32)width;
+    g_draw_h = (f32)height;
     io->DeltaTime = 1.0f / 60.0f;
 
     /* --- ВВОД ---
@@ -223,7 +312,42 @@ void sh_imgui_begin(i32 width, i32 height, qbool menu_visible)
         if (g_window)
             ScreenToClient(g_window, &p);
 
-        io->AddMousePosEvent((f32)p.x, (f32)p.y);
+        /* КООРДИНАТЫ КУРСОРА.
+
+           GetCursorPos/ScreenToClient дают пиксели КЛИЕНТСКОЙ ОБЛАСТИ
+           окна, а ImGui рисует в координатах io->DisplaySize, то есть
+           в координатах движка (1280x720, 1920x1080 и т.д.). Если
+           клиентская область отличается от них - а в оконном режиме
+           отличается всегда - клики попадают не туда: "курсор сломан".
+
+           Пересчитываем в пространство рендера. */
+        {
+            RECT rc;
+
+            if (g_window && GetClientRect(g_window, &rc))
+            {
+                f32 cw = (f32)(rc.right - rc.left);
+                f32 ch = (f32)(rc.bottom - rc.top);
+
+                /* соотношение разумное - пересчитываем, иначе
+                   оставляем как есть: битое GetClientRect не должно
+                   утащить курсор в бесконечность */
+                if (cw > 0.0f && ch > 0.0f &&
+                    cw < 20000.0f && ch < 20000.0f)
+                {
+                    io->AddMousePosEvent((f32)p.x * g_draw_w / cw,
+                                         (f32)p.y * g_draw_h / ch);
+                }
+                else
+                {
+                    io->AddMousePosEvent((f32)p.x, (f32)p.y);
+                }
+            }
+            else
+            {
+                io->AddMousePosEvent((f32)p.x, (f32)p.y);
+            }
+        }
 
         {
             i32 mb[3];
