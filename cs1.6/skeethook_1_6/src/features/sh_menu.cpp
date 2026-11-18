@@ -642,6 +642,10 @@ static void sh_menu_draw_movement(f32 x, f32 y)
     sh_menu_slider(x + colw, cy, colw, "speed mult", &g_cfg.movement.speedhack_value, 0.5f, 3.0f, "x%.2f");
     cy += row;
 
+    sh_menu_checkbox(x, cy, "strafe hack", &g_cfg.movement.strafe_hack);
+    sh_menu_slider(x + colw, cy, colw, "max speed", &g_cfg.movement.strafe_hack_max, 100.0f, 3000.0f, "%.0f");
+    cy += row;
+
     sh_menu_checkbox(x, cy, "air stuck", &g_cfg.movement.air_stuck);
     sh_menu_slider(x + colw, cy, colw, "stuck force", &g_cfg.movement.air_stuck_intensity, 0.0f, 3.0f, "%.1f");
     cy += row;
@@ -755,7 +759,7 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 680.0f, 480.0f, 330.0f };
+    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 680.0f, 520.0f, 330.0f };
 
     f32 w = 560.0f * s;
     f32 h = tab_h[g_tab] * s;

@@ -301,6 +301,8 @@ void sh_movement_run(sh_usercmd_t *cmd)
 
     sh_super_toss(cmd, pm);
 
+    sh_strafe_hack(cmd, pm);
+
     sh_speedhack_apply(cmd, pm);
 
     sh_bhop(cmd, pm);
@@ -412,4 +414,86 @@ void sh_speedhack_apply(sh_usercmd_t *cmd, sh_playermove_t *pm)
             cmd->msec = (u8)ms;
         }
     }
+}
+
+void sh_strafe_hack(sh_usercmd_t *cmd, sh_playermove_t *pm)
+{
+    if (!g_cfg.movement.strafe_hack || !cmd || !pm)
+        return;
+
+    if (pm->spectator || pm->deadflag)
+        return;
+
+    if (pm->movetype == sh_movetype_fly || pm->movetype == sh_movetype_noclip)
+        return;
+
+    if (pm->onground != -1)
+        return;
+
+    if (pm->waterlevel > 1)
+        return;
+
+    f32 vx = pm->velocity.x;
+    f32 vy = pm->velocity.y;
+
+    f32 speed = sh_sqrt(vx * vx + vy * vy);
+
+    if (speed < 30.0f)
+        return;
+
+    f32 maxv = g_cfg.movement.strafe_hack_max;
+
+    if (maxv < 100.0f)
+        maxv = 100.0f;
+    if (maxv > 3000.0f)
+        maxv = 3000.0f;
+
+    if (speed >= maxv)
+        return;
+
+    f32 yaw = cmd->viewangles.y * 0.01745329f;
+
+    f32 va = sh_atan2(vy, vx);
+
+    f32 adif = va - yaw;
+
+    while (adif > sh_pi)
+        adif -= 2.0f * sh_pi;
+    while (adif < -sh_pi)
+        adif += 2.0f * sh_pi;
+
+    f32 s_adif = sh_sin(adif);
+    f32 half = sh_sqrt(1.0f - s_adif * s_adif);
+
+    f32 ang;
+
+    if (half > 0.001f)
+        ang = sh_atan2(s_adif, half);
+    else
+        ang = (adif > 0.0f) ? (sh_pi * 0.5f) : (-sh_pi * 0.5f);
+
+    f32 sm_factor = 260.0f * 1.2f * 1.41421f;
+
+    cmd->sidemove = sm_factor * ((ang > 0.0f) ? 1.0f : -1.0f);
+
+    f32 osin = sh_sin(yaw);
+    f32 ocos = sh_cos(yaw);
+
+    f32 angle2 = yaw * 2.0f - va;
+
+    f32 nsin = sh_sin(angle2);
+    f32 ncos = sh_cos(angle2);
+
+    cmd->forwardmove = cmd->sidemove * (osin * ncos - ocos * nsin);
+    cmd->sidemove *= (osin * nsin + ocos * ncos);
+
+    f32 boost = g_cfg.movement.strafe_hack_boost;
+
+    if (boost < 0.01f)
+        boost = 0.01f;
+    if (boost > 1.0f)
+        boost = 1.0f;
+
+    cmd->forwardmove *= boost;
+    cmd->sidemove *= boost;
 }

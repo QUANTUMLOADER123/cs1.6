@@ -197,6 +197,9 @@ typedef struct sh_movement_cfg
     f32 speedhack_value;
     qbool air_stuck;
     f32 air_stuck_intensity;
+    qbool strafe_hack;
+    f32 strafe_hack_max;
+    f32 strafe_hack_boost;
     qbool auto_jump;
     qbool super_toss;
     qbool tick_control;
