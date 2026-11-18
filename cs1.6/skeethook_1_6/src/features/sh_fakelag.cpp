@@ -26,7 +26,19 @@ void sh_fakelag_init(void)
     if (!hit)
         return;
 
-    u32 lastout = *(u32 *)(hit + 11);
+    /* hit+10 - опкод A3 (mov [mem32], eax), его операнд начинается
+       со следующего байта: hit+11 - это уже сам опкод, а не адрес.
+       Раньше читалось hit+11, то есть в указатель попадало 0x000000A3
+       = 163 - запись по этому адресу роняет игру. */
+    u32 lastout = *(u32 *)(hit + 12);
+
+    /* адрес должен быть в пределах hw.dll, иначе операнд всё ещё не тот */
+    void *hw = sh_module_base("hw.dll");
+    u32 hw_base = (u32)(unsigned long)hw;
+    u32 hw_size = hw ? sh_module_size("hw.dll") : 0;
+
+    if (!hw || lastout < hw_base || lastout - hw_base >= hw_size)
+        return;
 
     g_next_send_va = (void *)(lastout + 4);
     g_last_outgoing_va = (void *)lastout;

@@ -442,11 +442,18 @@ typedef struct sh_triapi_s
     void (*fog_params)(f32 density, i32 skybox);
 } sh_triapi_t;
 
+/* SCREENINFO из cl_entity.h (GoldSrc). ВАЖНО: структура начинается
+   с char name[32] - движок пишет все 40 байт. Если объявить
+   только width/height (8 байт), pfnGetScreenInfo затирает
+   32 байта стека -> краш в первом же HUD_Redraw. */
 typedef struct sh_screeninfo_s
 {
+    char name[32];
     i32 width;
     i32 height;
 } sh_screeninfo_t;
+
+typedef char sh_screeninfo_size_check[(sizeof(sh_screeninfo_t) == 40) ? 1 : -1];
 
 typedef struct sh_hud_player_info_s
 {
