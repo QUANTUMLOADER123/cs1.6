@@ -25,6 +25,7 @@ void sh_tracer3d_init(void);
 qbool sh_chams_gl_init(void);
 qbool sh_chams_gl_ready(void);
 qbool sh_skybox_fast_init(void);
+void sh_misc_screen_init(void);
 void sh_tracer3d_add(const vec3_t *start, const vec3_t *end);
 qbool sh_tracer3d_ready(void);
 void sh_scope_draw(void);
@@ -49,7 +50,6 @@ void sh_players_track_anim(void);
 #include "../../include/sh_skybox.h"
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
-#include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
 void sh_players_track_anim(void);
@@ -364,8 +364,20 @@ i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
     sh_rage_run(cmd);
     sh_rage_apply_recoil(cmd);
 
+    vec3_t pre_angles = cmd->viewangles;
+
     if (g_cfg.antiaim.enabled)
         sh_antiaim_run(cmd);
+
+    f32 yaw_delta = cmd->viewangles.y - pre_angles.y;
+
+    while (yaw_delta > 180.0f)
+        yaw_delta -= 360.0f;
+    while (yaw_delta < -180.0f)
+        yaw_delta += 360.0f;
+
+    if (yaw_delta != 0.0f)
+        sh_movement_fix(cmd, yaw_delta);
 
     sh_movement_run(cmd);
 
@@ -802,6 +814,7 @@ qbool sh_hooks_install(void)
     sh_tracer3d_init();
     sh_chams_gl_init();
     sh_matrix_init();
+    sh_misc_screen_init();
     sh_skybox_fast_init();
 
     if (create_move)

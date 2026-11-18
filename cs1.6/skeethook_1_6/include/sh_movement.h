@@ -24,6 +24,7 @@ void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm);
 void sh_autostrafe(sh_usercmd_t *cmd, sh_playermove_t *pm);
 void sh_quick_stop(sh_usercmd_t *cmd, sh_playermove_t *pm);
 void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm);
+void sh_movement_fix(sh_usercmd_t *cmd, f32 yaw_delta);
 void sh_auto_jump_hold(sh_usercmd_t *cmd, sh_playermove_t *pm);
 f32  sh_strafe_omega(f32 wishspeed);
 f32  sh_friction_drop(f32 speed, f32 frametime);
