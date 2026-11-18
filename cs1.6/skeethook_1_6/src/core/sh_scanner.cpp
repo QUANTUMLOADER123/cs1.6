@@ -55,8 +55,11 @@ void *sh_find_pattern(void *base, u32 size, const sh_pattern_t *pattern)
     if (!base || !size || !pattern || !pattern->bytes || !pattern->mask)
         return 0;
 
+    if (pattern->len > size)
+        return 0;
+
     u8 *start = (u8 *)base;
-    u8 *end = start + size - pattern->len;
+    u8 *end = start + (size - pattern->len) + 1;
     u8 first = pattern->bytes[0];
 
     for (u8 *p = start; p < end; ++p)

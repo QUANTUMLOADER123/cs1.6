@@ -88,9 +88,16 @@ static void *sh_va_to_ptr(u32 va)
     if (!base)
         return 0;
 
-    u32 off = va - (u32)base;
+    u32 b = (u32)base;
+
+    if (va < b)
+        return 0;
+
+    u32 off = va - b;
+
     if (off >= sh_module_size("client.dll"))
         return 0;
+
     return (u8 *)base + off;
 }
 
