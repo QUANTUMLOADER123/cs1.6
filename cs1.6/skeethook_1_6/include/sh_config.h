@@ -164,6 +164,7 @@ typedef struct sh_misc_cfg
     qbool knife_bot;
     qbool fast_reload;
     qbool no_recoil;
+    qbool no_recoil_effect;
     qbool no_spread;
     qbool no_flash;
     qbool no_smoke;

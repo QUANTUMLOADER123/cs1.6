@@ -148,6 +148,7 @@ void sh_config_defaults(void)
     g_cfg.misc.knife_bot = (qbool)0;
     g_cfg.misc.fast_reload = (qbool)0;
     g_cfg.misc.no_recoil = (qbool)0;
+    g_cfg.misc.no_recoil_effect = (qbool)0;
     g_cfg.misc.no_spread = (qbool)0;
     g_cfg.misc.no_flash = (qbool)0;
     g_cfg.misc.no_smoke = (qbool)0;

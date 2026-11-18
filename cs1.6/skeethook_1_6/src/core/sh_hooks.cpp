@@ -416,6 +416,13 @@ i32 __cdecl sh_player_move_hook(sh_playermove_t *pmove, i32 server)
     if (pmove && g_cfg.misc.no_fall_damage)
         sh_fall_predict(pmove);
 
+    if (pmove && g_cfg.misc.no_recoil_effect)
+    {
+        pmove->punchangle.x = 0.0f;
+        pmove->punchangle.y = 0.0f;
+        pmove->punchangle.z = 0.0f;
+    }
+
 
     return 0;
 }

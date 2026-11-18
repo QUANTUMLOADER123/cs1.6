@@ -489,6 +489,8 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     cy += 20.0f * s;
 
     sh_menu_checkbox(x, cy, "no recoil", &g_cfg.misc.no_recoil);
+    sh_menu_checkbox(x + colw, cy, "no recoil fx", &g_cfg.misc.no_recoil_effect);
+    cy += row;
     sh_menu_checkbox(x + colw, cy, "no spread", &g_cfg.misc.no_spread);
     cy += row;
 
