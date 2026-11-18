@@ -3,6 +3,7 @@
 #include "../../include/sh_sdk.h"
 #include "../../include/sh_types.h"
 #include "../../include/sh_scanner.h"
+#include "../../include/sh_crash.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -63,6 +64,9 @@ static DWORD WINAPI sh_worker(void *param)
 {
     (void)param;
 
+    sh_crash_init();
+    sh_crash_stage("воркер запущен");
+
     /* до 10 минут: инжект в главном меню не даёт g_pmove, пока не
        загрузится карта - ждать надо столько, сколько игрок сидит в меню */
     for (i32 i = 0; i < 12000; ++i)
@@ -85,10 +89,14 @@ static DWORD WINAPI sh_worker(void *param)
             continue;
         }
 
+        sh_crash_stage("конфиг");
         sh_config_load();
+
+        sh_crash_stage("установка хуков");
 
         if (sh_hooks_install())
         {
+            sh_crash_stage("работает");
             sh_trace("хуки установлены");
             return 0;
         }
@@ -144,4 +152,13 @@ SH_EXPORT sh_config *sh_get_config(void)
 SH_EXPORT qbool sh_is_attached(void)
 {
     return sh_sdk_ready();
+}
+
+/* Проверка обработчика крашей без падения игры: пишет отчёт
+   в skeethook_crash.log и в буфер обмена. */
+SH_EXPORT qbool sh_test_crash_report(void)
+{
+    sh_c_crash_test();
+
+    return 1;
 }

@@ -6,6 +6,7 @@
 #include "../../include/sh_sdk.h"
 #include "../../include/sh_math.h"
 #include "../../include/sh_scanner.h"
+#include "../../include/sh_crash.h"
 #include "../../include/sh_font.h"
 #include "../../include/sh_nospread.h"
 #include "../../include/sh_modelchanger.h"
@@ -347,6 +348,7 @@ static void sh_first_init(void)
 
 i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
 {
+    sh_crash_stage("CreateMove");
     if (!cmd)
         return g_create_move_orig ? g_create_move_orig(frametime, cmd) : 0;
 
@@ -399,6 +401,8 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     if (!sh_is_ready())
         return result;
 
+    sh_crash_stage("HUD_Redraw: первый init");
+
     g_frame_time = time;
 
     sh_first_init();
@@ -420,7 +424,11 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
         }
     }
 
+    sh_crash_stage("HUD_Redraw: render_begin");
+
     sh_render_begin(w, h);
+
+    sh_crash_stage("HUD_Redraw: тики фич");
 
     sh_visuals_effects_tick(time);
     sh_skybox_tick();
@@ -433,8 +441,12 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_visuals_apply_nightmode();
     sh_worldfx_tick();
 
+    sh_crash_stage("HUD_Redraw: ESP");
+
     if (g_cfg.visuals.enabled)
         sh_esp_run();
+
+    sh_crash_stage("HUD_Redraw: отрисовка");
 
     sh_visuals_effects_draw();
     sh_soundesp_draw();
@@ -446,6 +458,8 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_indicators_draw();
     sh_scope_draw();
 
+    sh_crash_stage("HUD_Redraw: меню");
+
     sh_menu_draw();
 
     sh_render_end();
@@ -455,6 +469,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 
 i32 __cdecl sh_player_move_hook(sh_playermove_t *pmove, i32 server)
 {
+    sh_crash_stage("PlayerMove");
     g_pmove = pmove;
 
     sh_engine_trace_setup();

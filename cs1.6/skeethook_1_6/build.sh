@@ -15,7 +15,7 @@ for f in ext/minhook/src/hook.c ext/minhook/src/buffer.c ext/minhook/src/trampol
 done
 
 CXF="-target $T -std=c++17 -O2 -fno-exceptions -fno-rtti -Iinclude -Iext/minhook/include -D_CRT_SECURE_NO_WARNINGS"
-SRC="src/core/sh_scanner.cpp src/core/sh_math.cpp src/core/sh_config.cpp src/core/sh_hooks.cpp src/core/sh_dllmain.cpp
+SRC="src/core/sh_scanner.cpp src/core/sh_math.cpp src/core/sh_config.cpp src/core/sh_hooks.cpp src/core/sh_dllmain.cpp src/core/sh_crash.cpp
      src/sdk/sh_patterns.cpp src/render/sh_render.cpp src/render/sh_font.cpp src/render/sh_font_data.cpp
      src/features/sh_players.cpp src/features/sh_bones.cpp src/features/sh_antiaim.cpp
      src/features/sh_misc.cpp src/features/sh_esp.cpp src/features/sh_menu.cpp src/features/sh_usermsg.cpp src/features/sh_ballistics.cpp src/features/sh_autowall.cpp src/features/sh_movement.cpp src/features/sh_visuals.cpp src/features/sh_events.cpp src/features/sh_nospread.cpp src/features/sh_modelchanger.cpp src/features/sh_soundesp.cpp \
