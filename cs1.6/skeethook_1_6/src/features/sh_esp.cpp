@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "../../include/sh_features.h"
 #include "../../include/sh_autowall.h"
 #include "../../include/sh_icons.h"
@@ -161,13 +162,13 @@ static void sh_draw_health(const sh_player_t *p, const sh_box_t *b)
     {
         char buf[16];
         i32 n = p->health;
-        i32 i = 0;
-        if (n >= 100)
-            buf[i++] = '0' + (n / 100) % 10;
-        if (n >= 10)
-            buf[i++] = '0' + (n / 10) % 10;
-        buf[i++] = '0' + n % 10;
-        buf[i] = 0;
+
+        if (n < 0)
+            n = 0;
+        if (n > 9999)
+            n = 9999;
+
+        snprintf(buf, sizeof(buf), "%d", n);
 
         sh_text(x - 16.0f, b->top + h * 0.5f - 5.0f, hp, "%s", buf);
     }
