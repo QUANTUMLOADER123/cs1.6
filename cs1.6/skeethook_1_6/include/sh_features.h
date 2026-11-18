@@ -146,4 +146,6 @@ void sh_msg_round_time(i32 seconds);
 i32 sh_player_is_dead(i32 index);
 
 void sh_menu_draw(void);
+void *sh_game_window_for_imgui(void);
+qbool sh_menu_visible_now(void);
 void sh_menu_watermark_only(void);

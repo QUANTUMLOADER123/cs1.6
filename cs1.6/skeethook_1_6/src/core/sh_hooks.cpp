@@ -1,6 +1,7 @@
 #include "../../include/sh_hooks.h"
 #include "../../include/sh_config.h"
 #include "../../include/sh_features.h"
+#include "../../include/sh_imgui.h"
 #include "../../include/sh_icons.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_sdk.h"
@@ -537,7 +538,38 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 
     sh_crash_stage("HUD_Redraw: меню");
 
-    sh_menu_draw();
+    /* ImGui-кадр. Важно: begin/end оборачивают ТОЛЬКО меню,
+       иначе ImGui перехватит ввод у ESP-отрисовки и хуков.
+
+       sh_imgui_init вызывается один раз при первом кадре: он
+       создаёт контекст, грузит шрифт через GDI/FreeType и отдаёт
+       текстуру бэкенду. */
+    {
+        static i32 imgui_tried;
+
+        if (!sh_imgui_ready() && !imgui_tried)
+        {
+            imgui_tried = 1;
+
+            if (!sh_imgui_init((void *)sh_game_window_for_imgui()))
+                sh_crash_stage("imgui: инициализация не удалась");
+        }
+
+        if (sh_imgui_ready())
+        {
+            /* закрываем наш самописный проход, чтобы GL-состояние
+               было предсказуемым для ImGui */
+            sh_render_end();
+
+            sh_imgui_begin(w, h, sh_menu_visible_now());
+            sh_menu_draw();
+            sh_imgui_end();
+        }
+        else
+        {
+            sh_menu_draw();
+        }
+    }
 
     sh_render_end();
 
