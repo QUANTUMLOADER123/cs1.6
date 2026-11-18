@@ -11,6 +11,7 @@ typedef void(__stdcall *gl_void_i_fn)(u32);
 typedef u8(__stdcall *gl_is_enabled_fn)(u32);
 typedef void(__stdcall *gl_void_f4_fn)(f32, f32, f32, f32);
 typedef void(__stdcall *gl_void_ii_fn)(u32, u32);
+typedef void(__stdcall *gl_get_iv_fn)(u32, i32 *);
 
 static const u8 g_pat_model[] = {
     0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x48, 0xA1, 0x00, 0x00, 0x00, 0x00, 0x8B,
@@ -59,6 +60,7 @@ static gl_void_i_fn g_gl_enable;
 static gl_is_enabled_fn g_gl_is_enabled;
 static gl_void_f4_fn g_gl_color4f;
 static gl_void_ii_fn g_gl_blend_func;
+static gl_get_iv_fn g_gl_get_iv;
 static gl_void_i_fn g_gl_depth_func;
 static gl_void_i_fn g_gl_depth_mask;
 static f32 *g_material_alpha;
@@ -66,13 +68,15 @@ static qbool g_ready;
 static qbool g_override;
 static f32 g_ov_col[4];
 
-#define sh_gl_texture_2d   3553
-#define sh_gl_depth_test   2929
-#define sh_gl_blend        3042
-#define sh_gl_src_alpha    770
-#define sh_gl_one_minus    771
-#define sh_gl_lequal       515
-#define sh_gl_greater      519
+#define sh_gl_texture_2d    0x0DE1
+#define sh_gl_depth_test    0x0B71
+#define sh_gl_blend         0x0BE2
+#define sh_gl_src_alpha     0x0302
+#define sh_gl_one_minus     0x0303
+#define sh_gl_lequal        0x0203
+#define sh_gl_blend_src_rgb 0x80E1
+#define sh_gl_blend_dst_rgb 0x80E0
+#define sh_gl_greater      0x0204
 
 static i32 sh_chams_block(draw_model_fn orig, const f32 *col, u32 depth_func,
                           qbool write_depth, qbool untextured)
@@ -93,6 +97,15 @@ static i32 sh_chams_block(draw_model_fn orig, const f32 *col, u32 depth_func,
         g_gl_disable(sh_gl_texture_2d);
     else if (!untextured && !textured)
         g_gl_enable(sh_gl_texture_2d);
+
+    i32 prev_src = sh_gl_src_alpha;
+    i32 prev_dst = sh_gl_one_minus;
+
+    if (g_gl_get_iv)
+    {
+        g_gl_get_iv(sh_gl_blend_src_rgb, &prev_src);
+        g_gl_get_iv(sh_gl_blend_dst_rgb, &prev_dst);
+    }
 
     g_gl_blend_func(sh_gl_src_alpha, sh_gl_one_minus);
 
@@ -118,7 +131,7 @@ static i32 sh_chams_block(draw_model_fn orig, const f32 *col, u32 depth_func,
     if (g_material_alpha)
         *g_material_alpha = prev;
 
-    g_gl_blend_func(sh_gl_src_alpha, sh_gl_one_minus);
+    g_gl_blend_func((u32)prev_src, (u32)prev_dst);
     g_gl_depth_func(sh_gl_lequal);
     g_gl_depth_mask(1);
 
@@ -238,6 +251,7 @@ qbool sh_chams_gl_init(void)
     g_gl_is_enabled = (gl_is_enabled_fn)(void *)GetProcAddress(gl, "glIsEnabled");
     g_gl_color4f = (gl_void_f4_fn)(void *)GetProcAddress(gl, "glColor4f");
     g_gl_blend_func = (gl_void_ii_fn)(void *)GetProcAddress(gl, "glBlendFunc");
+    g_gl_get_iv = (gl_get_iv_fn)(void *)GetProcAddress(gl, "glGetIntegerv");
     g_gl_depth_func = (gl_void_i_fn)(void *)GetProcAddress(gl, "glDepthFunc");
     g_gl_depth_mask = (gl_void_i_fn)(void *)GetProcAddress(gl, "glDepthMask");
 
