@@ -264,6 +264,9 @@ f32 sh_atan(f32 v)
         s = (v > 0.0f) ? (sh_pi * 0.5f) : (-sh_pi * 0.5f);
     }
 
+    x = x / (1.0f + sh_sqrt(1.0f + x * x));
+    x = x / (1.0f + sh_sqrt(1.0f + x * x));
+
     f32 x2 = x * x;
     f32 t = x;
     f32 r = 0.0f;
@@ -274,6 +277,8 @@ f32 sh_atan(f32 v)
         r += ((i / 2) % 2 == 0) ? term : -term;
         t *= x2;
     }
+
+    r *= 4.0f;
 
     return (ax > 1.0f) ? (s - r) : r;
 }
