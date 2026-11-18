@@ -345,6 +345,37 @@ f32 sh_nospread_spread(i32 weapon_id, qbool silenced, qbool in_burst,
     return spread;
 }
 
+static f32 sh_np_clamp_cos(f32 v)
+{
+    if (v > 1.0f)
+        return 1.0f;
+    if (v < -1.0f)
+        return -1.0f;
+    return v;
+}
+
+static f32 sh_np_norm_angle(f32 a)
+{
+    while (a > 180.0f)
+        a -= 360.0f;
+    while (a < -180.0f)
+        a += 360.0f;
+    return a;
+}
+
+qbool sh_nospread_compensable(const vec3_t *viewangles, f32 ox, f32 oy)
+{
+    if (!viewangles)
+        return false;
+
+    f32 len = sh_sqrt(1.0f + ox * ox + oy * oy);
+    f32 vert = sh_sqrt(1.0f + oy * oy);
+    f32 rad = viewangles->x * 0.01745329f;
+    f32 ratio = len * -sh_sin(rad) / vert;
+
+    return (ratio >= -1.0f && ratio <= 1.0f);
+}
+
 void sh_nospread_angles(i32 weapon_id, u32 seed, qbool silenced,
                         qbool in_burst, vec3_t *viewangles)
 {
@@ -365,21 +396,37 @@ void sh_nospread_angles(i32 weapon_id, u32 seed, qbool silenced,
     sx *= spread;
     sy *= spread;
 
-    vec3_t fwd, right, up;
-    sh_angle_vectors(viewangles, &fwd, &right, &up);
+    if (!sh_nospread_compensable(viewangles, sx, sy))
+        return;
 
-    vec3_t dir;
-    dir.x = fwd.x + sx * right.x + sy * up.x;
-    dir.y = fwd.y + sx * right.y + sy * up.y;
-    dir.z = fwd.z + sx * right.z + sy * up.z;
+    f32 len = sh_sqrt(1.0f + sx * sx + sy * sy);
+    f32 vert = sh_sqrt(1.0f + sy * sy);
+    f32 vrad = viewangles->x * 0.01745329f;
+    f32 ratio = sh_np_clamp_cos(len * -sh_sin(vrad) / vert);
 
-    sh_normalize(&dir);
+    f32 base = sh_atan2(sy, 1.0f);
+    f32 branch = sh_atan2(ratio, sh_sqrt(1.0f - ratio * ratio));
 
-    vec3_t want;
-    sh_vectors_angle(&dir, &want);
+    f32 direct = base - branch;
+    f32 flipped = base - (3.14159265f - branch);
 
-    viewangles->x = want.x;
-    viewangles->y = want.y;
+    f32 pf = (direct >= 0.0f ? direct : -direct);
+    f32 ff = (flipped >= 0.0f ? flipped : -flipped);
+
+    f32 solved = (pf <= ff) ? direct : flipped;
+    solved *= 57.29577951f;
+
+    if (solved > 89.0f)
+        solved = 89.0f;
+    if (solved < -89.0f)
+        solved = -89.0f;
+
+    f32 srad = solved * 0.01745329f;
+    f32 proj = sh_cos(srad) + sy * sh_sin(srad);
+    f32 yaw = sh_np_norm_angle(viewangles->y + sh_atan2(sx, proj) * 57.29577951f);
+
+    viewangles->x = solved;
+    viewangles->y = yaw;
 }
 
 f32 sh_nospread_radius(i32 weapon_id)

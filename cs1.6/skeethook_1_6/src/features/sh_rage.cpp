@@ -587,12 +587,6 @@ void sh_rage_apply_recoil(sh_usercmd_t *cmd)
     if (!g_cfg.misc.no_recoil && !g_cfg.misc.no_spread)
         return;
 
-    if (g_cfg.misc.no_recoil)
-    {
-        cmd->viewangles.x -= g_pmove->punchangle.x;
-        cmd->viewangles.y -= g_pmove->punchangle.y;
-    }
-
     if (g_cfg.misc.no_spread)
     {
         sh_player_t *lp = sh_player_local();
@@ -601,5 +595,11 @@ void sh_rage_apply_recoil(sh_usercmd_t *cmd)
         u32 seed = sh_spread_seed();
 
         sh_nospread_angles(wid, seed, 0, 1, &cmd->viewangles);
+    }
+
+    if (g_cfg.misc.no_recoil)
+    {
+        cmd->viewangles.x -= g_pmove->punchangle.x;
+        cmd->viewangles.y -= g_pmove->punchangle.y;
     }
 }
