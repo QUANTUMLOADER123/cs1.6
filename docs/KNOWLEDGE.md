@@ -2182,3 +2182,28 @@ origin                2888   <- совпадает с известным зна�
 - `sh_autowall_trace`: `out->hitgroup` не инициализируется, но
   `sh_autowall_damage` читает только `damage`, а оба вызывающих
   (`sh_esp.cpp:246`, `sh_rage.cpp:28`) пишут `hitgroup = 0` сами.
+
+### Краш-фиксы перед живым тестом
+
+Помимо логических багов, отдельно прошёлся по тому, что роняет игру.
+
+| # | что было | последствие |
+|---|---|---|
+| 31 | `MH_Initialize()` вызывалась **после** четырёх `MH_CreateHook` | `HUD_StudioEvent`, `HUD_PostRunCmd`, `HUD_DrawNormalTriangles`, `V_CalcRefdef` не ставились: не работали no-spread, FOV/aspect/viewmodel, fog, трассеры |
+| 32 | `install` возвращал `true` при нуле поставленных хуков | воркер засыпал навсегда, мод молча не работал |
+| 33 | повторный `MH_Initialize` → `MH_ERROR_ALREADY_INITIALIZED` | воркер считал это провалом и зацикливался |
+| 34 | `DllMain(DETACH)` → `MH_DisableHook` под loader-lock | `Freeze()` делает `SuspendThread` всем потокам → вечный дедлок при выгрузке |
+| 35 | `sh_render_ready()` проверяла 4 указателя из 9 | `glEnable`/`glDisable`/`glBlendFunc`/`glLineWidth`/`glTexCoord2f` могли быть NULL → вызов по NULL на кадре |
+| 36 | WeaponList: `sh_str_len(buf, 63)` без учёта `read` | чтение `buf[n+1 .. n+7]` за концом сообщения |
+| 37 | `GetModuleFileNameA` без проверки возврата, `while (dir[i] && i < MAX_PATH)` | чтение `dir[260]` за массивом, запись `dir[last+1]` за границей |
+| 38 | `hdr->numbones` без проверки на отрицательное | битый studiohdr → отрицательный `count` |
+
+**Не воспроизводится побайтово:** zig-сборка содержит `.buildid`
+со счётчиком, поэтому два прогона дают разные SHA256 при идентичных
+секциях `.text`/`.rdata`/`.data`. Сверять надо посекционно, а не по
+хэшу файла.
+
+**Важно для инжекта:** `sh_sdk_ready()` требует `g_pmove`, а он
+появляется только после `HUD_PlayerMove`, то есть на загруженной
+карте. В главном меню `*g_pmove_slot == NULL`. Воркер ждёт до
+10 минут и пишет `skeethook_trace.log` рядом с `hl.exe`.
