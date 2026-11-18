@@ -1624,3 +1624,67 @@ left *= scale; right *= scale
 | Texturebug | срыв залипания на текстуре | средний |
 | Lag record | `cl_entity_t::ph[64]` + `animtime` вместо рендер-часов | средний |
 | Cone spread | полная таблица констант по оружию | средний |
+
+---
+
+## Полный разбор gold-sdk: результат прогона всех паттернов (2026-11-16)
+
+Все 52 паттерна из `src/cstrike1_5/common.hpp` прогнаны по **нашим** бинарям
+(`hw.dll`, `client.dll`, `mp.dll` из корня репо), не по их. Результат — не пересказ,
+а факт совпадения на нашей сборке.
+
+### Совпали (47 из 52)
+
+`hw.dll`: `world_transform` 0x7E080, `screen` 0x458F0, `viewport` 0x450F1,
+`bone_globals` 0x82A50, `bone_matrices` 0x880B0, `chams_model` 0x869E0,
+`chams_light` 0x83DE0, `chams_alpha` 0x88200, `studio_draw_player` 0x44900,
+`is_third_person` 0xBC70, `build_lightmap` 0x47390, `lightmap_format` 0x475F0,
+`rebuild_lightmaps` 0x49BC0, `execute_command` 0x286A0, `console_print` 0x2CB70,
+`draw_skybox` 0x507AE, `load_skys` 0x4F9C2, `load_skys_name` 0x4FA51,
+`environment_flag` 0x507B4, `environment_color` 0x507CF, `camera_frustum` 0x457C6,
+`no_scope_overlay` 0x11670, `antihit_camera_hook` 0xCE60,
+`antihit_camera_angles` 0x46905, `antihit_view_angles` 0x2016F,
+`fake_lag_global_time` 0x19349, `user_tracer` 0x7B5E0, `tracer_pool_head` 0x7B60F.
+
+`client.dll`: `local_weapon` 0xE030, `engine_funcs` 0x4472C, `fire_bullets` 0x2460,
+`bullet_impact` 0x20B0, `killfeed_saytext` 0x459C0, `no_smoke` 0x6A640,
+`no_scope` 0x65030, `scoped_fov` 0x67BC3, `team_names` 0xA475F,
+`message_damage` 0x4ADF0, `message_health` 0x4ADA0, `message_health_info` 0x4AFD0,
+`message_account` 0x4AF80, `message_score_attrib` 0x4AE80, `message_radar` 0x4AF00,
+`message_receive_weapon` 0x70C50, `message_ammox` 0x402A0, `message_begin` 0x5B3A0.
+
+`mp.dll`: `no_flash` 0x491D0.
+
+### НЕ совпали (5)
+
+`client` (19 байт), `entities` (16), `cvar_findvar` (15), `fov_scaled_write` (11),
+`create_interface` (1). Причина у всех одна — либо структура другая сборка,
+либо паттерн зависит от версии. Заменяются своими путями (`g_engfuncs` уже даёт
+доступ к cvars, а сущности мы берём через `AddEntity`-хук).
+
+### Уже перенесено в skeethook
+
+| Фича | Файл | Коммит |
+| --- | --- | --- |
+| aspect через `glFrustum` | `sh_aspect.cpp` | `0595966` |
+| lightmap nightmode | `sh_nightmode.cpp` | `4dcceae` |
+| anim breakers | `sh_bones.cpp` | `d480786` |
+| jumpbug + movement_fix | `sh_movement.cpp` | `8ce178d` |
+| killsound | `sh_usermsg.cpp` | `ec82c47` |
+| custom scope | `sh_scope.cpp` | `420175e` |
+| texturebug | `sh_movement.cpp` | `2b25da3` |
+
+### Осталось взять (по убыванию ценности)
+
+1. **No-spread: компенсация в обратную сторону.** Самое важное. Их `math::cone::compensate`
+   решает `cone(B) = forward(A)`, а не `forward(B) = cone(A)`. Замкнутая форма через
+   `alpha = atan2(Y, 1)`, две ветви `p = alpha - asin(ratio)` и `p = alpha - (pi - asin(ratio))`.
+   Плюс порядок: `compensate(target)` → вычесть punch, а не `compensate(target - punch)`.
+2. **SGS через делегирование.** `ground_strafe` на воздушных тиках зовёт `autostrafe(cmd, pm, false)`
+   без climb. У нас `sh_ground_strafe` выходит на `onground == -1` — вся воздушная фаза
+   теряется, поэтому у нас прироста нет.
+3. **Трассеры через `R_UserTracer`** (`hw.dll+0x7B5E0`, паттерн совпал). Второй аргумент —
+   направление, не конечная точка. Пул ограничен, `color 0..12`.
+4. **chams через `studio`** — у нас есть свой, но у них три отдельных паттерна
+   (model/light/alpha) с rim-подсветкой.
+5. **skybox** — подмена имени и перезагрузка (`load_skys`), паттерны совпали.
