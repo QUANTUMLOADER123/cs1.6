@@ -491,8 +491,26 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
 
             if (sx != 0.0f || sy != 0.0f)
             {
+                vec3_t world_up = { 0.0f, 0.0f, 1.0f };
+
+                if (dir.z > 0.999f || dir.z < -0.999f)
+                {
+                    world_up.x = 1.0f;
+                    world_up.y = 0.0f;
+                    world_up.z = 0.0f;
+                }
+
                 vec3_t right, up;
-                sh_angle_vectors(&cmd->viewangles, &dir, &right, &up);
+
+                right.x = dir.y * world_up.z - dir.z * world_up.y;
+                right.y = dir.z * world_up.x - dir.x * world_up.z;
+                right.z = dir.x * world_up.y - dir.y * world_up.x;
+                sh_normalize(&right);
+
+                up.x = right.y * dir.z - right.z * dir.y;
+                up.y = right.z * dir.x - right.x * dir.z;
+                up.z = right.x * dir.y - right.y * dir.x;
+                sh_normalize(&up);
 
                 vec3_t spread_dir;
                 sh_spread_trace_dir(&dir, &right, &up, sx, sy, &spread_dir);
