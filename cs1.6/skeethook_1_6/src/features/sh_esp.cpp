@@ -660,7 +660,10 @@ void sh_enemy_fire_draw(void)
     if (!g_cfg.misc.enemy_fire_indicator)
         return;
 
-    f32 now = g_pmove ? g_pmove->time : 0.0f;
+    if (!g_pmove)
+        return;
+
+    f32 now = g_pmove->time;
     sh_enemy_fire_tick(now);
 
     f32 s = sh_scale();

@@ -259,9 +259,17 @@ void sh_soundesp_draw(void)
     if (!g_cfg.visuals.sound_esp)
         return;
 
+    if (!g_pmove)
+    {
+        for (i32 i = 0; i < sh_max_sounds; ++i)
+            g_sounds[i].active = 0;
+
+        return;
+    }
+
     sh_soundesp_tick();
 
-    f32 now = g_pmove ? g_pmove->time : 0.0f;
+    f32 now = g_pmove->time;
 
     for (i32 i = 0; i < sh_max_sounds; ++i)
     {

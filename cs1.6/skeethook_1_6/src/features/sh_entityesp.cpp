@@ -103,7 +103,15 @@ void sh_entityesp_draw(void)
     if (!g_cfg.visuals.entity_esp)
         return;
 
-    f32 now = g_pmove ? g_pmove->time : 0.0f;
+    if (!g_pmove)
+    {
+        for (i32 i = 0; i < sh_max_world_ents; ++i)
+            g_wents[i].active = 0;
+
+        return;
+    }
+
+    f32 now = g_pmove->time;
 
     sh_text_esp_begin();
 
