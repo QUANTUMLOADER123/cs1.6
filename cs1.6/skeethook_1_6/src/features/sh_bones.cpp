@@ -109,6 +109,9 @@ static void sh_bones_build_map(sh_bone_snapshot_t *snap,
 
     i32 n = hdr->numbones;
 
+    if (n < 0)
+        n = 0;
+
     if (n > sh_max_bones)
         n = sh_max_bones;
 

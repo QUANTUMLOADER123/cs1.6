@@ -214,17 +214,29 @@ void sh_config_defaults(void)
 static void sh_config_path(char *out, i32 cap)
 {
     char dir[MAX_PATH];
-    GetModuleFileNameA(0, dir, MAX_PATH);
+    DWORD len = GetModuleFileNameA(0, dir, MAX_PATH);
+
+    dir[MAX_PATH - 1] = 0;
+
+    if (len == 0 || len >= MAX_PATH)
+    {
+        dir[0] = '.';
+        dir[1] = 0;
+    }
+    else
+    {
+        dir[len] = 0;
+    }
 
     i32 i = 0;
     i32 last = -1;
-    while (dir[i] && i < MAX_PATH)
+    while (dir[i] && i < MAX_PATH - 1)
     {
         if (dir[i] == '\\')
             last = i;
         ++i;
     }
-    if (last >= 0)
+    if (last >= 0 && last + 1 < MAX_PATH)
         dir[last + 1] = 0;
 
     snprintf(out, cap, "%s%s.cfg", dir, SH_NAME);
