@@ -15,19 +15,27 @@ static DWORD WINAPI sh_worker(void *param)
 
     for (i32 i = 0; i < 600; ++i)
     {
-        if (sh_module_base("client.dll"))
+        if (!sh_module_base("client.dll"))
         {
-            Sleep(120);
-            sh_sdk_resolve();
-
-            if (sh_sdk_ready())
-            {
-                sh_config_load();
-                sh_hooks_install();
-            }
-            return 0;
+            Sleep(50);
+            continue;
         }
-        Sleep(50);
+
+        Sleep(120);
+        sh_sdk_resolve();
+
+        if (!sh_sdk_ready())
+        {
+            Sleep(100);
+            continue;
+        }
+
+        sh_config_load();
+
+        if (sh_hooks_install())
+            return 0;
+
+        Sleep(100);
     }
 
     return 0;
