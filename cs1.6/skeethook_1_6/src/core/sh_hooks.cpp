@@ -31,6 +31,7 @@ void sh_remove_bob(void);
 void sh_fog_apply(void);
 void sh_entityesp_add(sh_cl_entity_t *ent, const char *model_name);
 void sh_entityesp_draw(void);
+qbool sh_trace_fraction(const vec3_t *start, const vec3_t *end, f32 *frac);
 #include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
@@ -692,7 +693,9 @@ void __cdecl sh_calc_refdef_hook(sh_ref_params_t *pparams)
         pparams->punchangle.x = 0.0f;
         pparams->punchangle.y = 0.0f;
         pparams->punchangle.z = 0.0f;
-        pparams->viewangles.x -= pparams->cl_viewangles.x - pparams->viewangles.x;
+
+        if (g_cfg.misc.no_recoil)
+            pparams->viewangles = pparams->cl_viewangles;
     }
 
     if (g_cfg.visuals.thirdperson && g_cfg.visuals.thirdperson_dist > 0.0f)
@@ -704,9 +707,26 @@ void __cdecl sh_calc_refdef_hook(sh_ref_params_t *pparams)
         if (dist > 400.0f)
             dist = 400.0f;
 
-        pparams->vieworg.x -= pparams->forward.x * dist;
-        pparams->vieworg.y -= pparams->forward.y * dist;
-        pparams->vieworg.z -= pparams->forward.z * dist;
+        vec3_t eye = pparams->vieworg;
+        vec3_t want;
+
+        want.x = eye.x - pparams->forward.x * dist;
+        want.y = eye.y - pparams->forward.y * dist;
+        want.z = eye.z - pparams->forward.z * dist;
+
+        f32 frac = 1.0f;
+
+        if (sh_trace_fraction(&eye, &want, &frac) && frac < 1.0f)
+        {
+            if (frac < 0.05f)
+                frac = 0.05f;
+
+            want.x = eye.x + (want.x - eye.x) * frac;
+            want.y = eye.y + (want.y - eye.y) * frac;
+            want.z = eye.z + (want.z - eye.z) * frac;
+        }
+
+        pparams->vieworg = want;
     }
 }
 
