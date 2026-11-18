@@ -301,6 +301,7 @@ void sh_movement_run(sh_usercmd_t *cmd)
 
     sh_super_toss(cmd, pm);
 
+    sh_ground_strafe(cmd, pm);
     sh_strafe_hack(cmd, pm);
 
     sh_speedhack_apply(cmd, pm);
@@ -499,4 +500,64 @@ void sh_strafe_hack(sh_usercmd_t *cmd, sh_playermove_t *pm)
 
     cmd->forwardmove *= boost;
     cmd->sidemove *= boost;
+}
+
+void sh_ground_strafe(sh_usercmd_t *cmd, sh_playermove_t *pm)
+{
+    if (!g_cfg.movement.ground_strafe || !cmd || !pm)
+        return;
+
+    if (pm->onground == -1)
+        return;
+
+    if (pm->spectator || pm->deadflag)
+        return;
+
+    if (pm->waterlevel > 1)
+        return;
+
+    if (pm->movetype == sh_movetype_fly || pm->movetype == sh_movetype_noclip)
+        return;
+
+    if (!(cmd->buttons & (sh_in_forward | sh_in_back | sh_in_moveleft | sh_in_moveright)))
+        return;
+
+    f32 vx = pm->velocity.x;
+    f32 vy = pm->velocity.y;
+
+    f32 speed = sh_sqrt(vx * vx + vy * vy);
+
+    if (speed < 200.0f)
+        return;
+
+    f32 maxs = g_cfg.movement.ground_strafe_max;
+
+    if (maxs < 200.0f)
+        maxs = 200.0f;
+    if (maxs > 2000.0f)
+        maxs = 2000.0f;
+
+    if (speed > maxs)
+        return;
+
+    static i32 g_gs_phase;
+    static f32 g_gs_last;
+
+    f32 now = pm->time;
+
+    if (now - g_gs_last < 0.03f)
+    {
+        if (g_gs_phase)
+            cmd->buttons |= sh_in_duck;
+
+        return;
+    }
+
+    g_gs_last = now;
+    g_gs_phase = !g_gs_phase;
+
+    if (g_gs_phase)
+        cmd->buttons |= sh_in_duck;
+    else
+        cmd->buttons &= ~sh_in_duck;
 }

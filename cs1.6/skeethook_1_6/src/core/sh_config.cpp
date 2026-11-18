@@ -44,6 +44,8 @@ void sh_config_defaults(void)
     g_cfg.movement.strafe_hack = (qbool)0;
     g_cfg.movement.strafe_hack_max = 1000.0f;
     g_cfg.movement.strafe_hack_boost = 1.0f;
+    g_cfg.movement.ground_strafe = (qbool)0;
+    g_cfg.movement.ground_strafe_max = 700.0f;
     g_cfg.movement.auto_jump = (qbool)1;
     g_cfg.movement.super_toss = (qbool)0;
     g_cfg.movement.tick_control = (qbool)0;

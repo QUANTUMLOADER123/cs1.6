@@ -18,6 +18,7 @@ qbool sh_fall_warning(f32 *damage);
 
 void sh_speedhack_apply(sh_usercmd_t *cmd, sh_playermove_t *pm);
 void sh_strafe_hack(sh_usercmd_t *cmd, sh_playermove_t *pm);
+void sh_ground_strafe(sh_usercmd_t *cmd, sh_playermove_t *pm);
 void sh_super_toss(sh_usercmd_t *cmd, sh_playermove_t *pm);
 
 void sh_autostrafe(sh_usercmd_t *cmd, sh_playermove_t *pm);
