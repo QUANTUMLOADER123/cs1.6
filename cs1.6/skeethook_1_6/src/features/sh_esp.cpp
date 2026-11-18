@@ -26,14 +26,35 @@ static qbool sh_make_box(const sh_player_t *p, sh_box_t *box)
     bottom.z -= 12.0f;
 
     vec2_t s_top, s_bottom;
-    if (!sh_world_to_screen(&top, &s_top))
-        return false;
-    if (!sh_world_to_screen(&bottom, &s_bottom))
+
+    qbool ok_top = sh_world_to_screen(&top, &s_top);
+    qbool ok_bottom = sh_world_to_screen(&bottom, &s_bottom);
+
+    if (!ok_top && !ok_bottom)
         return false;
 
+    if (!ok_top)
+    {
+        s_top.x = s_bottom.x;
+        s_top.y = 0.0f;
+    }
+
+    if (!ok_bottom)
+    {
+        s_bottom.x = s_top.x;
+        s_bottom.y = sh_screen_height();
+    }
+
     f32 h = s_bottom.y - s_top.y;
-    if (h < 2.0f || h > sh_screen_height())
+
+    if (h < 2.0f)
         return false;
+
+    if (h > sh_screen_height())
+    {
+        s_bottom.y = s_top.y + sh_screen_height();
+        h = s_bottom.y - s_top.y;
+    }
 
     f32 w = h * 0.42f;
 

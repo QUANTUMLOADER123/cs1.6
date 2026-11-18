@@ -120,7 +120,7 @@ void sh_antiaim_apply_pitch(sh_usercmd_t *cmd, f32 time)
         cmd->viewangles.x = 1620.0f;
         break;
     case sh_pitch_fake_up:
-        cmd->viewangles.x = -1619.0f;
+        cmd->viewangles.x = -1620.0f;
         break;
     case sh_pitch_spin:
     {
