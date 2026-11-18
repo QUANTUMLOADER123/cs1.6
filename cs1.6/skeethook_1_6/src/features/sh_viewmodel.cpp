@@ -71,23 +71,6 @@ void sh_fov_apply(void)
 
 void sh_aspect_apply(void)
 {
-    if (!g_engfuncs || !g_engfuncs->pfnCvar_SetValue)
-        return;
-
-    if (!g_cfg.visuals.aspect_ratio)
-    {
-        g_engfuncs->pfnCvar_SetValue("r_aspectratio", 0.0f);
-        return;
-    }
-
-    f32 a = g_cfg.visuals.aspect_value;
-
-    if (a < 0.5f)
-        a = 0.5f;
-    if (a > 3.0f)
-        a = 3.0f;
-
-    g_engfuncs->pfnCvar_SetValue("r_aspectratio", a);
 }
 
 void sh_remove_bob(void)

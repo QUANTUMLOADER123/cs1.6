@@ -4,6 +4,7 @@
 #include "../../include/sh_icons.h"
 #include "../../include/sh_render.h"
 #include "../../include/sh_sdk.h"
+#include "../../include/sh_math.h"
 #include "../../include/sh_scanner.h"
 #include "../../include/sh_font.h"
 #include "../../include/sh_nospread.h"
@@ -196,6 +197,37 @@ void __cdecl sh_txfer_pred_hook(void *ps, const void *pps, void *pcd,
         else
         {
             cd->fov = f;
+        }
+
+        if (g_cfg.visuals.aspect_ratio)
+        {
+            f32 a = g_cfg.visuals.aspect_value;
+
+            if (a < 0.5f)
+                a = 0.5f;
+            if (a > 3.0f)
+                a = 3.0f;
+
+            f32 base_a = 4.0f / 3.0f;
+            f32 ratio = a / base_a;
+
+            f32 rad = cd->fov * 0.01745329f * 0.5f;
+
+            f32 cs = sh_cos(rad);
+
+            f32 tan_h = ((cs != 0.0f) ? (sh_sin(rad) / cs) : 0.0f) * ratio;
+
+            if (tan_h > 0.05f)
+            {
+                f32 newfov = 2.0f * sh_atan(tan_h);
+
+                cd->fov = newfov * 57.29577951f;
+
+                if (cd->fov < 40.0f)
+                    cd->fov = 40.0f;
+                if (cd->fov > 160.0f)
+                    cd->fov = 160.0f;
+            }
         }
     }
 }
