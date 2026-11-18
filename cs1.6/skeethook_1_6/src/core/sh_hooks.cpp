@@ -14,6 +14,10 @@ void sh_soundesp_draw(void);
 void sh_soundesp_tick(void);
 void sh_wallbang_draw(void);
 void sh_hitbox_scan_draw(void);
+void sh_viewmodel_tick(void);
+void sh_fov_apply(void);
+void sh_aspect_apply(void);
+void sh_remove_bob(void);
 #include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
@@ -375,6 +379,10 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_visuals_effects_tick(time);
     sh_skybox_tick();
     sh_model_changer_tick();
+    sh_viewmodel_tick();
+    sh_fov_apply();
+    sh_aspect_apply();
+    sh_remove_bob();
     sh_visuals_apply_nightmode();
     sh_worldfx_tick();
 
@@ -430,11 +438,34 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
             ++p;
         }
 
-        if (base[0] == 's' || base[0] == 'S')
-            if (base[1] == 'm' || base[1] == 'M')
-                if (base[2] == 'o' || base[2] == 'O')
-                    if (base[3] == 'k' || base[3] == 'K')
-                        return 0;
+        const char *sm_names[] = {
+            "black_smoke", "black_smoke1", "black_smoke2",
+            "black_smoke3", "black_smoke4", "smokepuff", "gas_puff"
+        };
+
+        for (u32 k = 0; k < sh_countof(sm_names); ++k)
+        {
+            const char *n = sm_names[k];
+            i32 match = 1;
+
+            for (i32 c = 0; n[c]; ++c)
+            {
+                char a = base[c];
+                char b = n[c];
+
+                if (a >= 'A' && a <= 'Z')
+                    a = (char)(a + 32);
+
+                if (a != b)
+                {
+                    match = 0;
+                    break;
+                }
+            }
+
+            if (match && base[0])
+                return 0;
+        }
     }
 
     if (g_add_entity_orig)

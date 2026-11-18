@@ -104,6 +104,17 @@ void sh_config_defaults(void)
     g_cfg.visuals.hitbox_vis_check = (qbool)0;
     g_cfg.visuals.hitbox_scan = (qbool)0;
     g_cfg.visuals.esp_color_mode = 0;
+    g_cfg.visuals.fov_enabled = (qbool)0;
+    g_cfg.visuals.fov_value = 90.0f;
+    g_cfg.visuals.aspect_ratio = (qbool)0;
+    g_cfg.visuals.aspect_value = 1.333f;
+    g_cfg.visuals.viewmodel_offset = (qbool)0;
+    g_cfg.visuals.viewmodel_x = 0.0f;
+    g_cfg.visuals.viewmodel_y = 0.0f;
+    g_cfg.visuals.viewmodel_z = 0.0f;
+    g_cfg.visuals.viewmodel_fov = (qbool)0;
+    g_cfg.visuals.viewmodel_fov_value = 90.0f;
+    g_cfg.visuals.no_bob = (qbool)0;
     g_cfg.visuals.hitmarker = (qbool)1;
     g_cfg.visuals.indicators = (qbool)1;
     g_cfg.visuals.hitmarker_damage = (qbool)1;

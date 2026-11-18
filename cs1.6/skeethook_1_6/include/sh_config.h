@@ -98,6 +98,17 @@ typedef struct sh_visuals_cfg
     qbool hitbox_vis_check;
     qbool hitbox_scan;
     i32 esp_color_mode;
+    qbool fov_enabled;
+    f32 fov_value;
+    qbool aspect_ratio;
+    f32 aspect_value;
+    qbool viewmodel_offset;
+    f32 viewmodel_x;
+    f32 viewmodel_y;
+    f32 viewmodel_z;
+    qbool viewmodel_fov;
+    f32 viewmodel_fov_value;
+    qbool no_bob;
     qbool hitmarker;
     qbool indicators;
     qbool hitmarker_damage;
