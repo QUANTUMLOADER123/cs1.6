@@ -517,20 +517,42 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_checkbox(x, cy, "skybox change", &g_cfg.visuals.skybox_change);
     cy += row;
 
-    static const char *g_sky_items[12];
+    static const char *g_sky_items[sh_skybox_max];
     static qbool sky_init;
 
     if (!sky_init)
     {
-        for (i32 i = 0; i < 12; ++i)
+        sh_skybox_scan();
+
+        i32 cnt = sh_skybox_custom_count();
+
+        if (cnt <= 0)
+            cnt = sh_skybox_count;
+
+        if (cnt > sh_skybox_max)
+            cnt = sh_skybox_max;
+
+        for (i32 i = 0; i < cnt; ++i)
             g_sky_items[i] = sh_skybox_name(i);
+
         sky_init = 1;
     }
+
+    i32 sky_cnt = sh_skybox_custom_count();
+
+    if (sky_cnt <= 0)
+        sky_cnt = sh_skybox_count;
+
+    if (sky_cnt > sh_skybox_max)
+        sky_cnt = sh_skybox_max;
 
     static i32 sky_dbg;
     sky_dbg = g_cfg.visuals.skybox_index;
 
-    sh_menu_combo(x, cy, colw, "skybox", &sky_dbg, g_sky_items, 12);
+    if (sky_dbg >= sky_cnt)
+        sky_dbg = 0;
+
+    sh_menu_combo(x, cy, colw, "skybox", &sky_dbg, g_sky_items, sky_cnt);
     g_cfg.visuals.skybox_index = sky_dbg;
     cy += row + 6.0f * s;
 
