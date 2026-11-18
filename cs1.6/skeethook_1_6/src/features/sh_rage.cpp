@@ -171,6 +171,34 @@ void sh_rage_scan(sh_rage_result_t *out)
 
         if (g_cfg.aimbot.backtrack > 0)
         {
+            f32 tgt = sh_backtrack_time(p->index, g_cfg.aimbot.backtrack);
+
+            vec3_t bo, ba;
+            qbool extrap = 0;
+
+            if (tgt > 0.0f && sh_backtrack_lerp(p->index, tgt, &bo, &ba, &extrap))
+            {
+                f32 dz_off = center.z - p->origin.z;
+
+                bo.z += dz_off;
+
+                f32 dx = bo.x - eye.x;
+                f32 dy = bo.y - eye.y;
+                f32 dz = bo.z - eye.z;
+
+                f32 d_bt = dx * dx + dy * dy + dz * dz;
+
+                dx = center.x - eye.x;
+                dy = center.y - eye.y;
+                dz = center.z - eye.z;
+
+                f32 d_now = dx * dx + dy * dy + dz * dz;
+
+                if (d_bt > 1.0f && d_bt < d_now * 9.0f)
+                    center = bo;
+            }
+            else
+            {
             i32 want_bt = -1;
 
             if (g_cfg.aimbot.hitbox == 1)
@@ -198,6 +226,7 @@ void sh_rage_scan(sh_rage_result_t *out)
 
                 if (d_bt > 1.0f && d_bt < d_now * 4.0f)
                     center = bt;
+            }
             }
         }
 

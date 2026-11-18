@@ -238,9 +238,9 @@ static void sh_menu_draw_rage(f32 x, f32 y)
     sh_menu_combo(x + colw, cy, colw, "multipoint", &g_cfg.aimbot.multipoint, g_mp_items, 3);
     cy += row;
 
-    static const char *g_bt_items[] = { "off", "1 frame", "2 frames", "3 frames" };
+    static const char *g_bt_items[] = { "off", "1 frame", "2 frames", "3 frames", "4 frames", "6 frames" };
 
-    sh_menu_combo(x, cy, colw, "backtrack", &g_cfg.aimbot.backtrack, g_bt_items, 4);
+    sh_menu_combo(x, cy, colw, "backtrack", &g_cfg.aimbot.backtrack, g_bt_items, 6);
     cy += row;
 
     sh_menu_combo(x, cy, colw, "priority", &g_cfg.aimbot.priority, g_priority_items, 4);

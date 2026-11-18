@@ -507,3 +507,50 @@ qbool sh_backtrack_lerp(i32 ent_index, f32 target_time, vec3_t *out_origin,
 
     return 1;
 }
+
+f32 sh_backtrack_time(i32 ent_index, i32 frames_back)
+{
+    if (ent_index <= 0 || ent_index >= sh_max_bone_players)
+        return 0.0f;
+
+    if (!g_engfuncs || !g_engfuncs->pfnGetEntityByIndex)
+        return 0.0f;
+
+    sh_cl_entity_t *ent = (sh_cl_entity_t *)g_engfuncs->pfnGetEntityByIndex(ent_index);
+
+    if (!ent)
+        return 0.0f;
+
+    i32 imod = ent->current_position & sh_hist_mask;
+    f32 newest = ent->ph[imod].animtime;
+
+    if (newest <= 0.0f)
+        return 0.0f;
+
+    if (frames_back < 1)
+        frames_back = 1;
+
+    f32 tick = 1.0f / 100.0f;
+
+    if (g_pmove && g_pmove->frametime > 0.0f)
+        tick = g_pmove->frametime;
+
+    f32 target = newest - tick * (f32)frames_back;
+
+    f32 oldest = 0.0f;
+
+    for (i32 i = 1; i < sh_hist_mask; ++i)
+    {
+        f32 at = ent->ph[(imod - i) & sh_hist_mask].animtime;
+
+        if (at == 0.0f)
+            break;
+
+        oldest = at;
+    }
+
+    if (oldest > 0.0f && target < oldest)
+        target = oldest;
+
+    return target;
+}

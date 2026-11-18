@@ -87,3 +87,4 @@ i32 sh_bones_backtrack_frames(i32 index);
 
 qbool sh_backtrack_lerp(i32 ent_index, f32 target_time, vec3_t *out_origin,
                         vec3_t *out_angles, qbool *extrap);
+f32 sh_backtrack_time(i32 ent_index, i32 frames_back);
