@@ -114,22 +114,32 @@ void sh_quick_stop(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (speed < pm->maxspeed * 0.25f)
         return;
 
-    f32 vel_yaw = sh_atan2_deg(vy, vx);
-    f32 back = vel_yaw + 180.0f;
+    f32 yaw = sh_rad(cmd->viewangles.y);
+    f32 cy = sh_cos(yaw);
+    f32 sy = sh_sin(yaw);
 
-    f32 dw = back - cmd->viewangles.y;
+    f32 fwd_c = vx * cy + vy * sy;
+    f32 side_c = vx * sy - vy * cy;
 
-    while (dw > 180.0f)
-        dw -= 360.0f;
-    while (dw < -180.0f)
-        dw += 360.0f;
+    f32 limit = pm->maxspeed;
 
-    f32 r = sh_sin_deg(dw);
+    if (limit < 1.0f)
+        limit = 250.0f;
 
-    cmd->forwardmove = (sh_cos_deg(dw) < 0.0f) ? -sh_max_move : sh_max_move;
-    cmd->sidemove = -r * sh_max_move;
+    f32 fm = -fwd_c * 2.0f;
+    f32 sm = -side_c * 2.0f;
 
-    (void)vel_yaw;
+    f32 mag = sh_sqrt(fm * fm + sm * sm);
+
+    if (mag > limit)
+    {
+        f32 k = limit / mag;
+        fm *= k;
+        sm *= k;
+    }
+
+    cmd->forwardmove = fm;
+    cmd->sidemove = sm;
 }
 
 void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm)
