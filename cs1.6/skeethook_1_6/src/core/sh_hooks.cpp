@@ -175,6 +175,29 @@ void __cdecl sh_txfer_pred_hook(void *ps, const void *pps, void *pcd,
         for (i32 i = 0; i < sh_max_weapons; ++i)
             g_weapon_data[i] = wd[i];
     }
+
+    if (pcd && g_cfg.visuals.fov_enabled)
+    {
+        sh_client_data_t *cd = (sh_client_data_t *)pcd;
+
+        f32 f = g_cfg.visuals.fov_value;
+
+        if (f < 40.0f)
+            f = 40.0f;
+        if (f > 160.0f)
+            f = 160.0f;
+
+        if (cd->fov < 90.0f && cd->fov > 1.0f)
+        {
+            f32 zoom_ratio = cd->fov / 90.0f;
+
+            cd->fov = f * zoom_ratio;
+        }
+        else
+        {
+            cd->fov = f;
+        }
+    }
 }
 
 static create_move_fn g_create_move_orig;

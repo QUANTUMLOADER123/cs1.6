@@ -67,20 +67,6 @@ f32 sh_viewmodel_fov_scale(void)
 
 void sh_fov_apply(void)
 {
-    if (!g_engfuncs || !g_engfuncs->pfnCvar_SetValue)
-        return;
-
-    if (!g_cfg.visuals.fov_enabled)
-        return;
-
-    f32 f = g_cfg.visuals.fov_value;
-
-    if (f < 40.0f)
-        f = 40.0f;
-    if (f > 160.0f)
-        f = 160.0f;
-
-    g_engfuncs->pfnCvar_SetValue("default_fov", f);
 }
 
 void sh_aspect_apply(void)
