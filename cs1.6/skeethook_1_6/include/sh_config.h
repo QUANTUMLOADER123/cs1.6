@@ -110,6 +110,7 @@ typedef struct sh_visuals_cfg
     f32 viewmodel_fov_value;
     qbool no_bob;
     qbool fog;
+    qbool entity_esp;
     f32 fog_density;
     i32 fog_mode;
     i32 fog_r;

@@ -20,6 +20,8 @@ void sh_fov_apply(void);
 void sh_aspect_apply(void);
 void sh_remove_bob(void);
 void sh_fog_apply(void);
+void sh_entityesp_add(sh_cl_entity_t *ent, const char *model_name);
+void sh_entityesp_draw(void);
 #include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
@@ -439,6 +441,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_soundesp_draw();
     sh_wallbang_draw();
     sh_hitbox_scan_draw();
+    sh_entityesp_draw();
     sh_grenade_path_draw();
     sh_hitmarker_draw();
     sh_indicators_draw();
@@ -572,6 +575,9 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
                 return 0;
         }
     }
+
+    if (g_cfg.visuals.entity_esp && ent && model_name)
+        sh_entityesp_add(ent, model_name);
 
     if (g_add_entity_orig)
         result = g_add_entity_orig(type, ent, model_name);
