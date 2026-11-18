@@ -165,6 +165,12 @@ typedef struct sh_misc_cfg
     qbool fast_reload;
     qbool no_recoil;
     qbool no_recoil_effect;
+    qbool hide_hud;
+    qbool hide_hud_weapons;
+    qbool hide_hud_crosshair;
+    qbool hide_hud_health;
+    qbool hide_hud_timer;
+    qbool hide_hud_money;
     qbool no_spread;
     qbool no_flash;
     qbool no_smoke;

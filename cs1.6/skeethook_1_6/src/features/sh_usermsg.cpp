@@ -357,6 +357,36 @@ static i32 __cdecl sh_cb_screen_fade(const char *name, i32 size, i32 read)
     return 0;
 }
 
+static i32 __cdecl sh_cb_hide_weapon(const char *name, i32 size, i32 read)
+{
+    (void)read;
+
+    if (!g_cfg.misc.hide_hud)
+        return 1;
+
+    if (!name || size < 1)
+        return 1;
+
+    u8 *bits = (u8 *)name;
+
+    u8 add = 0;
+
+    if (g_cfg.misc.hide_hud_weapons)
+        add |= 0x01;
+    if (g_cfg.misc.hide_hud_crosshair)
+        add |= 0x40;
+    if (g_cfg.misc.hide_hud_health)
+        add |= 0x08;
+    if (g_cfg.misc.hide_hud_timer)
+        add |= 0x10;
+    if (g_cfg.misc.hide_hud_money)
+        add |= 0x20;
+
+    *bits |= add;
+
+    return 1;
+}
+
 void sh_msgs_register(void)
 {
     if (!g_engfuncs || !g_engfuncs->pfnHookUserMsg)
@@ -370,4 +400,5 @@ void sh_msgs_register(void)
     g_engfuncs->pfnHookUserMsg("ScoreAttrib", sh_cb_score_attrib);
     g_engfuncs->pfnHookUserMsg("RoundTime", sh_cb_round_time);
     g_engfuncs->pfnHookUserMsg("ScreenFade", sh_cb_screen_fade);
+    g_engfuncs->pfnHookUserMsg("HideWeapon", sh_cb_hide_weapon);
 }

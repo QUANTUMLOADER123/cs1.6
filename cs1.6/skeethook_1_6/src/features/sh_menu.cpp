@@ -575,6 +575,18 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_checkbox(x, cy, "no smoke", &g_cfg.misc.no_smoke);
     cy += row;
 
+    sh_menu_checkbox(x, cy, "hide hud", &g_cfg.misc.hide_hud);
+    sh_menu_checkbox(x + colw, cy, "hide weapons", &g_cfg.misc.hide_hud_weapons);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "hide crosshair", &g_cfg.misc.hide_hud_crosshair);
+    sh_menu_checkbox(x + colw, cy, "hide health", &g_cfg.misc.hide_hud_health);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "hide timer", &g_cfg.misc.hide_hud_timer);
+    sh_menu_checkbox(x + colw, cy, "hide money", &g_cfg.misc.hide_hud_money);
+    cy += row;
+
     sh_menu_checkbox(x, cy, "no scope", &g_cfg.misc.no_scope);
     sh_menu_checkbox(x + colw, cy, "no scope borders", &g_cfg.misc.no_scope_borders);
     cy += row;
@@ -727,7 +739,7 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 570.0f, 380.0f, 330.0f };
+    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 640.0f, 380.0f, 330.0f };
 
     f32 w = 560.0f * s;
     f32 h = tab_h[g_tab] * s;
