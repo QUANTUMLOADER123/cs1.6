@@ -108,17 +108,7 @@ void __cdecl sh_camera_offset_hook(f32 *ofs)
     if (g_camera_offset_orig)
         g_camera_offset_orig(ofs);
 
-    if (!ofs || !g_cfg.visuals.thirdperson)
-        return;
-
-    f32 dist = g_cfg.visuals.thirdperson_dist;
-
-    if (dist < 32.0f)
-        dist = 32.0f;
-    if (dist > 200.0f)
-        dist = 200.0f;
-
-    ofs[2] = dist;
+    (void)ofs;
 }
 
 i32 __cdecl sh_is_thirdperson_hook(void)
