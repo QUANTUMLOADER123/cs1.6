@@ -1688,3 +1688,75 @@ left *= scale; right *= scale
 4. **chams через `studio`** — у нас есть свой, но у них три отдельных паттерна
    (model/light/alpha) с rim-подсветкой.
 5. **skybox** — подмена имени и перезагрузка (`load_skys`), паттерны совпали.
+
+---
+
+## Разбор завершён: что проверено и чем закрыто (2026-11-16)
+
+Прочитан весь `gold-sdk` (src/features + src/cstrike1_5 + src/core + src/render + main).
+Ниже — по каждому модулю: что у них, что у нас, вердикт.
+
+### client_mini.dll — уточнение
+
+`client_mini.dll` (301 KB, base 0x10000000) — **не** игровой клиент. У `client.dll` 200+
+экспортов (`HUD_Redraw`, `CL_CreateMove`, `HUD_PlayerMove`, `HUD_TxferPredictionData`...),
+у `client_mini.dll` — **один** (`CreateInterface`). Это модуль лаунчера. Хуки остаются
+на `client.dll`.
+
+Прогон пяти несовпавших паттернов по `client_mini.dll`:
+
+| паттерн | результат |
+| --- | --- |
+| `fov_scaled_write` | совпал, 1 вхождение @ `0x613F` |
+| `cvar_findvar` | совпал, 5 вхождений (`0x1F53`, `0x590D`, `0x5921`, `0x9FB4`, `0xA297`) — разные cvar-таблицы |
+| `client` | не совпал (завязан на их оффсет `0x19CCB4`) |
+| `entities` | не совпал |
+| `create_interface` | это имя экспорта, не байтовый паттерн |
+
+`fov_scaled_write` — переменная `0x10046F10`, инициализируется `1.0f`, лежит прямо перед
+`refdef` (`0x46F14` = vieworg, `0x46F18` = viewangles, `0x46F1C`). Их `fov_changer` пишет
+туда `fov/90`, а `V_CalcFOV` умножает. У нас FOV идёт через `clientdata_t::fov` — второй
+путь не нужен.
+
+### Вердикты по модулям
+
+| их модуль | вердикт | причина |
+| --- | --- | --- |
+| `aspect_ratio` | **взято** (`sh_aspect.cpp`) | `glFrustum`-слот |
+| `nightmode` | **взято** (`sh_nightmode.cpp`) | правка лайтмапов |
+| `anim_breakers` | **взято** (`sh_bones.cpp`) | `sequence` 3/4 |
+| `misc` (jumpbug, movement_fix, ground_strafe) | **взято** (`sh_movement.cpp`) | SGS-делегирование |
+| `killsounds` | **взято** (`sh_usermsg.cpp`) | хук SayText |
+| `removals` (custom_scope) | **взято** (`sh_scope.cpp`) | `scoped_fov < 90` |
+| `texturebug` | **взято** (`sh_movement.cpp`) | `upmove = -12.7` |
+| `bullet_tracers` -> `R_UserTracer` | **взято** (`sh_tracer3d.cpp`) | 3D-пул движка |
+| `skybox` (скан папки) | **взято** (`sh_skybox.cpp`) | `gfx/env` |
+| `third_person` (трассировка) | **взято** (`sh_hooks.cpp`) | камера не лезет в стены |
+| `studio::segment_vs_hitbox` | **взято** (`sh_bones.cpp`) | OBB-тест луча |
+| `main` (retry инициализации) | **взято** (`sh_dllmain.cpp`) | 3 уровня повтора |
+| `penetrate` | **не взято** | их таблица — упрощение; у нас полноценный CS 1.6 autowall (`power = 42`, 8 шагов, текстуры) |
+| `chams` | **не взято** | требует экспортов `gl_*`, которых нет; у нас свой путь через rendermode |
+| `lag_record` | **уже было** | `cl_entity_t::ph[64]` + `animtime` используется в `sh_bones.cpp` |
+| `antihit` (`movement_fix`) | **уже было** | компенсация через `sh_dot` в `sh_antiaim.cpp` |
+| `esp` | **уже было, богаче** | у нас 993 строки против 303 |
+| `ragebot` | **уже было, богаче** | 605 против 483 |
+| `legitbot` | **уже было** | 141 строка, проще нашего |
+| `config` | **уже было** | бинарный формат + `magic`/`size`, сохранение при закрытии меню |
+| `sprites` | **уже было** | парсим `sprites/*.txt` в `sh_icons.cpp` |
+| `input` | **не нужно** | у нас свой ввод, у них ImGui-маппинг клавиш |
+| `console` | **не нужно** | свой лог |
+| `cursor` | **не нужно** | SDL_ShowCursor нам не нужен |
+| `event_manager` | **не нужно** | у нас `pfnHookUserMsg` |
+
+### Исправленные по ходу баги в нашем коде
+
+1. `vieworg` в thirdperson без трассировки — камера проходила сквозь стены.
+2. `pparams->viewangles.x -= cl_viewangles.x - viewangles.x` — раскрывается в
+   `2*v - cl`, бессмыслица. Заменено на `viewangles = cl_viewangles`.
+3. `sh_ground_strafe` выходил на `onground == -1` — терял всю воздушную фазу SGS.
+4. `no_spread` компенсировал в обратную сторону (`forward(B) = cone(A)` вместо
+   `cone(B) = forward(A)`), плюс порядок punch был перевёрнут.
+5. Инициализация умирала после первой неудачной попытки установки хуков.
+6. `skybox` был ограничен 12 захардкоженными именами.
+7. `custom scope`: паттерн `8B 0D ???? 83 C1` давал 9 совпадений вместо 1.
+8. `killsound`: буфер 2048 байт при нужных 4012 — звук обрезался.
