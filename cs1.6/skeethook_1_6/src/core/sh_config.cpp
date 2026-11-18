@@ -133,6 +133,9 @@ void sh_config_defaults(void)
     g_cfg.visuals.anim_breakers = (qbool)0;
     g_cfg.visuals.killsound = (qbool)0;
     g_cfg.visuals.custom_scope = (qbool)0;
+    g_cfg.visuals.tracer3d = (qbool)0;
+    g_cfg.visuals.tracer3d_color = 3;
+    g_cfg.visuals.tracer3d_life = 1.0f;
     g_cfg.visuals.scope_gap = 6.0f;
     g_cfg.visuals.scope_len = 12.0f;
     g_cfg.visuals.scope_thick = 1.5f;

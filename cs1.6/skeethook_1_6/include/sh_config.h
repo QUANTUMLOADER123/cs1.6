@@ -116,6 +116,9 @@ typedef struct sh_visuals_cfg
     qbool anim_breakers;
     qbool killsound;
     qbool custom_scope;
+    qbool tracer3d;
+    i32 tracer3d_color;
+    f32 tracer3d_life;
     f32 scope_gap;
     f32 scope_len;
     f32 scope_thick;

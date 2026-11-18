@@ -71,6 +71,8 @@ void sh_aim_lock_angles(sh_target_t *target, vec3_t *angles);
 
 qbool sh_trace_line(const vec3_t *start, const vec3_t *end, vec3_t *hitsh);
 qbool sh_trace_fraction(const vec3_t *start, const vec3_t *end, f32 *out_hit);
+void sh_tracer3d_add(const vec3_t *start, const vec3_t *end);
+qbool sh_tracer3d_ready(void);
 i32 sh_trace_material(const vec3_t *start, const vec3_t *end);
 
 void sh_antiaim_run(sh_usercmd_t *cmd);

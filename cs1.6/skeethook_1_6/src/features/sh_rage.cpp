@@ -512,6 +512,7 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
                 to = end;
 
             sh_visuals_tracer_add(&from, &to);
+            sh_tracer3d_add(&from, &to);
         }
 
         if (g_cfg.visuals.impact)

@@ -21,6 +21,9 @@ void sh_aspect_init(void);
 void sh_nightmode_init(void);
 void sh_killsound_init(void);
 void sh_scope_init(void);
+void sh_tracer3d_init(void);
+void sh_tracer3d_add(const vec3_t *start, const vec3_t *end);
+qbool sh_tracer3d_ready(void);
 void sh_scope_draw(void);
 void sh_nightmode_poll(void);
 qbool sh_nightmode_ready(void);
@@ -793,6 +796,7 @@ qbool sh_hooks_install(void)
     sh_nightmode_init();
     sh_killsound_init();
     sh_scope_init();
+    sh_tracer3d_init();
 
     if (create_move)
     {
