@@ -152,6 +152,7 @@ void sh_config_defaults(void)
     g_cfg.misc.no_flash = (qbool)0;
     g_cfg.misc.no_smoke = (qbool)0;
     g_cfg.misc.no_scope = (qbool)0;
+    g_cfg.misc.no_scope_borders = (qbool)0;
     g_cfg.misc.crosshair = (qbool)1;
     g_cfg.misc.radar_hack = (qbool)0;
     g_cfg.misc.radar_rotate = (qbool)1;

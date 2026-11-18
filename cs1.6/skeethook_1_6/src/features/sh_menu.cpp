@@ -574,7 +574,10 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "no scope", &g_cfg.misc.no_scope);
-    sh_menu_checkbox(x + colw, cy, "crosshair", &g_cfg.misc.crosshair);
+    sh_menu_checkbox(x + colw, cy, "no scope borders", &g_cfg.misc.no_scope_borders);
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "crosshair", &g_cfg.misc.crosshair);
     cy += row;
 
     sh_menu_checkbox(x, cy, "hitmarker", &g_cfg.visuals.hitmarker);

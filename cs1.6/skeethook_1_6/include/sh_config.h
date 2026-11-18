@@ -168,6 +168,7 @@ typedef struct sh_misc_cfg
     qbool no_flash;
     qbool no_smoke;
     qbool no_scope;
+    qbool no_scope_borders;
     qbool crosshair;
     qbool radar_hack;
     qbool radar_rotate;

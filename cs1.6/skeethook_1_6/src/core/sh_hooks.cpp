@@ -438,6 +438,58 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
             ++p;
         }
 
+        if (g_cfg.misc.no_scope_borders)
+        {
+            const char *sc = (const char *)base;
+            i32 is_scope = 0;
+
+            {
+                const char *pat = "scope_arc";
+                i32 ok = 1;
+
+                for (i32 c = 0; pat[c]; ++c)
+                {
+                    char a = sc[c];
+
+                    if (a >= 'A' && a <= 'Z')
+                        a = (char)(a + 32);
+                    if (a != pat[c])
+                    {
+                        ok = 0;
+                        break;
+                    }
+                }
+
+                if (ok)
+                    is_scope = 1;
+            }
+
+            if (!is_scope)
+            {
+                const char *pat2 = "crosshairs/scope";
+                i32 ok = 1;
+
+                for (i32 c = 0; pat2[c]; ++c)
+                {
+                    char a = sc[c];
+
+                    if (a >= 'A' && a <= 'Z')
+                        a = (char)(a + 32);
+                    if (a != pat2[c])
+                    {
+                        ok = 0;
+                        break;
+                    }
+                }
+
+                if (ok)
+                    is_scope = 1;
+            }
+
+            if (is_scope)
+                return 0;
+        }
+
         const char *sm_names[] = {
             "black_smoke", "black_smoke1", "black_smoke2",
             "black_smoke3", "black_smoke4", "smokepuff", "gas_puff"
