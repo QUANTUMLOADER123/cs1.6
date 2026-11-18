@@ -181,6 +181,8 @@ void sh_skybox_apply(i32 index)
 
     g_engfuncs->pfnCvar_Set("sv_skyname", sh_skybox_name(index));
     g_applied = index;
+
+    sh_skybox_fast_apply(sh_skybox_name(index));
 }
 
 void sh_skybox_restore(void)
@@ -189,7 +191,10 @@ void sh_skybox_restore(void)
         return;
 
     if (g_saved_valid && g_engfuncs && g_engfuncs->pfnCvar_Set)
+    {
         g_engfuncs->pfnCvar_Set("sv_skyname", g_saved);
+        sh_skybox_fast_apply(g_saved);
+    }
 
     g_applied = -1;
 }

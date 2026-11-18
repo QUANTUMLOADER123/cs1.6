@@ -24,6 +24,7 @@ void sh_scope_init(void);
 void sh_tracer3d_init(void);
 qbool sh_chams_gl_init(void);
 qbool sh_chams_gl_ready(void);
+qbool sh_skybox_fast_init(void);
 void sh_tracer3d_add(const vec3_t *start, const vec3_t *end);
 qbool sh_tracer3d_ready(void);
 void sh_scope_draw(void);
@@ -801,6 +802,7 @@ qbool sh_hooks_install(void)
     sh_tracer3d_init();
     sh_chams_gl_init();
     sh_matrix_init();
+    sh_skybox_fast_init();
 
     if (create_move)
     {

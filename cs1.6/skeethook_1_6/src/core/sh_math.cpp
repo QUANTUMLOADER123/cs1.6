@@ -1,5 +1,6 @@
 #include "../../include/sh_math.h"
 #include "../../include/sh_sdk.h"
+#include "../../include/sh_features.h"
 
 #include <math.h>
 
@@ -158,7 +159,7 @@ qbool sh_world_to_screen(const vec3_t *origin, vec2_t *out)
     if (g_tri_api && g_tri_api->world_to_screen)
     {
         f32 scr[2];
-        if (g_tri_api->world_to_screen((f32 *)origin, scr))
+        if (!g_tri_api->world_to_screen((f32 *)origin, scr))
             return false;
         out->x = scr[0];
         out->y = scr[1];
@@ -168,8 +169,15 @@ qbool sh_world_to_screen(const vec3_t *origin, vec2_t *out)
     if (!g_globals)
         return false;
 
+    sh_player_t *me = sh_player_local();
+
+    if (!me)
+        return false;
+
+    vec3_t eye = me->origin;
+
     vec3_t delta;
-    sh_sub(&delta, origin, (const vec3_t *)&g_globals->v_forward);
+    sh_sub(&delta, origin, &eye);
 
     f32 fwd = sh_dot(&delta, (const vec3_t *)&g_globals->v_forward);
     if (fwd < 0.01f)
