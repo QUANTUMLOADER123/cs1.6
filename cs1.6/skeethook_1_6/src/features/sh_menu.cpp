@@ -588,6 +588,7 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_checkbox(x, cy, "lightmap night", &g_cfg.visuals.lightmap_mode);
     sh_menu_checkbox(x + colw, cy, "anim breakers", &g_cfg.visuals.anim_breakers);
     sh_menu_checkbox(x, cy + row, "killsound", &g_cfg.visuals.killsound);
+    sh_menu_checkbox(x + colw, cy + row, "custom scope", &g_cfg.visuals.custom_scope);
     cy += row;
 
     if (g_cfg.visuals.anim_breakers)

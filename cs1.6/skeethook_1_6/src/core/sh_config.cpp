@@ -131,6 +131,10 @@ void sh_config_defaults(void)
     g_cfg.visuals.lightmap_mode = (qbool)0;
     g_cfg.visuals.anim_breakers = (qbool)0;
     g_cfg.visuals.killsound = (qbool)0;
+    g_cfg.visuals.custom_scope = (qbool)0;
+    g_cfg.visuals.scope_gap = 6.0f;
+    g_cfg.visuals.scope_len = 12.0f;
+    g_cfg.visuals.scope_thick = 1.5f;
     g_cfg.visuals.anim_air = (qbool)1;
     g_cfg.visuals.anim_ground = (qbool)1;
     g_cfg.visuals.lightmap_r = 0.45f;

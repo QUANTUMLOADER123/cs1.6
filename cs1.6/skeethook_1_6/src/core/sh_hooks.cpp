@@ -20,6 +20,8 @@ void sh_fov_apply(void);
 void sh_aspect_init(void);
 void sh_nightmode_init(void);
 void sh_killsound_init(void);
+void sh_scope_init(void);
+void sh_scope_draw(void);
 void sh_nightmode_poll(void);
 qbool sh_nightmode_ready(void);
 void sh_aspect_poll(void);
@@ -423,6 +425,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_grenade_path_draw();
     sh_hitmarker_draw();
     sh_indicators_draw();
+    sh_scope_draw();
 
     sh_menu_draw();
 
@@ -769,6 +772,7 @@ qbool sh_hooks_install(void)
     sh_aspect_init();
     sh_nightmode_init();
     sh_killsound_init();
+    sh_scope_init();
 
     if (create_move)
     {

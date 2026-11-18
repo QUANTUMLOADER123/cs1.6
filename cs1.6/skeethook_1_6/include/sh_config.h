@@ -115,6 +115,10 @@ typedef struct sh_visuals_cfg
     qbool lightmap_mode;
     qbool anim_breakers;
     qbool killsound;
+    qbool custom_scope;
+    f32 scope_gap;
+    f32 scope_len;
+    f32 scope_thick;
     qbool anim_air;
     qbool anim_ground;
     f32 lightmap_r;
