@@ -113,6 +113,9 @@ typedef struct sh_visuals_cfg
     qbool entity_esp;
     qbool smoke_edit;
     qbool lightmap_mode;
+    qbool anim_breakers;
+    qbool anim_air;
+    qbool anim_ground;
     f32 lightmap_r;
     f32 lightmap_g;
     f32 lightmap_b;

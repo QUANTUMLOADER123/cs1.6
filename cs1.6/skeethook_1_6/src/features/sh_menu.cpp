@@ -586,7 +586,15 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "lightmap night", &g_cfg.visuals.lightmap_mode);
+    sh_menu_checkbox(x + colw, cy, "anim breakers", &g_cfg.visuals.anim_breakers);
     cy += row;
+
+    if (g_cfg.visuals.anim_breakers)
+    {
+        sh_menu_checkbox(x, cy, "air run", &g_cfg.visuals.anim_air);
+        sh_menu_checkbox(x + colw, cy, "ground run", &g_cfg.visuals.anim_ground);
+        cy += row;
+    }
 
     sh_menu_slider(x, cy, colw, "lm red", &g_cfg.visuals.lightmap_r, 0.05f, 2.0f, "%.2f");
     sh_menu_slider(x + colw, cy, colw, "lm green", &g_cfg.visuals.lightmap_g, 0.05f, 2.0f, "%.2f");

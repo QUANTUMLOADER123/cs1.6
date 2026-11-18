@@ -128,6 +128,9 @@ void sh_config_defaults(void)
     g_cfg.visuals.entity_esp = (qbool)0;
     g_cfg.visuals.smoke_edit = (qbool)0;
     g_cfg.visuals.lightmap_mode = (qbool)0;
+    g_cfg.visuals.anim_breakers = (qbool)0;
+    g_cfg.visuals.anim_air = (qbool)1;
+    g_cfg.visuals.anim_ground = (qbool)1;
     g_cfg.visuals.lightmap_r = 0.45f;
     g_cfg.visuals.lightmap_g = 0.52f;
     g_cfg.visuals.lightmap_b = 0.85f;

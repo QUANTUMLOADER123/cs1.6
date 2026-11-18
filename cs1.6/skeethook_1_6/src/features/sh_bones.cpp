@@ -306,6 +306,23 @@ static i32 sh_bones_draw_player(i32 flags, sh_entity_state_t *pplayer)
     if (g_draw_orig)
         r = g_draw_orig(flags, pplayer);
 
+    if (pplayer && pplayer->number > 0 && pplayer->number == g_local_player)
+    {
+        if (g_cfg.visuals.anim_breakers && g_pmove)
+        {
+            qbool moving = (g_pmove->velocity.x != 0.0f || g_pmove->velocity.y != 0.0f);
+            qbool ducking = (g_pmove->oldbuttons & sh_in_duck) != 0;
+
+            if (moving && !ducking)
+            {
+                if (g_cfg.visuals.anim_air && g_pmove->onground == -1)
+                    pplayer->sequence = 4;
+                else if (g_cfg.visuals.anim_ground && g_pmove->onground != -1)
+                    pplayer->sequence = 3;
+            }
+        }
+    }
+
     if (pplayer && pplayer->number > 0)
     {
         const sh_studio_header_t *hdr = sh_bones_current_header();
