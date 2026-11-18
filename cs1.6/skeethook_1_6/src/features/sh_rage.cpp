@@ -603,4 +603,14 @@ void sh_rage_apply_recoil(sh_usercmd_t *cmd)
         cmd->viewangles.x -= g_pmove->punchangle.x;
         cmd->viewangles.y -= g_pmove->punchangle.y;
     }
+
+    if (cmd->viewangles.x > 89.0f)
+        cmd->viewangles.x = 89.0f;
+    if (cmd->viewangles.x < -89.0f)
+        cmd->viewangles.x = -89.0f;
+
+    while (cmd->viewangles.y > 180.0f)
+        cmd->viewangles.y -= 360.0f;
+    while (cmd->viewangles.y < -180.0f)
+        cmd->viewangles.y += 360.0f;
 }
