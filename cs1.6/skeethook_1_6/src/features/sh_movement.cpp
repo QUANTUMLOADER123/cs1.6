@@ -1,3 +1,4 @@
+#include <windows.h>
 #include "../../include/sh_movement.h"
 #include "../../include/sh_math.h"
 #include "../../include/sh_config.h"
@@ -149,6 +150,22 @@ void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (pm->onground == -1)
         return;
 
+    /* BHOP ДОЛЖЕН УСКОРЯТЬ, А НЕ ЗАСТАВЛЯТЬ ПРЫГАТЬ.
+
+       Раньше переиздание прыжка происходило безусловно, и персонаж
+       скакал сам по себе даже без зажатого пробела - убрать это
+       можно было только в меню, а меню не открывалось (баг 45).
+
+       Теперь переиздаём только когда игрок действительно держит
+       прыжок: смотрим реальную клавишу. Учитываем оба варианта -
+       кнопку в команде (её может выставить движок) и физическое
+       нажатие пробела. */
+    qbool holding = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
+
+    if (!holding && !(cmd->buttons & sh_in_jump) &&
+        !(pm->oldbuttons & sh_in_jump))
+        return;
+
     static i32 g_release_frames;
 
     if (g_release_frames > 0)
@@ -172,6 +189,10 @@ void sh_bhop(sh_usercmd_t *cmd, sh_playermove_t *pm)
 void sh_auto_jump_hold(sh_usercmd_t *cmd, sh_playermove_t *pm)
 {
     if (!g_cfg.movement.auto_jump || !cmd || !pm)
+        return;
+
+    /* тоже требуем реального нажатия: иначе прыжок "залипает" */
+    if (!(GetAsyncKeyState(VK_SPACE) & 0x8000))
         return;
 
     if (pm->onground == -1)

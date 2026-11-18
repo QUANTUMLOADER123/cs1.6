@@ -20,6 +20,8 @@ static const char *g_tabs[] = {
     "rage", "antiaim", "visuals", "misc", "movement", "settings"
 };
 
+static void sh_menu_release_mouse(qbool release);
+
 static void sh_menu_toggle(void)
 {
     static i32 prev;
@@ -30,25 +32,249 @@ static void sh_menu_toggle(void)
         g_visible = !g_visible;
         g_cfg.menu_open = (qbool)g_visible;
 
+        /* забираем/возвращаем мышь вместе с видимостью меню */
+        sh_menu_release_mouse((qbool)g_visible);
+
         if (!g_visible)
             sh_config_save();
     }
     prev = now;
+
+    /* ESC закрывает ТОЛЬКО наше меню, если оно открыто.
+       Раньше ESC не обрабатывался вообще, и игра закрывала своё
+       меню - а наше оставалось висеть с "потерянным" курсором.
+       Теперь ESC = быстрый выход, но не в том же кадре, что INSERT. */
+    static i32 prev_esc;
+    i32 esc = (GetAsyncKeyState(VK_ESCAPE) & 0x8000) != 0;
+
+    if (esc && !prev_esc && g_visible)
+    {
+        g_visible = 0;
+        g_cfg.menu_open = (qbool)0;
+        sh_menu_release_mouse(0);
+        sh_config_save();
+    }
+    prev_esc = esc;
 }
 
 static POINT g_mouse;
 static qbool g_click;
+static qbool g_click_edge;   /* фронт ЛКМ, считается раз за кадр */
+
+/* ОКНО ИГРЫ.
+
+   WindowFromPoint() тут не годится: он возвращает САМОЕ ГЛУБОКОЕ окно
+   под курсором - им вполне может оказаться дочернее окно или чужое
+   окно, оказавшееся сверху. Тогда ScreenToClient считает координаты
+   относительно него, и попадания по пунктам меню уезжают.
+
+   Поэтому окно игры находим один раз по классу: GoldSrc создаёт окно
+   класса "Valve001". _windowed_mouse=0 (инжект в полноэкранном режиме)
+   тоже ломает координаты, но его мы исправляем ниже. */
+static HWND sh_game_window(void)
+{
+    static HWND cached;
+
+    if (cached && IsWindow(cached))
+        return cached;
+
+    cached = FindWindowA("Valve001", 0);
+
+    if (!cached)
+        cached = GetActiveWindow();
+
+    if (!cached)
+        cached = GetForegroundWindow();
+
+    return cached;
+}
+
+/* ОСВОБОЖДЕНИЕ МЫШИ.
+
+   В GoldSrc мышь захвачена движком (SetCapture + ClipCursor +
+   скрытый курсор), поэтому при открытом меню курсора не видно и
+   двигать нечем - ровно то, на что жаловались.
+
+   IN_DeactivateMouse() определена в client.dll и снимает захват;
+   IN_ActivateMouse() возвращает обратно. Вызываем их при
+   переключении видимости меню, а не каждый кадр - это дешёво
+   и не конфликтует с движком. */
+typedef void (*in_mouse_fn)(void);
+
+static in_mouse_fn sh_in_mouse(const char *name)
+{
+    static HMODULE client;
+    static in_mouse_fn on;
+    static in_mouse_fn off;
+
+    if (!client)
+        client = GetModuleHandleA("client.dll");
+
+    if (!client)
+        return 0;
+
+    if (name[3] == 'D')   /* IN_DeactivateMouse */
+    {
+        if (!off)
+            off = (in_mouse_fn)(void *)GetProcAddress(client, name);
+        return off;
+    }
+
+    if (!on)
+        on = (in_mouse_fn)(void *)GetProcAddress(client, name);
+
+    return on;
+}
+
+static void sh_menu_release_mouse(qbool release)
+{
+    if (release)
+    {
+        /* Экспорты IN_* из client.dll трогают внутреннее состояние
+           движка (в частности mouse_x/mouse_y), поэтому вызываем их
+           только как дополнение к Win32-снятию захвата, и только если
+           они реально нашлись. Если нет - обходимся Win32: ClipCursor(0)
+           и ReleaseCapture достаточно, чтобы курсор освободился. */
+        in_mouse_fn deact = sh_in_mouse("IN_DeactivateMouse");
+
+        if (deact)
+            deact();
+
+        ClipCursor(0);
+        ReleaseCapture();
+
+        ShowCursor(TRUE);
+
+        {
+            /* курсор в центр, иначе он прилипает к краю экрана */
+            HWND w = sh_game_window();
+
+            if (w)
+            {
+                RECT rc;
+
+                if (GetClientRect(w, &rc))
+                {
+                    POINT c;
+
+                    c.x = (rc.right - rc.left) / 2;
+                    c.y = (rc.bottom - rc.top) / 2;
+                    ClientToScreen(w, &c);
+                    SetCursorPos(c.x, c.y);
+                }
+            }
+        }
+    }
+    else
+    {
+        in_mouse_fn act = sh_in_mouse("IN_ActivateMouse");
+
+        if (act)
+            act();
+
+        ClipCursor(0);
+        ShowCursor(FALSE);
+
+        {
+            /* курсор обратно в центр окна, чтобы камера не дёрнулась:
+               GoldSrc считает дельту мыши от предыдущей позиции, и
+               если курсор остался в углу меню, камеру резко дёрнет. */
+            HWND w = sh_game_window();
+
+            if (w)
+            {
+                RECT rc;
+
+                if (GetClientRect(w, &rc))
+                {
+                    POINT c;
+
+                    c.x = (rc.right - rc.left) / 2;
+                    c.y = (rc.bottom - rc.top) / 2;
+                    ClientToScreen(w, &c);
+                    SetCursorPos(c.x, c.y);
+                }
+            }
+        }
+    }
+}
+
+/* Покадровая коррекция: если меню открыто, мышь обязана быть свободна.
+   Движок (IN_ActivateMouse из V_CalcRefdef / при возврате фокуса) может
+   повторно захватить её в любой момент, поэтому недостаточно освободить
+   один раз при открытии - проверяем каждый кадр. */
+static void sh_menu_cursor_tick(void)
+{
+    if (!g_visible)
+        return;
+
+    /* снимаем клип, если движок вернул его обратно */
+    if (GetCapture() == sh_game_window())
+        ReleaseCapture();
+
+    {
+        CURSORINFO ci;
+
+        ci.cbSize = sizeof(ci);
+
+        /* ShowCursor ведёт счётчик: движок мог увести его в минус,
+           поэтому крутим до нуля, но не бесконечно */
+        if (GetCursorInfo(&ci) && !(ci.flags & 0x00000001 /* CURSOR_SHOWING */))
+        {
+            i32 guard = 0;
+
+            while (ShowCursor(TRUE) < 0 && ++guard < 16)
+                ;
+        }
+    }
+}
+
+/* Приведение координат курсора к системе координат рендера.
+   Меню рисуется в координатах движка (pfnGetScreenInfo), а
+   ScreenToClient даёт координаты клиентской области окна. В
+   полноэкранном режиме они обычно совпадают, но при windowed /
+   другом разрешении - нет, и клики уезжают. */
+static void sh_menu_to_render_space(POINT *p)
+{
+    HWND wnd = sh_game_window();
+    RECT rc;
+
+    if (!wnd || !GetClientRect(wnd, &rc))
+        return;
+
+    i32 cw = rc.right - rc.left;
+    i32 ch = rc.bottom - rc.top;
+    i32 rw = sh_screen_width();
+    i32 rh = sh_screen_height();
+
+    if (cw <= 0 || ch <= 0 || rw <= 0 || rh <= 0)
+        return;
+
+    p->x = (LONG)((f32)p->x * (f32)rw / (f32)cw);
+    p->y = (LONG)((f32)p->y * (f32)rh / (f32)ch);
+}
 
 static void sh_menu_input_begin(void)
 {
     GetCursorPos(&g_mouse);
 
-    HWND wnd = WindowFromPoint(g_mouse);
+    HWND wnd = sh_game_window();
 
     if (wnd)
         ScreenToClient(wnd, &g_mouse);
 
-    g_click = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+    sh_menu_to_render_space(&g_mouse);
+
+    {
+        static i32 prev_click;
+
+        i32 now = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) ? 1 : 0;
+
+        g_click = (qbool)now;
+        g_click_edge = (qbool)(now && !prev_click);
+
+        prev_click = now;
+    }
 }
 
 static qbool sh_mouse_in(f32 x, f32 y, f32 w, f32 h)
@@ -57,9 +283,23 @@ static qbool sh_mouse_in(f32 x, f32 y, f32 w, f32 h)
            (f32)g_mouse.y >= y && (f32)g_mouse.y <= y + h;
 }
 
+/* ВАЖНО: это ФРОНТ нажатия, а не уровень.
+
+   Раньше возвращался g_click, то есть "кнопка сейчас зажата". Зажал
+   ЛКМ на чекбоксе - значение перещёлкивалось КАЖДЫЙ кадр, пока
+   кнопка не отпущена. Выглядело как "ничего нельзя выставить":
+   галочка ставится и тут же снимается следующим кадром (и так 60 раз
+   в секунду), слайдер уезжает в край.
+
+   Теперь возвращаем true ровно один кадр - в момент перехода
+   "было отпущено -> стало зажато". */
+/* флаг фронта считается ОДИН раз за кадр в sh_menu_input_begin(),
+   потому что sh_mouse_clicked() зовётся из десятков виджетов:
+   если считать фронт внутри неё, второй вызов в том же кадре
+   вернул бы false и клик "съедался" бы первым же виджетом */
 static qbool sh_mouse_clicked(void)
 {
-    return g_click;
+    return g_click_edge;
 }
 
 static void sh_menu_checkbox(f32 x, f32 y, const char *label, qbool *value)
@@ -114,14 +354,32 @@ static void sh_menu_slider(f32 x, f32 y, f32 w, const char *label, f32 *value,
     f32 frac = (*value - lo) / (hi - lo);
     sh_draw_rect(x, tracky, w * frac, 3.0f * s, (col4_t)SH_COL_RGBA(190, 235, 60, 255));
 
-    if (sh_mouse_in(x, tracky - 4.0f * s, w, 11.0f * s) && sh_mouse_clicked())
+    /* Слайдер: тянется, пока ЛКМ зажата, а не только по клику.
+
+       Для перетаскивания нужен УРОВЕНЬ кнопки (g_click), а не фронт:
+       фронт сработал бы один раз и значение встало бы намертво.
+       Начало перетаскивания ловим по фронту. */
     {
-        f32 t = ((f32)g_mouse.x - x) / (w > 1.0f ? w : 1.0f);
+        static const void *drag_owner;
+        const void *self = (const void *)value;
 
-        if (t < 0.0f) t = 0.0f;
-        if (t > 1.0f) t = 1.0f;
+        qbool over = sh_mouse_in(x, tracky - 4.0f * s, w, 11.0f * s);
 
-        *value = lo + t * (hi - lo);
+        if (over && sh_mouse_clicked())
+            drag_owner = self;
+
+        if (drag_owner == self && g_click)
+        {
+            f32 t = ((f32)g_mouse.x - x) / (w > 1.0f ? w : 1.0f);
+
+            if (t < 0.0f) t = 0.0f;
+            if (t > 1.0f) t = 1.0f;
+
+            *value = lo + t * (hi - lo);
+        }
+
+        if (!g_click)
+            drag_owner = 0;
     }
 }
 
@@ -881,10 +1139,14 @@ void sh_menu_draw(void)
     sh_draw_rect(ox, oy + 26.0f * s, sidebar, h - 26.0f * s,
                  (col4_t)SH_COL_RGBA(16, 16, 16, 255));
 
+    sh_menu_cursor_tick();
     sh_menu_input_begin();
 
     POINT mp = g_mouse;
-    qbool clicked = g_click;
+
+    /* именно фронт: g_click - уровень, при зажатой ЛКМ вкладки
+       переключались бы каждый кадр */
+    qbool clicked = sh_mouse_clicked();
 
     for (i32 i = 0; i < (i32)sh_countof(g_tabs); ++i)
     {

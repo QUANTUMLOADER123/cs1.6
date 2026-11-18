@@ -2,8 +2,8 @@
 
 SDK + чит для CS 1.6. Все адреса — по сигнатурам, без хардкода.
 
-**DLL:** `skeethook_1_6.dll` — 435 KB (446464 байт), 32-bit, PE32
-**SHA256:** `856f03528e0eb39ce0616dce7b66debde3c74c0fc6aa3ad870efd4baa543af61`
+**DLL:** `skeethook_1_6.dll` — 435 KB (449024 байт), 32-bit, PE32
+**SHA256:** `4cb35c22f213ac2c6758aae0747d5973d32fc54accedfe5180e51944854ce4d3`
 
 ## Установка
 
