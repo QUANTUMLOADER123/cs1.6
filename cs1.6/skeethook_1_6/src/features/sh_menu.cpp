@@ -134,6 +134,14 @@ static void sh_menu_combo(f32 x, f32 y, f32 w, const char *label, i32 *value,
     static i32 open_combo = -1;
     static const void *owner;
 
+    if (count <= 0)
+        return;
+
+    if (*value < 0)
+        *value = 0;
+    if (*value >= count)
+        *value = count - 1;
+
     col4_t bg = { 26, 26, 26, 255 };
     col4_t bd = { 44, 44, 44, 255 };
     col4_t tx = { 200, 200, 200, 255 };
