@@ -547,6 +547,29 @@ static void sh_menu_draw_misc(f32 x, f32 y)
                    32.0f, 400.0f, "%.0f");
     cy += row;
 
+    sh_menu_section("view / camera", x, cy);
+    cy += 20.0f * s;
+
+    sh_menu_checkbox(x, cy, "fov changer", &g_cfg.visuals.fov_enabled);
+    sh_menu_slider(x + colw, cy, colw, "fov", &g_cfg.visuals.fov_value, 40.0f, 160.0f, "%.0f");
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "aspect ratio", &g_cfg.visuals.aspect_ratio);
+    sh_menu_slider(x + colw, cy, colw, "aspect", &g_cfg.visuals.aspect_value, 0.5f, 3.0f, "%.2f");
+    cy += row;
+
+    sh_menu_checkbox(x, cy, "viewmodel offset", &g_cfg.visuals.viewmodel_offset);
+    sh_menu_checkbox(x + colw, cy, "no bob", &g_cfg.visuals.no_bob);
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "vm x", &g_cfg.visuals.viewmodel_x, -20.0f, 20.0f, "%.0f");
+    sh_menu_slider(x + colw, cy, colw, "vm y", &g_cfg.visuals.viewmodel_y, -20.0f, 20.0f, "%.0f");
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "vm z", &g_cfg.visuals.viewmodel_z, -20.0f, 20.0f, "%.0f");
+    sh_menu_slider(x + colw, cy, colw, "vm fov", &g_cfg.visuals.viewmodel_fov_value, 40.0f, 140.0f, "%.0f");
+    cy += row;
+
     sh_menu_checkbox(x, cy, "no smoke", &g_cfg.misc.no_smoke);
     cy += row;
 
@@ -699,7 +722,7 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 430.0f, 380.0f, 330.0f };
+    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 570.0f, 380.0f, 330.0f };
 
     f32 w = 560.0f * s;
     f32 h = tab_h[g_tab] * s;
