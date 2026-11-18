@@ -110,7 +110,7 @@ void sh_vectors_angle(const vec3_t *forward, vec3_t *angles)
     if (forward->x == 0.0f && forward->y == 0.0f)
     {
         yaw = 0.0f;
-        pitch = (forward->z > 0.0f) ? 90.0f : 270.0f;
+        pitch = (forward->z > 0.0f) ? 90.0f : -90.0f;
     }
     else
     {
@@ -118,7 +118,8 @@ void sh_vectors_angle(const vec3_t *forward, vec3_t *angles)
         if (yaw < 0.0f) yaw += 360.0f;
         f32 hyp = sqrtf(forward->x * forward->x + forward->y * forward->y);
         pitch = sh_deg(atan2f(-forward->z, hyp));
-        if (pitch < 0.0f) pitch += 360.0f;
+        if (pitch > 90.0f) pitch = 90.0f;
+        if (pitch < -90.0f) pitch = -90.0f;
     }
 
     angles->x = pitch;
