@@ -33,20 +33,51 @@ static void sh_edge_jump(sh_usercmd_t *cmd)
     if (g_pmove->waterlevel > sh_waterlevel_none)
         return;
 
-    vec3_t start = g_pmove->origin;
+    if (!g_trace_fn)
+        return;
+
+    f32 vx = g_pmove->velocity.x;
+    f32 vy = g_pmove->velocity.y;
+
+    f32 speed = sh_sqrt(vx * vx + vy * vy);
+
+    if (speed < 100.0f)
+        return;
+
+    f32 dirx = vx / speed;
+    f32 diry = vy / speed;
+
+    f32 ft = g_pmove->frametime;
+
+    if (ft <= 0.0f)
+        ft = 0.01f;
+
+    if (ft > 0.1f)
+        ft = 0.1f;
+
+    f32 per_frame = speed * ft;
+
+    f32 probe = per_frame * 1.5f;
+
+    if (probe < 4.0f)
+        probe = 4.0f;
+    if (probe > 48.0f)
+        probe = 48.0f;
+
     vec3_t ahead;
-    sh_scale(&ahead, &g_pmove->velocity, 0.1f);
-    sh_add(&ahead, &start, &ahead);
+    ahead.x = g_pmove->origin.x + dirx * probe;
+    ahead.y = g_pmove->origin.y + diry * probe;
+    ahead.z = g_pmove->origin.z;
 
     vec3_t down = ahead;
     down.z -= 48.0f;
 
-    if (!g_trace_fn)
+    i32 hit = g_trace_fn(ahead, down, 0, -1);
+
+    if (hit)
         return;
 
-    i32 hit = g_trace_fn(ahead, down, 0, -1);
-    if (!hit)
-        cmd->buttons |= sh_in_jump;
+    cmd->buttons |= sh_in_jump;
 }
 
 static void sh_fast_ladder(sh_usercmd_t *cmd)
