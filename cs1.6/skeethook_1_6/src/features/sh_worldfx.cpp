@@ -103,12 +103,31 @@ void sh_fog_apply(void)
     col[1] = (f32)g_cfg.visuals.fog_g / 255.0f;
     col[2] = (f32)g_cfg.visuals.fog_b / 255.0f;
 
-    if (on == last_state && dens == last_dens &&
+    f32 near_d = 100.0f;
+    f32 far_d = 2000.0f;
+
+    i32 mode = g_cfg.visuals.fog_mode;
+
+    if (mode == 1)
+    {
+        near_d = 20.0f;
+        far_d = 600.0f;
+    }
+    else if (mode == 2)
+    {
+        near_d = 800.0f;
+        far_d = 6000.0f;
+    }
+
+    static i32 last_mode = -1;
+
+    if (on == last_state && dens == last_dens && mode == last_mode &&
         col[0] == last_col[0] && col[1] == last_col[1] && col[2] == last_col[2])
         return;
 
     last_state = on;
     last_dens = dens;
+    last_mode = mode;
     last_col[0] = col[0];
     last_col[1] = col[1];
     last_col[2] = col[2];
@@ -117,7 +136,7 @@ void sh_fog_apply(void)
         g_tri_api->fog_params(on ? dens : 0.0f, 1);
 
     if (g_tri_api->fog)
-        g_tri_api->fog((f32 *)col, 100.0f, 2000.0f, on);
+        g_tri_api->fog((f32 *)col, near_d, far_d, on);
 }
 
 qbool sh_fog_enabled(void)

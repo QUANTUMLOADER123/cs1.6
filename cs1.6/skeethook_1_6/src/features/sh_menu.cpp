@@ -587,6 +587,13 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     cy += row;
 
     sh_menu_slider(x, cy, colw, "fog density", &g_cfg.visuals.fog_density, 0.001f, 0.05f, "%.3f");
+
+    static const char *g_fog_items[] = { "normal", "thick", "far" };
+
+    if (g_cfg.visuals.fog_mode < 0 || g_cfg.visuals.fog_mode > 2)
+        g_cfg.visuals.fog_mode = 0;
+
+    sh_menu_combo(x + colw, cy, colw, "fog mode", &g_cfg.visuals.fog_mode, g_fog_items, 3);
     cy += row;
     sh_menu_checkbox(x + colw, cy, "viewmodel offset", &g_cfg.visuals.viewmodel_offset);
     sh_menu_checkbox(x + colw, cy, "no bob", &g_cfg.visuals.no_bob);
