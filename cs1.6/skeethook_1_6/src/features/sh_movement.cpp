@@ -301,6 +301,8 @@ void sh_movement_run(sh_usercmd_t *cmd)
 
     sh_super_toss(cmd, pm);
 
+    sh_speedhack_apply(cmd, pm);
+
     sh_bhop(cmd, pm);
     sh_auto_jump_hold(cmd, pm);
 
@@ -362,4 +364,52 @@ qbool sh_fall_warning(f32 *damage)
     }
 
     return 0;
+}
+
+void sh_speedhack_apply(sh_usercmd_t *cmd, sh_playermove_t *pm)
+{
+    if (!cmd || !pm)
+        return;
+
+    if (pm->spectator || pm->deadflag)
+        return;
+
+    if (g_cfg.movement.speedhack)
+    {
+        f32 f = g_cfg.movement.speedhack_value;
+
+        if (f < 0.5f)
+            f = 0.5f;
+        if (f > 3.0f)
+            f = 3.0f;
+
+        i32 ms = (i32)((f32)cmd->msec * f);
+
+        if (ms < 1)
+            ms = 1;
+        if (ms > 250)
+            ms = 250;
+
+        cmd->msec = (u8)ms;
+    }
+
+    if (g_cfg.movement.air_stuck)
+    {
+        if (pm->movetype != sh_movetype_walk && pm->movetype != sh_movetype_step)
+        {
+            f32 inten = g_cfg.movement.air_stuck_intensity;
+
+            if (inten < 0.0f)
+                inten = 0.0f;
+            if (inten > 3.0f)
+                inten = 3.0f;
+
+            i32 ms = (i32)((f32)cmd->msec * (1.0f - inten * 0.3f));
+
+            if (ms < 1)
+                ms = 1;
+
+            cmd->msec = (u8)ms;
+        }
+    }
 }

@@ -37,6 +37,10 @@ void sh_config_defaults(void)
     g_cfg.movement.autostrafe = (qbool)1;
     g_cfg.movement.quick_stop = (qbool)0;
     g_cfg.movement.bhop = (qbool)1;
+    g_cfg.movement.speedhack = (qbool)0;
+    g_cfg.movement.speedhack_value = 1.5f;
+    g_cfg.movement.air_stuck = (qbool)0;
+    g_cfg.movement.air_stuck_intensity = 1.0f;
     g_cfg.movement.auto_jump = (qbool)1;
     g_cfg.movement.super_toss = (qbool)0;
     g_cfg.movement.tick_control = (qbool)0;
