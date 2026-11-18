@@ -250,6 +250,11 @@ typedef struct sh_config
     sh_misc_cfg misc;
     sh_movement_cfg movement;
     sh_esp_shared esp;
+
+    /* НОВЫЕ поля добавлять ТОЛЬКО сюда, в конец: загрузчик конфига
+       восстанавливает старый файл копированием тела по смещению,
+       и вставка в середину сдвинула бы все последующие поля. */
+    qbool watermark;
 } sh_config;
 
 extern sh_config g_cfg;

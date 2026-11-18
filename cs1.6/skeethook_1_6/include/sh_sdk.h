@@ -845,6 +845,7 @@ void sh_set_trace_fn(i32 (*fn)(vec3_t, vec3_t, i32, i32));
 extern i32 (*g_trace_fn)(vec3_t, vec3_t, i32, i32);
 void sh_sdk_resolve(void);
 qbool sh_sdk_ready(void);
+qbool sh_sdk_hookable(void);
 sh_cl_entity_t *sh_get_entity(i32 index);
 void sh_sdk_set_entity_fn(sh_cl_entity_t *(*fn)(i32));
 

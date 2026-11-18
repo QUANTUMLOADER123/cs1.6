@@ -825,9 +825,40 @@ static void sh_draw_tab_button(f32 x, f32 y, f32 w, const char *label, i32 index
     }
 }
 
+/* Диагностический watermark: рисуется ВСЕГДА, когда DLL работает.
+   Нужен, чтобы за секунду отвечать на вопрос "а dll вообще жива?" -
+   раньше при неоткрывающемся меню это было неотличимо от "инжект
+   не прошёл". Показываем состояние sdk и подсказку по клавише. */
+static void sh_menu_watermark(void)
+{
+    if (!g_cfg.watermark)
+        return;
+
+    f32 x = 8.0f * sh_scale();
+    f32 y = 8.0f * sh_scale();
+
+    const char *sdk = sh_sdk_ready() ? "sdk ok" : "sdk waiting";
+    col4_t col = sh_sdk_ready() ? (col4_t)SH_COL_RGBA(120, 255, 140, 230)
+                                : (col4_t)SH_COL_RGBA(255, 190, 80, 230);
+
+    sh_text(x, y, col, "%s v%s  [%s]", SH_NAME, SH_VERSION, sdk);
+    sh_text(x, y + 12.0f * sh_scale(), (col4_t)SH_COL_RGBA(190, 190, 190, 210),
+            "INSERT - menu");
+}
+
+/* Публичная обёртка: нужна из HUD_Redraw, пока sdk не готов,
+   чтобы показать "dll жива, ждём sdk" даже без полного init. */
+void sh_menu_watermark_only(void)
+{
+    sh_menu_watermark();
+}
+
 void sh_menu_draw(void)
 {
     sh_menu_toggle();
+
+    sh_menu_watermark();
+
     if (!g_visible)
         return;
 

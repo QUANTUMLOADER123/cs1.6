@@ -80,10 +80,12 @@ static DWORD WINAPI sh_worker(void *param)
         Sleep(120);
         sh_sdk_resolve();
 
-        if (!sh_sdk_ready())
+        /* ждём только enginefuncs: их наличие достаточно, чтобы
+           поставить хуки. player_move придёт с первой картой. */
+        if (!sh_sdk_hookable())
         {
             if ((i % 600) == 0)
-                sh_trace("ждём player_move (инжект в меню? нужна карта)");
+                sh_trace("ждём enginefuncs от client.dll");
 
             Sleep(100);
             continue;

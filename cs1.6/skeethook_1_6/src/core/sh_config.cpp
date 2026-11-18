@@ -156,6 +156,7 @@ void sh_config_defaults(void)
     g_cfg.visuals.fog_b = 173;
     g_cfg.visuals.hitmarker = (qbool)1;
     g_cfg.visuals.indicators = (qbool)1;
+    g_cfg.watermark = (qbool)1;
     g_cfg.visuals.hitmarker_damage = (qbool)1;
     g_cfg.visuals.model_changer = (qbool)0;
     g_cfg.visuals.model_index = 0;

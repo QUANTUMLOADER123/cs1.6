@@ -319,7 +319,14 @@ static void sh_resolve_player_move(void)
     if (!hit)
         return;
 
-    void **slot = (void **)sh_abs_ptr(*(u32 *)(hit + 12));
+    /* Паттерн: 8B 54 24 08 8B 44 24 04 33 C9 A3 = 11 байт префикса.
+       A3 (mov [mem32],eax) стоит на индексе 10, его операнд начинается
+       со следующего байта, т.е. hit+11. Было hit+12 - читался мусор
+       (0x8501A36D вместо 0x01A36D84), g_pmove получался нулевым,
+       sh_sdk_ready() возвращал false, и воркер крутился в ожидании
+       ВЕЧНО: хуки не ставились, меню не открывалось. Краша при этом
+       не было - отсюда "заинжектил, жму INSERT, ничего". */
+    void **slot = (void **)sh_abs_ptr(*(u32 *)(hit + 11));
     if (!slot)
         return;
 
@@ -378,6 +385,16 @@ void sh_sdk_resolve(void)
 qbool sh_sdk_ready(void)
 {
     return g_engfuncs != 0 && g_pmove != 0;
+}
+
+/* Для УСТАНОВКИ ХУКОВ player_move не нужен: HUD_Redraw и прочие
+   экспорты client.dll есть и в главном меню, без карты. Требовать
+   g_pmove здесь - значит не поставить хуки, пока игрок не зайдёт
+   на сервер, и выглядеть это будет как "заинжектил, ничего не
+   происходит". g_pmove подхватится позже, при первом CreateMove. */
+qbool sh_sdk_hookable(void)
+{
+    return g_engfuncs != 0;
 }
 
 sh_cl_entity_t *sh_get_entity(i32 index)

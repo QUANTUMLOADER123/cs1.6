@@ -317,10 +317,12 @@ static void sh_engine_trace_setup(void)
 
 static qbool sh_is_ready(void)
 {
-    if (!sh_sdk_ready())
+    /* именно hookable, не ready: хуки можно ставить без карты,
+       g_pmove появится при первом CreateMove */
+    if (!sh_sdk_hookable())
     {
         sh_sdk_resolve();
-        if (!sh_sdk_ready())
+        if (!sh_sdk_hookable())
             return false;
     }
 
@@ -357,8 +359,20 @@ i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
     if (g_create_move_orig)
         result = g_create_move_orig(frametime, cmd);
 
-    if (!sh_is_ready())
-        return result;
+    /* здесь нужен ПОЛНЫЙ sdk (включая player_move): фичи читают
+       g_pmove. sh_is_ready() теперь проверяет только enginefuncs,
+       поэтому дотягиваем player_move отдельно - он появляется,
+       когда игрок уже на карте, то есть ровно в CreateMove. */
+    if (!sh_sdk_ready())
+    {
+        sh_sdk_resolve();
+
+        if (!sh_sdk_ready())
+            return result;
+    }
+
+    if (!g_cfg.ready)
+        sh_config_load();
 
     sh_players_collect();
     sh_players_track_anim();
@@ -398,8 +412,52 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     if (g_hud_redraw_orig)
         result = g_hud_redraw_orig(time, intermission);
 
+    /* Пока sdk не готов, меню и watermark всё равно надо показать:
+       иначе неоткрывающееся меню неотличимо от "dll не работает".
+       Рисуем в отдельном проходе (render_begin/end) и выходим. */
     if (!sh_is_ready())
+    {
+        /* Пока sdk не готов, всё равно показываем watermark - иначе
+           "меню не открывается" неотличимо от "dll не работает".
+
+           Рисовать можно только когда GL-процедуры уже получены;
+           sh_render_init() грузит opengl32.dll и кэширует указатели,
+           поэтому делаем её здесь (это дешёвый GetProcAddress,
+           повторный вызов безопасен) и проверяем sh_render_ready(). */
+        static i32 init_tried;
+
+        if (!init_tried)
+        {
+            sh_render_init();
+            init_tried = 1;
+        }
+
+        if (sh_render_ready())
+        {
+            i32 w = 640;
+            i32 h = 480;
+
+            if (g_engfuncs && g_engfuncs->pfnGetScreenInfo)
+            {
+                sh_screeninfo_t info;
+
+                for (u32 i = 0; i < sizeof(info); ++i)
+                    ((u8 *)&info)[i] = 0;
+
+                if (g_engfuncs->pfnGetScreenInfo(&info))
+                {
+                    w = info.width;
+                    h = info.height;
+                }
+            }
+
+            sh_render_begin(w, h);
+            sh_menu_watermark_only();
+            sh_render_end();
+        }
+
         return result;
+    }
 
     sh_crash_stage("HUD_Redraw: первый init");
 
