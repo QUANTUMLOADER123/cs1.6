@@ -1,4 +1,5 @@
 #include "../../include/sh_worldfx.h"
+#include "../../include/sh_scanner.h"
 #include "../../include/sh_config.h"
 #include "../../include/sh_sdk.h"
 #include "../../include/sh_types.h"
@@ -81,4 +82,38 @@ void sh_worldfx_hit_sound_damage(i32 dmg)
         snd = "weapons/ric2.wav";
 
     g_engfuncs->pfnPlaySoundByName(snd, vol);
+}
+
+void sh_fog_apply(void)
+{
+    if (!g_engfuncs || !g_engfuncs->pfnCvar_SetValue)
+        return;
+
+    static i32 last_on = -1;
+
+    i32 want = g_cfg.visuals.fog ? 1 : 0;
+
+    if (want == last_on)
+        return;
+
+    last_on = want;
+
+    g_engfuncs->pfnCvar_SetValue("gl_fog", (f32)want);
+}
+
+qbool sh_fog_enabled(void)
+{
+    return g_cfg.visuals.fog;
+}
+
+f32 sh_fog_density(void)
+{
+    f32 d = g_cfg.visuals.fog_density;
+
+    if (d < 0.001f)
+        d = 0.001f;
+    if (d > 0.05f)
+        d = 0.05f;
+
+    return d;
 }

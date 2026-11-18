@@ -560,7 +560,8 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_slider(x + colw, cy, colw, "aspect", &g_cfg.visuals.aspect_value, 0.5f, 3.0f, "%.2f");
     cy += row;
 
-    sh_menu_checkbox(x, cy, "viewmodel offset", &g_cfg.visuals.viewmodel_offset);
+    sh_menu_checkbox(x, cy, "fog", &g_cfg.visuals.fog);
+    sh_menu_checkbox(x + colw, cy, "viewmodel offset", &g_cfg.visuals.viewmodel_offset);
     sh_menu_checkbox(x + colw, cy, "no bob", &g_cfg.visuals.no_bob);
     cy += row;
 

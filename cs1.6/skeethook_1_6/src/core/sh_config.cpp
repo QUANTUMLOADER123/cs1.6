@@ -115,6 +115,9 @@ void sh_config_defaults(void)
     g_cfg.visuals.viewmodel_fov = (qbool)0;
     g_cfg.visuals.viewmodel_fov_value = 90.0f;
     g_cfg.visuals.no_bob = (qbool)0;
+    g_cfg.visuals.fog = (qbool)0;
+    g_cfg.visuals.fog_density = 0.005f;
+    g_cfg.visuals.fog_mode = 0;
     g_cfg.visuals.hitmarker = (qbool)1;
     g_cfg.visuals.indicators = (qbool)1;
     g_cfg.visuals.hitmarker_damage = (qbool)1;

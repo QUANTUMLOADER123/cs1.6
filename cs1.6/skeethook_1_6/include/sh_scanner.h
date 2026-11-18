@@ -12,6 +12,7 @@ typedef struct sh_pattern_s
 
 qbool sh_str_eq(const char *a, const char *b);
 void *sh_module_base(const char *module);
+void *sh_find_export_in(const char *module, const char *name);
 u32 sh_module_size(const char *module);
 void *sh_find_pattern(void *base, u32 size, const sh_pattern_t *pattern);
 void *sh_find_pattern_in(const char *module, const sh_pattern_t *pattern);

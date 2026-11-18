@@ -18,6 +18,7 @@ void sh_viewmodel_tick(void);
 void sh_fov_apply(void);
 void sh_aspect_apply(void);
 void sh_remove_bob(void);
+void sh_fog_apply(void);
 #include "../../include/sh_movement.h"
 #include "../../include/sh_bones.h"
 
@@ -385,6 +386,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_remove_bob();
     sh_visuals_apply_nightmode();
     sh_worldfx_tick();
+    sh_fog_apply();
 
     if (g_cfg.visuals.enabled)
         sh_esp_run();

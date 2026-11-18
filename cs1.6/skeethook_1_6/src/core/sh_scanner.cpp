@@ -99,3 +99,13 @@ i32 sh_pattern_rel32(void *at)
         return 0;
     return *(i32 *)at;
 }
+
+void *sh_find_export_in(const char *module, const char *name)
+{
+    HMODULE h = (HMODULE)sh_module_base(module);
+
+    if (!h)
+        return 0;
+
+    return (void *)GetProcAddress(h, name);
+}
