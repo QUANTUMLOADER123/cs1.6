@@ -409,10 +409,10 @@ static void sh_draw_hitboxes(const sh_player_t *p)
         { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }
     };
 
-    col4_t c = g_cfg.visuals.col_hitbox;
-
     for (i32 b = 0; b < snap->bbox_count; ++b)
     {
+        col4_t c = g_cfg.visuals.col_hitbox;
+
         vec3_t pts[8];
 
         if (!sh_bones_bbox_corners(snap, b, pts))
