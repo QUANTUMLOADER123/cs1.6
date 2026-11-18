@@ -667,6 +667,7 @@ static void sh_menu_draw_movement(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "ground strafe", &g_cfg.movement.ground_strafe);
+    sh_menu_checkbox(x + colw, cy, "jumpbug", &g_cfg.movement.jumpbug);
     sh_menu_slider(x + colw, cy, colw, "gs max", &g_cfg.movement.ground_strafe_max, 200.0f, 2000.0f, "%.0f");
     cy += row;
 

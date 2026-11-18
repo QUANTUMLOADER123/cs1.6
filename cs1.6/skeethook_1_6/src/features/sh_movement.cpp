@@ -285,6 +285,36 @@ void sh_tick_control(sh_usercmd_t *cmd)
     cmd->msec = (u8)target;
 }
 
+void sh_jumpbug(sh_usercmd_t *cmd, sh_playermove_t *pm)
+{
+    if (!g_cfg.movement.jumpbug || !cmd || !pm)
+        return;
+
+    if (pm->onground != -1)
+        return;
+
+    if (pm->velocity.z >= 0.0f)
+        return;
+
+    cmd->buttons |= sh_in_duck;
+}
+
+void sh_movement_fix(sh_usercmd_t *cmd, f32 yaw_delta)
+{
+    if (!cmd || yaw_delta == 0.0f)
+        return;
+
+    f32 rad = yaw_delta * 0.01745329f;
+    f32 cs = sh_cos(rad);
+    f32 sn = sh_sin(rad);
+
+    f32 fwd = cmd->forwardmove;
+    f32 side = cmd->sidemove;
+
+    cmd->forwardmove = fwd * cs - side * sn;
+    cmd->sidemove = fwd * sn + side * cs;
+}
+
 void sh_movement_run(sh_usercmd_t *cmd)
 {
     sh_playermove_t *pm = g_pmove;
@@ -308,6 +338,8 @@ void sh_movement_run(sh_usercmd_t *cmd)
 
     sh_bhop(cmd, pm);
     sh_auto_jump_hold(cmd, pm);
+
+    sh_jumpbug(cmd, pm);
 
     if (cmd->buttons & sh_in_attack)
         sh_shots_on_attack();
