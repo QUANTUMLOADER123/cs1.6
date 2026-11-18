@@ -362,7 +362,7 @@ void sh_movement_run(sh_usercmd_t *cmd)
     if (!pm || !cmd)
         return;
 
-    if (g_cfg.movement.autostrafe)
+    if (g_cfg.movement.autostrafe && !g_cfg.movement.ground_strafe)
         sh_autostrafe(cmd, pm);
 
     sh_quick_stop(cmd, pm);
@@ -581,7 +581,10 @@ void sh_ground_strafe(sh_usercmd_t *cmd, sh_playermove_t *pm)
         return;
 
     if (pm->onground == -1)
+    {
+        sh_autostrafe(cmd, pm);
         return;
+    }
 
     if (pm->spectator || pm->deadflag)
         return;
