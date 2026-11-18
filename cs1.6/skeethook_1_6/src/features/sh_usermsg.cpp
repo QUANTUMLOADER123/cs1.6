@@ -3,6 +3,92 @@
 #include "../../include/sh_hitmarker.h"
 #include "../../include/sh_worldfx.h"
 #include "../../include/sh_sdk.h"
+#include "../../include/sh_math.h"
+
+#include <windows.h>
+#include <mmsystem.h>
+
+typedef i32(__stdcall *sh_play_sound_fn)(const void *data, void *mod, u32 flags);
+
+static sh_play_sound_fn g_play_sound;
+static qbool g_snd_ready;
+static u8 g_wav_kill[8192];
+static u8 g_wav_hs[8192];
+static u32 g_wav_kill_len;
+static u32 g_wav_hs_len;
+
+static void sh_put_u32(u8 *p, u32 v)
+{
+    p[0] = (u8)(v & 0xFF);
+    p[1] = (u8)((v >> 8) & 0xFF);
+    p[2] = (u8)((v >> 16) & 0xFF);
+    p[3] = (u8)((v >> 24) & 0xFF);
+}
+
+static void sh_put_u16(u8 *p, u16 v)
+{
+    p[0] = (u8)(v & 0xFF);
+    p[1] = (u8)((v >> 8) & 0xFF);
+}
+
+static u32 sh_make_wav(u8 *out, u32 cap, f32 freq, f32 dur)
+{
+    const u32 rate = 22050;
+    u32 samples = (u32)(dur * (f32)rate);
+
+    if (samples > (cap - 44) / 2)
+        samples = (cap - 44) / 2;
+
+    u32 data = samples * 2;
+
+    out[0] = 'R'; out[1] = 'I'; out[2] = 'F'; out[3] = 'F';
+    sh_put_u32(out + 4, 36 + data);
+    out[8] = 'W'; out[9] = 'A'; out[10] = 'V'; out[11] = 'E';
+    out[12] = 'f'; out[13] = 'm'; out[14] = 't'; out[15] = ' ';
+    sh_put_u32(out + 16, 16);
+    sh_put_u16(out + 20, 1);
+    sh_put_u16(out + 22, 1);
+    sh_put_u32(out + 24, rate);
+    sh_put_u32(out + 28, rate * 2);
+    sh_put_u16(out + 32, 2);
+    sh_put_u16(out + 34, 16);
+    out[36] = 'd'; out[37] = 'a'; out[38] = 't'; out[39] = 'a';
+    sh_put_u32(out + 40, data);
+
+    for (u32 i = 0; i < samples; ++i)
+    {
+        f32 t = (f32)i / (f32)rate;
+        f32 env = 1.0f - (f32)i / (f32)samples;
+        f32 v = sh_sin(6.2831853f * freq * t) * env * 0.35f;
+        i16 sv = (i16)(v * 32767.0f);
+
+        out[44 + i * 2] = (u8)(sv & 0xFF);
+        out[45 + i * 2] = (u8)((u16)sv >> 8);
+    }
+
+    return 44 + data;
+}
+
+void sh_killsound_init(void)
+{
+    if (g_snd_ready)
+        return;
+
+    HMODULE winmm = LoadLibraryA("winmm.dll");
+
+    if (!winmm)
+        return;
+
+    g_play_sound = (sh_play_sound_fn)(void *)GetProcAddress(winmm, "PlaySoundW");
+
+    if (!g_play_sound)
+        return;
+
+    g_wav_kill_len = sh_make_wav(g_wav_kill, (u32)sizeof(g_wav_kill), 660.0f, 0.09f);
+    g_wav_hs_len = sh_make_wav(g_wav_hs, (u32)sizeof(g_wav_hs), 1180.0f, 0.07f);
+
+    g_snd_ready = (qbool)1;
+}
 
 sh_msg_state_t g_msgs;
 
@@ -387,6 +473,40 @@ static i32 __cdecl sh_cb_hide_weapon(const char *name, i32 size, i32 read)
     return 1;
 }
 
+static u32 g_killfeed_time;
+
+static i32 __cdecl sh_cb_say_text(const char *name, i32 size, i32 read)
+{
+    (void)size;
+
+    if (read < 3 || !name)
+        return 1;
+
+    const u8 *p = (const u8 *)name;
+
+    if (g_cfg.visuals.killsound && p[0] == (u8)g_local_player)
+    {
+        u32 now = (u32)(g_pmove ? g_pmove->time * 1000.0f : 0.0f);
+
+        if (now - g_killfeed_time > 150)
+        {
+            g_killfeed_time = now;
+
+            const void *wav = 0;
+
+            if (p[2] == 1 && g_wav_hs_len)
+                wav = g_wav_hs;
+            else if (g_wav_kill_len)
+                wav = g_wav_kill;
+
+            if (g_play_sound && wav)
+                g_play_sound(wav, 0, 0x0007u);
+        }
+    }
+
+    return 1;
+}
+
 void sh_msgs_register(void)
 {
     if (!g_engfuncs || !g_engfuncs->pfnHookUserMsg)
@@ -401,4 +521,5 @@ void sh_msgs_register(void)
     g_engfuncs->pfnHookUserMsg("RoundTime", sh_cb_round_time);
     g_engfuncs->pfnHookUserMsg("ScreenFade", sh_cb_screen_fade);
     g_engfuncs->pfnHookUserMsg("HideWeapon", sh_cb_hide_weapon);
+    g_engfuncs->pfnHookUserMsg("SayText", sh_cb_say_text);
 }

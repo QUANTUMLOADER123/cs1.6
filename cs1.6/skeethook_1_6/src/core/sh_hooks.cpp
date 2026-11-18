@@ -19,6 +19,7 @@ void sh_viewmodel_tick(void);
 void sh_fov_apply(void);
 void sh_aspect_init(void);
 void sh_nightmode_init(void);
+void sh_killsound_init(void);
 void sh_nightmode_poll(void);
 qbool sh_nightmode_ready(void);
 void sh_aspect_poll(void);
@@ -767,6 +768,7 @@ qbool sh_hooks_install(void)
 
     sh_aspect_init();
     sh_nightmode_init();
+    sh_killsound_init();
 
     if (create_move)
     {
