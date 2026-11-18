@@ -8,6 +8,16 @@
 
 static HMODULE g_self;
 static HANDLE g_thread;
+static volatile LONG g_detach_done;
+
+static DWORD WINAPI sh_detach_worker(void *param)
+{
+    (void)param;
+
+    sh_hooks_uninstall();
+
+    return 0;
+}
 
 static DWORD WINAPI sh_worker(void *param)
 {
@@ -43,8 +53,6 @@ static DWORD WINAPI sh_worker(void *param)
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserved)
 {
-    (void)reserved;
-
     if (reason == DLL_PROCESS_ATTACH)
     {
         g_self = module;
@@ -56,7 +64,11 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserved)
     }
     else if (reason == DLL_PROCESS_DETACH)
     {
-        sh_hooks_uninstall();
+        /* reserved != 0 - процесс завершается, разбирать хуки нельзя:
+           MinHook замораживает все потоки, а под loader-lock это
+           дедлок. При завершении процесса память и так отдаст ОС. */
+        if (reserved == 0)
+            sh_hooks_uninstall();
     }
 
     return TRUE;
