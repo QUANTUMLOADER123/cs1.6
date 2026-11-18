@@ -74,7 +74,7 @@ static void sh_copy_name(char *dst, const char *src, i32 max)
 
 void sh_entityesp_add(sh_cl_entity_t *ent, const char *model_name)
 {
-    if (!g_cfg.visuals.entity_esp || !ent || !model_name)
+    if (!ent || !model_name || !g_cfg.visuals.entity_esp || !g_pmove)
         return;
 
     i32 kind = 0;
@@ -89,7 +89,7 @@ void sh_entityesp_add(sh_cl_entity_t *ent, const char *model_name)
     sh_went_t *w = &g_wents[g_went_cursor];
 
     w->origin = ent->origin;
-    w->born = g_pmove ? g_pmove->time : 0.0f;
+    w->born = g_pmove->time;
     w->kind = kind;
     w->active = 1;
 

@@ -219,7 +219,7 @@ static qbool sh_sound_skip(const char *name)
 
 void sh_soundesp_add(const vec3_t *origin, const char *name)
 {
-    if (!origin || !g_cfg.visuals.sound_esp)
+    if (!origin || !g_pmove || !g_cfg.visuals.sound_esp)
         return;
 
     if (sh_sound_skip(name))
@@ -233,7 +233,7 @@ void sh_soundesp_add(const vec3_t *origin, const char *name)
     sh_sound_t *s = &g_sounds[g_sound_cursor];
 
     s->origin = *origin;
-    s->born = g_pmove ? g_pmove->time : 0.0f;
+    s->born = g_pmove->time;
     s->kind = kind;
     s->active = 1;
 
