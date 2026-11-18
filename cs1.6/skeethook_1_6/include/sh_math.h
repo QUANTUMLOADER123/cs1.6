@@ -24,6 +24,9 @@ f32 sh_angle_delta(f32 a, f32 b);
 void sh_angle_normalize(vec3_t *angles);
 f32 sh_normalize_yaw(f32 y);
 qbool sh_world_to_screen(const vec3_t *origin, vec2_t *out);
+qbool sh_matrix_init(void);
+qbool sh_matrix_ready(void);
+qbool sh_matrix_world_to_screen(const vec3_t *world, vec2_t *out);
 
 f32 sh_sqrt(f32 v);
 f32 sh_sin(f32 rad);

@@ -800,6 +800,7 @@ qbool sh_hooks_install(void)
     sh_scope_init();
     sh_tracer3d_init();
     sh_chams_gl_init();
+    sh_matrix_init();
 
     if (create_move)
     {
