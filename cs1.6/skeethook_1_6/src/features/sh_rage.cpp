@@ -436,6 +436,17 @@ void sh_rage_apply(sh_usercmd_t *cmd, const sh_rage_result_t *r)
     {
         cmd->viewangles.x += sh_angle_delta(want.x, cmd->viewangles.x) / smooth;
         cmd->viewangles.y += sh_angle_delta(want.y, cmd->viewangles.y) / smooth;
+
+        if (cmd->viewangles.x > 89.0f)
+            cmd->viewangles.x = 89.0f;
+        else if (cmd->viewangles.x < -89.0f)
+            cmd->viewangles.x = -89.0f;
+
+        while (cmd->viewangles.y > 180.0f)
+            cmd->viewangles.y -= 360.0f;
+
+        while (cmd->viewangles.y < -180.0f)
+            cmd->viewangles.y += 360.0f;
     }
 
     if (g_cfg.aimbot.auto_stop && sh_rage_should_fire(r))
