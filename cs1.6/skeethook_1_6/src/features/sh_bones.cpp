@@ -506,10 +506,20 @@ qbool sh_backtrack_lerp(i32 ent_index, f32 target_time, vec3_t *out_origin,
     if (t0 != t1)
         frac = (target_time - t0) / (t1 - t0);
 
-    if (frac < 0.0f)
-        frac = 0.0f;
-    if (frac > 1.0f)
-        frac = 1.0f;
+    if (extrapolate)
+    {
+        if (frac < -2.0f)
+            frac = -2.0f;
+        if (frac > 2.0f)
+            frac = 2.0f;
+    }
+    else
+    {
+        if (frac < 0.0f)
+            frac = 0.0f;
+        if (frac > 1.0f)
+            frac = 1.0f;
+    }
 
     out_origin->x = p0->origin.x + (p1->origin.x - p0->origin.x) * frac;
     out_origin->y = p0->origin.y + (p1->origin.y - p0->origin.y) * frac;
@@ -517,7 +527,7 @@ qbool sh_backtrack_lerp(i32 ent_index, f32 target_time, vec3_t *out_origin,
 
     out_angles->x = p0->angles.x + (p1->angles.x - p0->angles.x) * frac;
     out_angles->y = p0->angles.y + sh_ang_diff(p1->angles.y, p0->angles.y) * frac;
-    out_angles->z = p0->angles.z + (p1->angles.z - p0->angles.z) * frac;
+    out_angles->z = p0->angles.z + sh_ang_diff(p1->angles.z, p0->angles.z) * frac;
 
     if (extrap)
         *extrap = extrapolate;
