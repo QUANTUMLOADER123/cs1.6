@@ -264,11 +264,34 @@ void sh_config_load(void)
     u32 size = 0;
 
     if (fread(&magic, sizeof(magic), 1, f) != 1 ||
-        fread(&size, sizeof(size), 1, f) != 1 ||
-        magic != 0x53484B31u || size != (u32)sizeof(sh_config))
+        fread(&size, sizeof(size), 1, f) != 1 || magic != 0x53484B31u)
     {
         fclose(f);
         sh_config_defaults();
+        sh_config_save();
+        return;
+    }
+
+    if (size != (u32)sizeof(sh_config))
+    {
+        sh_config partial;
+        size_t want = (size_t)size < sizeof(sh_config) ? (size_t)size : sizeof(sh_config);
+        size_t rd = fread(&partial, 1, want, f);
+        fclose(f);
+
+        sh_config_defaults();
+
+        if (rd == want)
+        {
+            const size_t head = sizeof(g_cfg.ready) + sizeof(g_cfg.menu_open);
+            size_t body = want > head ? want - head : 0;
+
+            if (body)
+                memcpy((u8 *)&g_cfg + head, (u8 *)&partial + head, body);
+
+            g_cfg.ready = (qbool)1;
+        }
+
         sh_config_save();
         return;
     }
