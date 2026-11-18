@@ -22,6 +22,8 @@ void sh_nightmode_init(void);
 void sh_killsound_init(void);
 void sh_scope_init(void);
 void sh_tracer3d_init(void);
+qbool sh_chams_gl_init(void);
+qbool sh_chams_gl_ready(void);
 void sh_tracer3d_add(const vec3_t *start, const vec3_t *end);
 qbool sh_tracer3d_ready(void);
 void sh_scope_draw(void);
@@ -631,7 +633,7 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
             }
         }
     }
-    else if (g_cfg.visuals.chams)
+    else if (g_cfg.visuals.chams && !sh_chams_gl_ready())
     {
         sh_player_t *pl = 0;
 
@@ -797,6 +799,7 @@ qbool sh_hooks_install(void)
     sh_killsound_init();
     sh_scope_init();
     sh_tracer3d_init();
+    sh_chams_gl_init();
 
     if (create_move)
     {
