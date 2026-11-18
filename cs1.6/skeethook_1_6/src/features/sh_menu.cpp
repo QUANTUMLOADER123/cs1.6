@@ -557,7 +557,7 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_slider(x + colw, cy, colw, "fov", &g_cfg.visuals.fov_value, 40.0f, 160.0f, "%.0f");
     cy += row;
 
-    sh_menu_checkbox(x, cy, "aspect ratio", &g_cfg.visuals.aspect_ratio);
+    sh_menu_checkbox(x, cy, "aspect (frustum)", &g_cfg.visuals.aspect_ratio);
     sh_menu_slider(x + colw, cy, colw, "aspect", &g_cfg.visuals.aspect_value, 0.5f, 3.0f, "%.2f");
     cy += row;
 

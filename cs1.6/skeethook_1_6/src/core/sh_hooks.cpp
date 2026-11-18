@@ -17,7 +17,10 @@ void sh_wallbang_draw(void);
 void sh_hitbox_scan_draw(void);
 void sh_viewmodel_tick(void);
 void sh_fov_apply(void);
-void sh_aspect_apply(void);
+void sh_aspect_init(void);
+void sh_aspect_poll(void);
+void sh_aspect_shutdown(void);
+qbool sh_aspect_ready(void);
 void sh_remove_bob(void);
 void sh_fog_apply(void);
 void sh_entityesp_add(sh_cl_entity_t *ent, const char *model_name);
@@ -191,36 +194,6 @@ void __cdecl sh_txfer_pred_hook(void *ps, const void *pps, void *pcd,
             cd->fov = f;
         }
 
-        if (g_cfg.visuals.aspect_ratio)
-        {
-            f32 a = g_cfg.visuals.aspect_value;
-
-            if (a < 0.5f)
-                a = 0.5f;
-            if (a > 3.0f)
-                a = 3.0f;
-
-            f32 base_a = 4.0f / 3.0f;
-            f32 ratio = a / base_a;
-
-            f32 rad = cd->fov * 0.01745329f * 0.5f;
-
-            f32 cs = sh_cos(rad);
-
-            f32 tan_h = ((cs != 0.0f) ? (sh_sin(rad) / cs) : 0.0f) * ratio;
-
-            if (tan_h > 0.05f)
-            {
-                f32 newfov = 2.0f * sh_atan(tan_h);
-
-                cd->fov = newfov * 57.29577951f;
-
-                if (cd->fov < 40.0f)
-                    cd->fov = 40.0f;
-                if (cd->fov > 160.0f)
-                    cd->fov = 160.0f;
-            }
-        }
     }
 }
 
@@ -429,7 +402,7 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_model_changer_tick();
     sh_viewmodel_tick();
     sh_fov_apply();
-    sh_aspect_apply();
+    sh_aspect_poll();
     sh_remove_bob();
     sh_visuals_apply_nightmode();
     sh_worldfx_tick();
@@ -787,6 +760,8 @@ qbool sh_hooks_install(void)
 
     if (MH_Initialize() != MH_OK)
         return false;
+
+    sh_aspect_init();
 
     if (create_move)
     {
