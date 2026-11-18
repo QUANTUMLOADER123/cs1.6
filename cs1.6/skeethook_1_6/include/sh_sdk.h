@@ -577,6 +577,43 @@ typedef struct sh_studio_iface_s
     i32 (*studio_draw_player)(i32 flags, sh_entity_state_t *pplayer);
 } sh_studio_iface_t;
 
+typedef struct sh_ref_params_s
+{
+    vec3_t vieworg;
+    vec3_t viewangles;
+    vec3_t forward;
+    vec3_t right;
+    vec3_t up;
+    f32 frametime;
+    f32 time;
+    i32 intermission;
+    i32 paused;
+    i32 spectator;
+    i32 onground;
+    i32 waterlevel;
+    vec3_t simvel;
+    vec3_t simorg;
+    vec3_t viewheight;
+    f32 idealpitch;
+    vec3_t cl_viewangles;
+    i32 health;
+    vec3_t crosshairangle;
+    f32 viewsize;
+    vec3_t punchangle;
+    i32 maxclients;
+    i32 viewentity;
+    i32 playernum;
+    i32 max_entities;
+    i32 demoplayback;
+    i32 hardware;
+    i32 smoothing;
+    void *cmd;
+    void *movevars;
+    i32 viewport[4];
+    i32 nextView;
+    i32 onlyClientDraw;
+} sh_ref_params_t;
+
 typedef struct sh_studio_api_s
 {
     void *mem_calloc;

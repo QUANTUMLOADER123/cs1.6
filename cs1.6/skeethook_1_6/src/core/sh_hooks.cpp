@@ -386,7 +386,6 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
     sh_remove_bob();
     sh_visuals_apply_nightmode();
     sh_worldfx_tick();
-    sh_fog_apply();
 
     if (g_cfg.visuals.enabled)
         sh_esp_run();
@@ -621,6 +620,53 @@ i32 __cdecl sh_user_msg_hook(const char *name, i32 size)
     return 0;
 }
 
+typedef void(__cdecl *calc_refdef_fn)(sh_ref_params_t *pparams);
+
+static calc_refdef_fn g_calc_refdef_orig;
+
+void __cdecl sh_calc_refdef_hook(sh_ref_params_t *pparams)
+{
+    if (g_calc_refdef_orig)
+        g_calc_refdef_orig(pparams);
+
+    if (!pparams)
+        return;
+
+    if (g_cfg.misc.no_recoil_effect)
+    {
+        pparams->punchangle.x = 0.0f;
+        pparams->punchangle.y = 0.0f;
+        pparams->punchangle.z = 0.0f;
+        pparams->viewangles.x -= pparams->cl_viewangles.x - pparams->viewangles.x;
+    }
+
+    if (g_cfg.visuals.thirdperson && g_cfg.visuals.thirdperson_dist > 0.0f)
+    {
+        f32 dist = g_cfg.visuals.thirdperson_dist;
+
+        if (dist < 32.0f)
+            dist = 32.0f;
+        if (dist > 400.0f)
+            dist = 400.0f;
+
+        pparams->vieworg.x -= pparams->forward.x * dist;
+        pparams->vieworg.y -= pparams->forward.y * dist;
+        pparams->vieworg.z -= pparams->forward.z * dist;
+    }
+}
+
+typedef void(__cdecl *draw_tris_fn)(void);
+
+static draw_tris_fn g_draw_normal_orig;
+
+void __cdecl sh_draw_normal_tris_hook(void)
+{
+    if (g_draw_normal_orig)
+        g_draw_normal_orig();
+
+    sh_fog_apply();
+}
+
 qbool sh_hooks_install(void)
 {
     if (!sh_is_ready())
@@ -641,6 +687,24 @@ qbool sh_hooks_install(void)
         if (MH_CreateHook(post_run_cmd, (void *)sh_hud_post_run_cmd_hook,
                           (void **)&g_hud_post_run_cmd_orig) == MH_OK)
             MH_EnableHook(post_run_cmd);
+    }
+
+    void *draw_normal = sh_find_export_body("client.dll", "HUD_DrawNormalTriangles");
+
+    if (draw_normal)
+    {
+        if (MH_CreateHook(draw_normal, (void *)sh_draw_normal_tris_hook,
+                          (void **)&g_draw_normal_orig) == MH_OK)
+            MH_EnableHook(draw_normal);
+    }
+
+    void *calc_refdef = sh_find_export_body("client.dll", "V_CalcRefdef");
+
+    if (calc_refdef)
+    {
+        if (MH_CreateHook(calc_refdef, (void *)sh_calc_refdef_hook,
+                          (void **)&g_calc_refdef_orig) == MH_OK)
+            MH_EnableHook(calc_refdef);
     }
 
     void *create_move = sh_find_export_body("client.dll", "CL_CreateMove");

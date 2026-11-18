@@ -86,19 +86,38 @@ void sh_worldfx_hit_sound_damage(i32 dmg)
 
 void sh_fog_apply(void)
 {
-    if (!g_engfuncs || !g_engfuncs->pfnCvar_SetValue)
+    if (!g_tri_api)
         return;
 
-    static i32 last_on = -1;
+    static i32 last_state = -1;
+    static f32 last_dens = -1.0f;
+    static f32 last_col[3] = { -1.0f, -1.0f, -1.0f };
 
-    i32 want = g_cfg.visuals.fog ? 1 : 0;
+    i32 on = g_cfg.visuals.fog ? 1 : 0;
 
-    if (want == last_on)
+    f32 dens = sh_fog_density();
+
+    f32 col[3] = { 0.55f, 0.60f, 0.68f };
+
+    col[0] = (f32)g_cfg.visuals.fog_r / 255.0f;
+    col[1] = (f32)g_cfg.visuals.fog_g / 255.0f;
+    col[2] = (f32)g_cfg.visuals.fog_b / 255.0f;
+
+    if (on == last_state && dens == last_dens &&
+        col[0] == last_col[0] && col[1] == last_col[1] && col[2] == last_col[2])
         return;
 
-    last_on = want;
+    last_state = on;
+    last_dens = dens;
+    last_col[0] = col[0];
+    last_col[1] = col[1];
+    last_col[2] = col[2];
 
-    g_engfuncs->pfnCvar_SetValue("gl_fog", (f32)want);
+    if (g_tri_api->fog_params)
+        g_tri_api->fog_params(on ? dens : 0.0f, 1);
+
+    if (g_tri_api->fog)
+        g_tri_api->fog((f32 *)col, 100.0f, 2000.0f, on);
 }
 
 qbool sh_fog_enabled(void)

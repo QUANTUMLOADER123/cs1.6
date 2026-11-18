@@ -112,6 +112,9 @@ typedef struct sh_visuals_cfg
     qbool fog;
     f32 fog_density;
     i32 fog_mode;
+    i32 fog_r;
+    i32 fog_g;
+    i32 fog_b;
     qbool hitmarker;
     qbool indicators;
     qbool hitmarker_damage;

@@ -118,6 +118,9 @@ void sh_config_defaults(void)
     g_cfg.visuals.fog = (qbool)0;
     g_cfg.visuals.fog_density = 0.005f;
     g_cfg.visuals.fog_mode = 0;
+    g_cfg.visuals.fog_r = 140;
+    g_cfg.visuals.fog_g = 153;
+    g_cfg.visuals.fog_b = 173;
     g_cfg.visuals.hitmarker = (qbool)1;
     g_cfg.visuals.indicators = (qbool)1;
     g_cfg.visuals.hitmarker_damage = (qbool)1;

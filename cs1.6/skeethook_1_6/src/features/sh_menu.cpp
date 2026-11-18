@@ -561,6 +561,10 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "fog", &g_cfg.visuals.fog);
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "fog density", &g_cfg.visuals.fog_density, 0.001f, 0.05f, "%.3f");
+    cy += row;
     sh_menu_checkbox(x + colw, cy, "viewmodel offset", &g_cfg.visuals.viewmodel_offset);
     sh_menu_checkbox(x + colw, cy, "no bob", &g_cfg.visuals.no_bob);
     cy += row;
@@ -740,7 +744,7 @@ void sh_menu_draw(void)
         return;
 
     f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 640.0f, 380.0f, 330.0f };
+    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 680.0f, 380.0f, 330.0f };
 
     f32 w = 560.0f * s;
     f32 h = tab_h[g_tab] * s;
