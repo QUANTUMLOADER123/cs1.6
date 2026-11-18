@@ -441,6 +441,9 @@ void sh_strafe_hack(sh_usercmd_t *cmd, sh_playermove_t *pm)
     if (speed < 30.0f)
         return;
 
+    if (cmd->buttons & (sh_in_forward | sh_in_back | sh_in_moveleft | sh_in_moveright))
+        return;
+
     f32 maxv = g_cfg.movement.strafe_hack_max;
 
     if (maxv < 100.0f)
