@@ -579,6 +579,11 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     cy += row;
 
     sh_menu_checkbox(x, cy, "no smoke", &g_cfg.misc.no_smoke);
+    sh_menu_checkbox(x + colw, cy, "smoke visuals", &g_cfg.visuals.smoke_edit);
+    cy += row;
+
+    sh_menu_slider(x, cy, colw, "smoke alpha", &g_cfg.visuals.smoke_alpha, 0.05f, 1.0f, "%.2f");
+    cy += row;
     cy += row;
 
     sh_menu_checkbox(x, cy, "hide hud", &g_cfg.misc.hide_hud);

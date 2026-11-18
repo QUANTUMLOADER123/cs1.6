@@ -111,6 +111,11 @@ typedef struct sh_visuals_cfg
     qbool no_bob;
     qbool fog;
     qbool entity_esp;
+    qbool smoke_edit;
+    f32 smoke_alpha;
+    i32 smoke_r;
+    i32 smoke_g;
+    i32 smoke_b;
     f32 fog_density;
     i32 fog_mode;
     i32 fog_r;

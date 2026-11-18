@@ -126,6 +126,11 @@ void sh_config_defaults(void)
     g_cfg.visuals.no_bob = (qbool)0;
     g_cfg.visuals.fog = (qbool)0;
     g_cfg.visuals.entity_esp = (qbool)0;
+    g_cfg.visuals.smoke_edit = (qbool)0;
+    g_cfg.visuals.smoke_alpha = 0.45f;
+    g_cfg.visuals.smoke_r = 170;
+    g_cfg.visuals.smoke_g = 170;
+    g_cfg.visuals.smoke_b = 170;
     g_cfg.visuals.fog_density = 0.005f;
     g_cfg.visuals.fog_mode = 0;
     g_cfg.visuals.fog_r = 140;

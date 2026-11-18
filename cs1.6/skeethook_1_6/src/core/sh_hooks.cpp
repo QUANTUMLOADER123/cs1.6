@@ -572,7 +572,30 @@ i32 __cdecl sh_add_entity_hook(i32 type, sh_cl_entity_t *ent,
             }
 
             if (match && base[0])
-                return 0;
+            {
+                if (g_cfg.misc.no_smoke)
+                    return 0;
+
+                if (ent && g_cfg.visuals.smoke_edit)
+                {
+                    f32 a = g_cfg.visuals.smoke_alpha;
+
+                    if (a < 0.05f)
+                        a = 0.05f;
+                    if (a > 1.0f)
+                        a = 1.0f;
+
+                    ent->curstate.rendermode = sh_rendermode_transalpha;
+                    ent->curstate.renderamt = (i32)(a * 255.0f);
+                    ent->curstate.rendercolor = (sh_color24_t){
+                        (u8)g_cfg.visuals.smoke_r,
+                        (u8)g_cfg.visuals.smoke_g,
+                        (u8)g_cfg.visuals.smoke_b
+                    };
+                }
+
+                break;
+            }
         }
     }
 
