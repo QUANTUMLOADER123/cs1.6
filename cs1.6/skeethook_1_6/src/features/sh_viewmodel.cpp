@@ -4,6 +4,9 @@
 #include "../../include/sh_math.h"
 #include "../../include/sh_sdk.h"
 
+static vec3_t g_vm_base;
+static i32 g_vm_ent = -1;
+
 static sh_cl_entity_t *sh_viewmodel_ent(void)
 {
     if (!g_engfuncs || !g_engfuncs->pfnGetViewModel)
@@ -32,6 +35,14 @@ void sh_viewmodel_tick(void)
     vec3_t ang = g_pmove->angles;
 
     sh_angle_vectors(&ang, &fwd, &right, &up);
+
+    if (vm->index != g_vm_ent)
+    {
+        g_vm_ent = vm->index;
+        g_vm_base = vm->origin;
+    }
+
+    vm->origin = g_vm_base;
 
     if (g_cfg.visuals.viewmodel_offset)
     {
