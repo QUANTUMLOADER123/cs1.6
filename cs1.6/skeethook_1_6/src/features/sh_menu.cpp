@@ -612,6 +612,7 @@ static void sh_menu_draw_misc(f32 x, f32 y)
     sh_menu_checkbox(x, cy + row, "killsound", &g_cfg.visuals.killsound);
     sh_menu_checkbox(x + colw, cy + row, "custom scope", &g_cfg.visuals.custom_scope);
     sh_menu_checkbox(x, cy + row * 2.0f, "3d tracer", &g_cfg.visuals.tracer3d);
+    sh_menu_checkbox(x + colw, cy + row * 2.0f, "chams rim", &g_cfg.visuals.chams_rim);
     cy += row;
 
     if (g_cfg.visuals.anim_breakers)

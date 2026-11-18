@@ -4,6 +4,8 @@
 #include "../../include/sh_config.h"
 #include "../../include/sh_scanner.h"
 #include "../../include/sh_types.h"
+#include "../../include/sh_sdk.h"
+#include "../../include/sh_math.h"
 
 typedef void(__stdcall *gl_void_i_fn)(u32);
 typedef u8(__stdcall *gl_is_enabled_fn)(u32);
@@ -36,9 +38,22 @@ static const sh_pattern_t g_sig_alpha = {
     sizeof(g_pat_alpha)
 };
 
+static const u8 g_pat_light[] = {
+    0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x24, 0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00,
+    0x56, 0x57, 0x33, 0xFF, 0x3B, 0xCF,
+};
+
+static const sh_pattern_t g_sig_light = {
+    "chams_light", g_pat_light,
+    "xxxxxxxx????xxxxxx",
+    sizeof(g_pat_light)
+};
+
 typedef i32(__cdecl *draw_model_fn)(void);
+typedef i32(__cdecl *light_vertex_fn)(i32 light, f32 *normal, f32 *base, f32 *out);
 
 static draw_model_fn g_model_orig;
+static light_vertex_fn g_light_orig;
 static gl_void_i_fn g_gl_disable;
 static gl_void_i_fn g_gl_enable;
 static gl_is_enabled_fn g_gl_is_enabled;
@@ -141,6 +156,73 @@ static i32 __cdecl sh_draw_model_hook(void)
     return sh_chams_block(g_model_orig, vis, sh_gl_lequal, (qbool)1, (qbool)1);
 }
 
+static i32 __cdecl sh_light_vertex_hook(i32 light, f32 *normal, f32 *base, f32 *out)
+{
+    if (!g_light_orig)
+        return 0;
+
+    i32 r = g_light_orig(light, normal, base, out);
+
+    if (!g_override || !out)
+        return r;
+
+    if (!g_cfg.visuals.chams_rim)
+    {
+        out[0] = g_ov_col[0];
+        out[1] = g_ov_col[1];
+        out[2] = g_ov_col[2];
+        return r;
+    }
+
+    f32 lv = (out[0] + out[1] + out[2]) * (1.0f / 3.0f);
+
+    if (lv < 0.0f)
+        lv = 0.0f;
+    if (lv > 1.0f)
+        lv = 1.0f;
+
+    f32 rim = 0.2f;
+
+    if (normal)
+    {
+        f32 nl = sh_sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+
+        if (nl > 0.0001f)
+        {
+            f32 nx = normal[0] / nl;
+            f32 ny = normal[1] / nl;
+            f32 nz = normal[2] / nl;
+
+            f32 facing = 0.0f;
+
+            if (g_globals)
+            {
+                facing = nx * g_globals->v_forward.x + ny * g_globals->v_forward.y +
+                         nz * g_globals->v_forward.z;
+            }
+
+            if (facing < 0.0f)
+                facing = -facing;
+            if (facing > 1.0f)
+                facing = 1.0f;
+
+            f32 edge = 1.0f - facing;
+            rim = edge * edge * edge;
+        }
+    }
+
+    f32 shade = 0.06f + lv * 0.28f + rim * 0.82f;
+
+    if (shade > 1.0f)
+        shade = 1.0f;
+
+    out[0] = g_ov_col[0] * shade;
+    out[1] = g_ov_col[1] * shade;
+    out[2] = g_ov_col[2] * shade;
+
+    return r;
+}
+
 qbool sh_chams_gl_init(void)
 {
     if (g_ready)
@@ -176,6 +258,15 @@ qbool sh_chams_gl_init(void)
         return false;
 
     MH_EnableHook((void *)model);
+
+    u8 *light = (u8 *)sh_find_pattern_in("hw.dll", &g_sig_light);
+
+    if (light)
+    {
+        if (MH_CreateHook((void *)light, (void *)sh_light_vertex_hook,
+                          (void **)&g_light_orig) == MH_OK)
+            MH_EnableHook((void *)light);
+    }
 
     g_ready = (qbool)1;
 
