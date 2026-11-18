@@ -5,6 +5,7 @@
 #include "../../include/sh_scanner.h"
 
 #include <windows.h>
+#include <stdio.h>
 
 static HMODULE g_self;
 static HANDLE g_thread;
@@ -19,11 +20,52 @@ static DWORD WINAPI sh_detach_worker(void *param)
     return 0;
 }
 
+/* маячок для диагностики: пишем в тот же каталог, что и конфиг,
+   чтобы при «ничего не произошло» было видно, докуда дошёл воркер */
+static void sh_trace(const char *stage)
+{
+    char path[MAX_PATH];
+    char dir[MAX_PATH];
+
+    DWORD len = GetModuleFileNameA(0, dir, MAX_PATH);
+
+    if (len == 0 || len >= MAX_PATH)
+        return;
+
+    dir[MAX_PATH - 1] = 0;
+    dir[len] = 0;
+
+    i32 last = -1;
+
+    for (i32 i = 0; i < MAX_PATH - 1 && dir[i]; ++i)
+    {
+        if (dir[i] == '\\')
+            last = i;
+    }
+
+    if (last < 0 || last + 1 >= MAX_PATH)
+        return;
+
+    dir[last + 1] = 0;
+
+    snprintf(path, MAX_PATH, "%sskeethook_trace.log", dir);
+
+    FILE *f = fopen(path, "ab");
+
+    if (!f)
+        return;
+
+    fprintf(f, "%s\n", stage);
+    fclose(f);
+}
+
 static DWORD WINAPI sh_worker(void *param)
 {
     (void)param;
 
-    for (i32 i = 0; i < 600; ++i)
+    /* до 10 минут: инжект в главном меню не даёт g_pmove, пока не
+       загрузится карта - ждать надо столько, сколько игрок сидит в меню */
+    for (i32 i = 0; i < 12000; ++i)
     {
         if (!sh_module_base("client.dll"))
         {
@@ -36,6 +78,9 @@ static DWORD WINAPI sh_worker(void *param)
 
         if (!sh_sdk_ready())
         {
+            if ((i % 600) == 0)
+                sh_trace("ждём player_move (инжект в меню? нужна карта)");
+
             Sleep(100);
             continue;
         }
@@ -43,10 +88,17 @@ static DWORD WINAPI sh_worker(void *param)
         sh_config_load();
 
         if (sh_hooks_install())
+        {
+            sh_trace("хуки установлены");
             return 0;
+        }
 
+        if ((i % 20) == 0)
+            sh_trace("хуки не встали, повтор");
         Sleep(100);
     }
+
+    sh_trace("истекло время ожидания");
 
     return 0;
 }
