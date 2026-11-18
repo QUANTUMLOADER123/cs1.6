@@ -159,8 +159,11 @@ void sh_players_collect(void)
 {
     g_player_count = 0;
 
-    if (g_engfuncs && g_engfuncs->pfnGetLocalPlayer)
-        g_local_index = g_engfuncs->pfnGetLocalPlayer();
+    /* g_local_player уже посчитан в sh_sdk_resolve (через сверку
+       указателя со списком сущностей). Здесь просто переиспользуем:
+       pfnGetLocalPlayer отдаёт cl_entity_s*, а не индекс. */
+    if (g_local_player > 0 && g_local_player < SH_MAX_ENTITIES)
+        g_local_index = g_local_player;
     else
         g_local_index = -1;
 

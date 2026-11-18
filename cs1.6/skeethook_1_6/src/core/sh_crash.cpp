@@ -416,6 +416,11 @@ static void sh_c_write_file(void)
     if (!f)
         return;
 
+    /* UTF-8 BOM: отчёт пишется в UTF-8 (русские метки этапов),
+       а без BOM половина редакторов и сам "type" в cp1251-консоли
+       показывают кракозябры. С BOM блокнот/VS Code/PowerShell
+       читают правильно. */
+    fwrite("\xEF\xBB\xBF", 1, 3, f);
     fwrite(g_report, 1, (size_t)g_report_len, f);
     fclose(f);
 }

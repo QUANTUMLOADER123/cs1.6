@@ -782,7 +782,8 @@ typedef struct sh_engfuncs_s
     void (*pfnKey_Event)(i32 key, i32 down);
     void *pad_0C4[2];
 
-    i32 (*pfnGetLocalPlayer)(void);
+    /* возвращает УКАЗАТЕЛЬ на cl_entity_s, а не индекс (см. cl_dll.h) */
+    void *(*pfnGetLocalPlayer)(void);
     void *(*pfnGetViewModel)(void);
     void *(*pfnGetEntityByIndex)(i32 index);
 

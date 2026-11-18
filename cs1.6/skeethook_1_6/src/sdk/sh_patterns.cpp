@@ -82,23 +82,30 @@ static const sh_named_pat_t g_sig_table[] = {
                          pat_txfer_overrides_mask, (i32)sizeof(pat_txfer_overrides)}},
 };
 
-static void *sh_va_to_ptr(u32 va)
+/* ВАЖНО: операнды вида "mov reg, imm32" в клиенте содержат АБСОЛЮТНЫЙ
+   виртуальный адрес (ASLR в GoldSrc для клиентских модулей нет, адреса
+   фиксированы при загрузке). Пересчитывать их от базы модуля НЕЛЬЗЯ:
+   вычитание базы даёт мусор, и дальше читаются байты кода как
+   указатели.
+
+   Именно на этом падало: BF C0 5C A2 01 = mov edi, 0x01A25CC0,
+   а 0x01A25CC0 лежит ВНЕ секций client.dll. sh_va_to_ptr вычитал
+   базу client.dll (0x21240000 в игре), получал отрицательное
+   смещение, и в g_engfuncs попадал адрес внутри .text hw.dll. */
+static void *sh_abs_ptr(u32 va)
 {
-    void *base = sh_module_base("client.dll");
-    if (!base)
+    if (!va)
         return 0;
 
-    u32 b = (u32)base;
-
-    if (va < b)
+    /* отсекаем очевидный мусор: адрес обязан быть в user-space
+       и выровнен хотя бы на 4 */
+    if (va < 0x00010000u || va >= 0x7FFF0000u)
         return 0;
 
-    u32 off = va - b;
-
-    if (off >= sh_module_size("client.dll"))
+    if (va & 3u)
         return 0;
 
-    return (u8 *)base + off;
+    return (void *)(unsigned long)va;
 }
 
 void *sh_find_named_sig(const char *name)
@@ -111,29 +118,199 @@ void *sh_find_named_sig(const char *name)
     return 0;
 }
 
+/* Проверка, что адрес лежит в СЕКЦИИ ДАННЫХ какого-нибудь модуля,
+   а не в коде. Для таблицы enginefuncs это критично: если указатель
+   попал в .text, дальше мы читаем байты кода как адреса функций и
+   падаем на первом же вызове (0xC0000005/IP=мусор).
+
+   Возвращает 1, если адрес в .data/.rdata/.bss любого загруженного
+   модуля или вообще не в модуле (тогда доверяем вызывающему). */
+static qbool sh_addr_not_code(u32 addr)
+{
+    void *mods[3];
+    const char *names[3] = { "client.dll", "hw.dll", 0 };
+    i32 n = 0;
+
+    for (i32 i = 0; i < 2; ++i)
+    {
+        void *b = sh_module_base(names[i]);
+
+        if (b)
+            mods[n++] = b;
+    }
+
+    for (i32 i = 0; i < n; ++i)
+    {
+        u8 *base = (u8 *)mods[i];
+        IMAGE_DOS_HEADER *dos = (IMAGE_DOS_HEADER *)base;
+        IMAGE_NT_HEADERS *nt;
+        u32 rva;
+
+        if (dos->e_magic != IMAGE_DOS_SIGNATURE)
+            continue;
+
+        nt = (IMAGE_NT_HEADERS *)(base + dos->e_lfanew);
+
+        if (nt->Signature != IMAGE_NT_SIGNATURE)
+            continue;
+
+        if (addr < (u32)(unsigned long)base ||
+            addr - (u32)(unsigned long)base >= nt->OptionalHeader.SizeOfImage)
+            continue;
+
+        rva = addr - (u32)(unsigned long)base;
+
+        {
+            i32 nsec = nt->FileHeader.NumberOfSections;
+            IMAGE_SECTION_HEADER *sec = IMAGE_FIRST_SECTION(nt);
+
+            for (i32 k = 0; k < nsec; ++k)
+            {
+                u32 va = sec[k].VirtualAddress;
+                u32 sz = sec[k].Misc.VirtualSize;
+
+                if (!sz)
+                    sz = sec[k].SizeOfRawData;
+
+                if (rva < va || rva - va >= sz)
+                    continue;
+
+                /* секция кода: имя начинается с ".text" */
+                if (sec[k].Name[0] == '.' && sec[k].Name[1] == 't' &&
+                    sec[k].Name[2] == 'e' && sec[k].Name[3] == 'x')
+                    return 0;
+
+                return 1;
+            }
+        }
+
+        /* внутри образа, но вне описанных секций - не доверяем */
+        return 0;
+    }
+
+    /* не в известных модулях - вызывающий сам решит */
+    return 1;
+}
+
+/* адрес обязан лежать в .text какого-нибудь модуля, иначе это не
+   функция (а байты кода/данных), и вызывать его нельзя */
+static qbool sh_addr_executable(u32 addr)
+{
+    const char *names[3] = { "client.dll", "hw.dll", 0 };
+
+    if (addr < 0x00010000u || addr >= 0x7FFF0000u)
+        return 0;
+
+    for (i32 i = 0; i < 2; ++i)
+    {
+        u8 *base = (u8 *)sh_module_base(names[i]);
+        IMAGE_DOS_HEADER *dos;
+        IMAGE_NT_HEADERS *nt;
+
+        if (!base)
+            continue;
+
+        dos = (IMAGE_DOS_HEADER *)base;
+
+        if (dos->e_magic != IMAGE_DOS_SIGNATURE)
+            continue;
+
+        nt = (IMAGE_NT_HEADERS *)(base + dos->e_lfanew);
+
+        if (nt->Signature != IMAGE_NT_SIGNATURE)
+            continue;
+
+        if (addr < (u32)(unsigned long)base ||
+            addr - (u32)(unsigned long)base >= nt->OptionalHeader.SizeOfImage)
+            continue;
+
+        {
+            u32 rva = addr - (u32)(unsigned long)base;
+            i32 nsec = nt->FileHeader.NumberOfSections;
+            IMAGE_SECTION_HEADER *sec = IMAGE_FIRST_SECTION(nt);
+
+            for (i32 k = 0; k < nsec; ++k)
+            {
+                u32 va = sec[k].VirtualAddress;
+                u32 sz = sec[k].Misc.VirtualSize;
+
+                if (!sz)
+                    sz = sec[k].SizeOfRawData;
+
+                if (rva < va || rva - va >= sz)
+                    continue;
+
+                if (sec[k].Name[0] == '.' && sec[k].Name[1] == 't' &&
+                    sec[k].Name[2] == 'e' && sec[k].Name[3] == 'x')
+                    return 1;
+
+                return 0;
+            }
+        }
+    }
+
+    return 0;
+}
+
 static void sh_resolve_initialize(void)
 {
     u8 *hit = (u8 *)sh_find_named_sig("initialize");
     if (!hit)
         return;
 
+    /* Ищем "BF ?? ?? ?? ?? F3 A5" - mov edi,<abs> + rep movsd.
+       Это ТОЧНЫЙ признак копирования таблицы enginefuncs:
+       BF задаёт приёмник, а F3 A5 подтверждает, что за ним идёт
+       копирование блоком (а не произвольный mov). Без F3 A5 можно
+       поймать любой "mov edi,const". */
     u8 *p = hit;
     i32 guard = 0;
+    qbool found = 0;
+
     while (guard++ < 128)
     {
-        if (*p == 0xBF)
+        if (p[0] == 0xBF && p[5] == 0xF3 && p[6] == 0xA5)
+        {
+            found = 1;
             break;
+        }
         ++p;
     }
-    if (*p != 0xBF)
+    if (!found)
         return;
 
-    void **slot = (void **)sh_va_to_ptr(*(u32 *)(p + 1));
+    void **slot = (void **)sh_abs_ptr(*(u32 *)(p + 1));
     if (!slot)
         return;
 
-    g_engfuncs_slot = slot;
-    g_engfuncs = (sh_engfuncs_t *)*slot;
+    /* ВАЖНО: операнд BF - это АДРЕС САМОЙ ТАБЛИЦЫ, а не слота с
+       указателем на неё.
+
+       Код в client.dll, где нашлась сигнатура:
+           B9 87 00 00 00        mov  ecx,0x87      ; 135 dword
+           BF C0 5C A2 01        mov  edi,<buf>
+           F3 A5                 rep movsd          ; копия таблицы
+       135*4 = 0x21C = sizeof(enginefuncs_t) - совпадает точно.
+       Значит <buf> - это копия таблицы движка, лежащая в .data.
+
+       Раньше мы делали *(u32*)slot, то есть брали ПЕРВЫЙ ЭЛЕМЕНТ
+       таблицы (указатель на функцию) и считали его самой таблицей.
+       Дальше pfnGetLocalPlayer читался из середины кода функции
+       (hw.dll+0x116E0 - начало .text), возвращал 0xC70CC483
+       (байты "83 C4 70 8B") и падал при вызове. */
+    {
+        sh_engfuncs_t *table = (sh_engfuncs_t *)slot;
+
+        if (!sh_addr_not_code((u32)(unsigned long)table))
+        {
+            g_engfuncs_slot = 0;
+            g_engfuncs = 0;
+            return;
+        }
+
+        g_engfuncs_slot = (void **)table;
+        g_engfuncs = table;
+    }
 }
 
 static void sh_resolve_player_move(void)
@@ -142,7 +319,7 @@ static void sh_resolve_player_move(void)
     if (!hit)
         return;
 
-    void **slot = (void **)sh_va_to_ptr(*(u32 *)(hit + 12));
+    void **slot = (void **)sh_abs_ptr(*(u32 *)(hit + 12));
     if (!slot)
         return;
 
@@ -160,14 +337,40 @@ void sh_sdk_resolve(void)
 
     if (g_engfuncs)
     {
-        g_get_entity = (sh_cl_entity_t * (*)(i32)) g_engfuncs->pfnGetEntityByIndex;
+        /* каждый указатель из таблицы проверяем на правдоподобность:
+           вызов мусорного адреса = мгновенное падение с IP внутри
+           кучи/кода. Проверка дешёвая, а падение дорогое. */
+        void *ge = (void *)g_engfuncs->pfnGetEntityByIndex;
+        void *gl = (void *)g_engfuncs->pfnGetLocalPlayer;
+
+        if (sh_addr_executable((u32)(unsigned long)ge))
+            g_get_entity = (sh_cl_entity_t * (*)(i32)) ge;
+        else
+            g_get_entity = 0;
+
         g_tri_api = (sh_triapi_t *)g_engfuncs->p_tri_api;
 
-        if (g_engfuncs->pfnGetLocalPlayer)
+        if (sh_addr_executable((u32)(unsigned long)gl))
         {
-            i32 idx = g_engfuncs->pfnGetLocalPlayer();
-            if (idx >= 0 && idx < SH_MAX_ENTITIES)
-                g_local_player = idx;
+            /* pfnGetLocalPlayer отдаёт cl_entity_s*, а нам нужен ИНДЕКС.
+               Берём указатель и ищем его в списке сущностей - это
+               единственный надёжный способ, т.к. отдельной функции
+               "дай индекс локального игрока" в GoldSrc нет. */
+            void *local = g_engfuncs->pfnGetLocalPlayer();
+
+            g_local_player = 0;
+
+            if (local && g_get_entity)
+            {
+                for (i32 i = 1; i < SH_MAX_ENTITIES; ++i)
+                {
+                    if (g_get_entity(i) == (sh_cl_entity_t *)local)
+                    {
+                        g_local_player = i;
+                        break;
+                    }
+                }
+            }
         }
     }
 }
