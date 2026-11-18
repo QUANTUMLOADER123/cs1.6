@@ -21,6 +21,7 @@ static const char *g_tabs[] = {
 };
 
 static void sh_menu_release_mouse(qbool release);
+static HWND sh_game_window(void);
 
 static void sh_menu_toggle(void)
 {
@@ -60,6 +61,17 @@ static void sh_menu_toggle(void)
 static POINT g_mouse;
 static qbool g_click;
 static qbool g_click_edge;   /* фронт ЛКМ, считается раз за кадр */
+
+/* сколько раз мы дёрнули ShowCursor(TRUE) — чтобы скомпенсировать
+   на закрытии: он ведёт счётчик, а не флаг */
+static i32 g_cursor_balance;
+
+/* видимая область содержимого - нужна и в хит-тестах, и в отрисовке */
+static f32 g_scroll_rect_x;
+static f32 g_scroll_rect_y;
+static f32 g_scroll_rect_w;
+static f32 g_scroll_rect_h;
+static f32 g_scroll_content_h;
 
 /* ОКНО ИГРЫ.
 
@@ -143,7 +155,18 @@ static void sh_menu_release_mouse(qbool release)
         ClipCursor(0);
         ReleaseCapture();
 
-        ShowCursor(TRUE);
+        /* ShowCursor — счётчик. Доводим его до 0 (видимо), но
+           запоминаем, сколько раз дёрнули, чтобы на закрытии
+           скомпенсировать ровно столько же. Иначе за сессию
+           счётчик уползёт и курсор "залипнет" видимым. */
+        {
+            i32 guard = 0;
+
+            while (ShowCursor(TRUE) < 0 && ++guard < 32)
+                ;
+
+            g_cursor_balance += guard;
+        }
 
         {
             /* курсор в центр, иначе он прилипает к краю экрана */
@@ -173,6 +196,14 @@ static void sh_menu_release_mouse(qbool release)
             act();
 
         ClipCursor(0);
+
+        /* возвращаем счётчик туда, где взяли */
+        while (g_cursor_balance > 0)
+        {
+            ShowCursor(FALSE);
+            --g_cursor_balance;
+        }
+
         ShowCursor(FALSE);
 
         {
@@ -212,21 +243,17 @@ static void sh_menu_cursor_tick(void)
     if (GetCapture() == sh_game_window())
         ReleaseCapture();
 
-    {
-        CURSORINFO ci;
+    /* ВАЖНО: ShowCursor здесь НЕ зовём.
 
-        ci.cbSize = sizeof(ci);
+       ShowCursor ведёт СЧЁТЧИК, а не флаг. Вызов в каждом кадре
+       увеличивал бы его на единицу за кадр — за секунду набегает
+       ~60, и курсор потом не спрятать никаким одним
+       ShowCursor(FALSE). Счётчик правим РОВНО ДВА РАЗА: в
+       sh_menu_release_mouse() при открытии и закрытии.
 
-        /* ShowCursor ведёт счётчик: движок мог увести его в минус,
-           поэтому крутим до нуля, но не бесконечно */
-        if (GetCursorInfo(&ci) && !(ci.flags & 0x00000001 /* CURSOR_SHOWING */))
-        {
-            i32 guard = 0;
-
-            while (ShowCursor(TRUE) < 0 && ++guard < 16)
-                ;
-        }
-    }
+       Покадрово нужно только SetCursor: GoldSrc перерисовывает
+       курсор сам (WM_SETCURSOR), и без этого он снова исчезает. */
+    SetCursor(LoadCursorA(0, IDC_ARROW));
 }
 
 /* Приведение координат курсора к системе координат рендера.
@@ -277,10 +304,38 @@ static void sh_menu_input_begin(void)
     }
 }
 
+/* Отсечение по области прокрутки.
+
+   Виджеты внутри вкладки рисуются в сдвинутых координатах и могут
+   оказаться ЗА пределами видимой области (выше или ниже окна).
+   Без этой проверки они продолжают ловить клики, даже будучи
+   невидимыми: например, пункт, уехавший под нижнюю границу,
+   срабатывает при клике по тому месту, где его уже нет.
+
+   g_scroll_rect_* заполняются в sh_menu_draw() до отрисовки
+   содержимого, поэтому к моменту хит-тестов они валидны. */
 static qbool sh_mouse_in(f32 x, f32 y, f32 w, f32 h)
 {
-    return (f32)g_mouse.x >= x && (f32)g_mouse.x <= x + w &&
-           (f32)g_mouse.y >= y && (f32)g_mouse.y <= y + h;
+    f32 mx = (f32)g_mouse.x;
+    f32 my = (f32)g_mouse.y;
+
+    if (mx < x || mx > x + w || my < y || my > y + h)
+        return 0;
+
+    /* горизонталь ограничиваем всегда, вертикаль - только когда
+       область прокрутки реально задана */
+    if (g_scroll_rect_w > 0.0f && g_scroll_rect_h > 0.0f)
+    {
+        if (mx < g_scroll_rect_x ||
+            mx > g_scroll_rect_x + g_scroll_rect_w)
+            return 0;
+
+        if (my < g_scroll_rect_y ||
+            my > g_scroll_rect_y + g_scroll_rect_h)
+            return 0;
+    }
+
+    return 1;
 }
 
 /* ВАЖНО: это ФРОНТ нажатия, а не уровень.
@@ -305,34 +360,38 @@ static qbool sh_mouse_clicked(void)
 static void sh_menu_checkbox(f32 x, f32 y, const char *label, qbool *value)
 {
     f32 s = sh_scale();
-    f32 box = 9.0f * s;
+    f32 box = 11.0f * s;
+    f32 tw = sh_text_width(label);
+    f32 hitw = box + 8.0f * s + tw;
+    qbool hover = sh_mouse_in(x, y - 3.0f * s, hitw, box + 5.0f * s);
 
-    sh_draw_rect(x, y, box, box, (col4_t)SH_COL_RGBA(18, 18, 18, 255));
-    sh_draw_rect_outline(x, y, box, box, 1.0f, (col4_t)SH_COL_RGBA(70, 70, 70, 255));
+    if (hover)
+        sh_draw_rect(x - 3.0f * s, y - 3.0f * s, hitw + 6.0f * s,
+                     box + 6.0f * s, (col4_t)SH_COL_RGBA(26, 27, 31, 150));
+
+    sh_draw_rect(x, y, box, box, (col4_t)SH_COL_RGBA(16, 17, 20, 255));
+    sh_draw_rect_outline(x, y, box, box, 1.0f,
+                         (col4_t)SH_COL_RGBA(*value ? 190 : 62,
+                                             *value ? 235 : 62,
+                                             *value ? 60 : 70, 255));
 
     if (*value)
-        sh_draw_rect(x + 2.0f * s, y + 2.0f * s, box - 4.0f * s, box - 4.0f * s,
-                     (col4_t)SH_COL_RGBA(190, 235, 60, 255));
-
-    sh_text(x + box + 6.0f * s, y, (col4_t)SH_COL_RGBA(215, 215, 215, 255), "%s", label);
-
-    f32 tw = sh_text_width(label);
-
-    if (sh_mouse_in(x, y - 2.0f * s, box + 6.0f * s + tw, box + 2.0f * s) &&
-        sh_mouse_clicked())
     {
-        static const void *last_toggle;
-        static u32 last_tick;
-
-        u32 now = GetTickCount();
-
-        if (last_toggle != (const void *)value || now - last_tick > 250)
-        {
-            *value = !*value;
-            last_toggle = (const void *)value;
-            last_tick = now;
-        }
+        /* галочка двумя штрихами - дешевле буквы и читается лучше */
+        sh_draw_rect(x + 2.5f * s, y + 5.0f * s, 3.0f * s, 2.0f * s,
+                     (col4_t)SH_COL_RGBA(190, 235, 60, 255));
+        sh_draw_rect(x + 4.5f * s, y + 3.5f * s, 2.0f * s, 2.0f * s,
+                     (col4_t)SH_COL_RGBA(190, 235, 60, 255));
+        sh_draw_rect(x + 5.5f * s, y + 2.5f * s, 3.0f * s, 5.0f * s,
+                     (col4_t)SH_COL_RGBA(190, 235, 60, 255));
     }
+
+    sh_text(x + box + 8.0f * s, y - 1.0f * s,
+            (col4_t)SH_COL_RGBA(hover ? 235 : 205, hover ? 235 : 205,
+                                hover ? 240 : 212, 255), "%s", label);
+
+    if (hover && sh_mouse_clicked())
+        *value = !*value;
 }
 
 static void sh_menu_slider(f32 x, f32 y, f32 w, const char *label, f32 *value,
@@ -451,8 +510,10 @@ static void sh_menu_combo(f32 x, f32 y, f32 w, const char *label, i32 *value,
 static void sh_menu_section(const char *title, f32 x, f32 y)
 {
     f32 s = sh_scale();
-    sh_text(x, y, (col4_t)SH_COL_RGBA(190, 235, 60, 255), "%s", title);
-    sh_draw_rect(x, y + 12.0f * s, 200.0f * s, 1.0f, (col4_t)SH_COL_RGBA(45, 45, 45, 255));
+
+    sh_text(x, y, (col4_t)SH_COL_RGBA(120, 130, 145, 255), "%s", title);
+    sh_draw_rect(x, y + 13.0f * s, 240.0f * s, 1.0f,
+                 (col4_t)SH_COL_RGBA(36, 38, 44, 255));
 }
 
 static const char *g_hitbox_items[] = {
@@ -1071,15 +1132,30 @@ static void sh_draw_tab_button(f32 x, f32 y, f32 w, const char *label, i32 index
 {
     f32 s = sh_scale();
     qbool active = (g_tab == index);
+    qbool hover = sh_mouse_in(x, y, w, 19.0f * s);
 
     if (active)
     {
-        sh_draw_rect(x, y, 2.0f, 13.0f * s, (col4_t)SH_COL_RGBA(190, 235, 60, 255));
-        sh_text(x + 8.0f * s, y, (col4_t)SH_COL_RGBA(240, 240, 240, 255), "%s", label);
+        sh_draw_rect(x, y, w, 19.0f * s,
+                     (col4_t)SH_COL_RGBA(28, 30, 36, 255));
+        sh_draw_rect(x, y, 2.0f * s, 19.0f * s,
+                     (col4_t)SH_COL_RGBA(190, 235, 60, 255));
+
+        sh_text(x + 9.0f * s, y + 4.0f * s,
+                (col4_t)SH_COL_RGBA(240, 240, 244, 255), "%s", label);
+    }
+    else if (hover)
+    {
+        sh_draw_rect(x, y, w, 19.0f * s,
+                     (col4_t)SH_COL_RGBA(22, 23, 27, 255));
+
+        sh_text(x + 9.0f * s, y + 4.0f * s,
+                (col4_t)SH_COL_RGBA(190, 190, 196, 255), "%s", label);
     }
     else
     {
-        sh_text(x + 8.0f * s, y, (col4_t)SH_COL_RGBA(130, 130, 130, 255), "%s", label);
+        sh_text(x + 9.0f * s, y + 4.0f * s,
+                (col4_t)SH_COL_RGBA(120, 120, 128, 255), "%s", label);
     }
 }
 
@@ -1111,8 +1187,218 @@ void sh_menu_watermark_only(void)
     sh_menu_watermark();
 }
 
+/* ================= КАРКАС МЕНЮ ================= */
+
+/* Позиция окна: перетаскивается за заголовок и запоминается.
+   0xFF = "ещё не инициализировано", тогда центрируем. */
+static f32 g_win_x = -1.0f;
+static f32 g_win_y = -1.0f;
+
+/* Прокрутка содержимого вкладки (в единицах 480p, до масштаба) */
+static f32 g_scroll[6];
+
+
+/* Зона заголовка — за неё тащим окно */
+static f32 g_title_x;
+static f32 g_title_y;
+static f32 g_title_w;
+static f32 g_title_h;
+
+static qbool g_dragging_wnd;
+static f32 g_drag_dx;
+static f32 g_drag_dy;
+
+#define sh_menu_w 560.0f
+#define sh_menu_h_max 620.0f
+#define sh_menu_title_h 26.0f
+#define sh_menu_sidebar_w 104.0f
+#define sh_menu_margin 16.0f
+#define sh_menu_scrollbar_w 7.0f
+
+/* Высота содержимого каждой вкладки в единицах 480p.
+   Значения берутся из реальной раскладки sh_menu_draw_*() —
+   последний элемент стоит примерно на этой высоте. Если добавляешь
+   пункты, поправь здесь, иначе скролл не дотянет до низа. */
+/* Высота считана СИМУЛЯЦИЕЙ по коду sh_menu_draw_*(): берём
+   стартовый сдвиг cy, прибавляем все "cy += row" и "cy += N*s".
+   Значения ниже - результат этой прокрутки, а не оценка на глаз.
+
+   range: rage 300, antiaim 360, visuals 480, misc 820,
+          movement 400, settings 196
+   Запас +10 на то, что последний виджет имеет высоту ~16. */
+static const f32 g_tab_content_h[6] = {
+    310.0f, 370.0f, 490.0f, 830.0f, 410.0f, 206.0f
+};
+
+static void sh_menu_scroll_clamp(void)
+{
+    f32 view = g_scroll_rect_h;
+    f32 maxs = g_scroll_content_h - view;
+
+    if (maxs < 0.0f)
+        maxs = 0.0f;
+
+    if (g_scroll[g_tab] > maxs)
+        g_scroll[g_tab] = maxs;
+
+    if (g_scroll[g_tab] < 0.0f)
+        g_scroll[g_tab] = 0.0f;
+}
+
+/* Сдвиг содержимого вверх на величину прокрутки.
+   Все sh_menu_draw_*() рисуют в абсолютных координатах, поэтому
+   подставляем cy уже сдвинутым, а хит-тесты внутри виджетов
+   работают по тем же сдвинутым координатам — ничего менять не надо. */
+/* ПОДКЛАСС ОКНА ИГРЫ — нужен ради колеса мыши.
+
+   WM_MOUSEWHEEL приходит в оконную процедуру, а не в поток, поэтому
+   без перехвата его не получить (GetAsyncKeyState колесо не отдаёт).
+   Ставим свой WndProc через SetWindowLongPtr(GWLP_WNDPROC) и зовём
+   оригинал для всего остального.
+
+   Побочный плюс: пока меню открыто, гасим клики и клавиатуру, чтобы
+   они не уходили в игру (иначе ESC открывал штатное меню, а ЛКМ
+   стреляла). */
+static WNDPROC g_orig_wndproc;
+static HWND g_subclassed;
+static i32 g_wheel_delta;
+
+static LRESULT CALLBACK sh_menu_wndproc(HWND hwnd, UINT msg, WPARAM wp,
+                                        LPARAM lp)
+{
+    if (g_visible)
+    {
+        if (msg == WM_MOUSEWHEEL)
+        {
+            g_wheel_delta += (i16)HIWORD(wp);
+
+            /* не отдаём колесо игре: иначе переключается оружие */
+            return 0;
+        }
+
+        if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP ||
+            msg == WM_RBUTTONDOWN || msg == WM_RBUTTONUP)
+        {
+            /* клики нужны меню, игре - нет */
+            return 0;
+        }
+    }
+
+    return CallWindowProcA(g_orig_wndproc, hwnd, msg, wp, lp);
+}
+
+static void sh_menu_subclass(void)
+{
+    HWND w = sh_game_window();
+
+    if (!w || w == g_subclassed)
+        return;
+
+    /* если окно пересоздали, старый подкласс умер вместе с ним */
+    g_orig_wndproc = (WNDPROC)SetWindowLongPtrA(w, GWLP_WNDPROC,
+                                                (LONG_PTR)sh_menu_wndproc);
+
+    if (g_orig_wndproc)
+        g_subclassed = w;
+}
+
+static void sh_menu_scroll_input(void)
+{
+    f32 s = sh_scale();
+
+    if (!g_visible)
+        return;
+
+    sh_menu_subclass();
+
+    /* колесо: WHEEL_DELTA = 120 на щелчок */
+    if (g_wheel_delta != 0)
+    {
+        g_scroll[g_tab] -= (f32)g_wheel_delta / 120.0f * 48.0f * s;
+        g_wheel_delta = 0;
+    }
+
+    /* клавиши-дублёры, если колеса нет */
+    if (GetAsyncKeyState(VK_PRIOR) & 0x8000)
+        g_scroll[g_tab] -= 40.0f * s;
+
+    if (GetAsyncKeyState(VK_NEXT) & 0x8000)
+        g_scroll[g_tab] += 40.0f * s;
+}
+
+/* Ползунок: тянется мышью, как обычный скроллбар. */
+static void sh_menu_scrollbar_draw(void)
+{
+    f32 s = sh_scale();
+    f32 x = g_scroll_rect_x + g_scroll_rect_w - sh_menu_scrollbar_w * s;
+    f32 y = g_scroll_rect_y;
+    f32 w = sh_menu_scrollbar_w * s;
+    f32 h = g_scroll_rect_h;
+
+    f32 maxs = g_scroll_content_h - g_scroll_rect_h;
+
+    if (maxs <= 1.0f)
+        return;
+
+    sh_draw_rect(x, y, w, h, (col4_t)SH_COL_RGBA(22, 22, 22, 200));
+
+    {
+        f32 thumb_h = h * (g_scroll_rect_h / g_scroll_content_h);
+
+        if (thumb_h < 18.0f * s)
+            thumb_h = 18.0f * s;
+
+        {
+            f32 travel = h - thumb_h;
+            f32 t = g_scroll[g_tab] / maxs;
+
+            f32 ty = y + travel * t;
+
+            static qbool dragging;
+            static f32 grab;
+
+            qbool over = sh_mouse_in(x, ty, w, thumb_h);
+
+            if (over && sh_mouse_clicked())
+            {
+                dragging = 1;
+                grab = (f32)g_mouse.y - ty;
+            }
+
+            if (dragging && g_click)
+            {
+                f32 ny = (f32)g_mouse.y - grab;
+
+                if (travel > 1.0f)
+                {
+                    f32 nt = (ny - y) / travel;
+
+                    if (nt < 0.0f) nt = 0.0f;
+                    if (nt > 1.0f) nt = 1.0f;
+
+                    g_scroll[g_tab] = nt * maxs;
+                }
+            }
+
+            if (!g_click)
+                dragging = 0;
+
+            sh_draw_rect(x, ty, w, thumb_h,
+                         (col4_t)SH_COL_RGBA(dragging ? 150 : 100,
+                                             dragging ? 190 : 140,
+                                             dragging ? 255 : 200, 235));
+        }
+    }
+}
+
 void sh_menu_draw(void)
 {
+    f32 s;
+    f32 w, h, ox, oy;
+    f32 sidebar;
+    f32 cx, cy;
+    f32 content_h;
+
     sh_menu_toggle();
 
     sh_menu_watermark();
@@ -1120,48 +1406,140 @@ void sh_menu_draw(void)
     if (!g_visible)
         return;
 
-    f32 s = sh_scale();
-    static const f32 tab_h[6] = { 330.0f, 470.0f, 440.0f, 680.0f, 560.0f, 330.0f };
+    s = sh_scale();
 
-    f32 w = 560.0f * s;
-    f32 h = tab_h[g_tab] * s;
-    f32 ox = ((f32)sh_screen_width() - w) * 0.5f;
-    f32 oy = ((f32)sh_screen_height() - h) * 0.5f;
+    w = sh_menu_w * s;
 
-    sh_draw_rect(ox, oy, w, h, (col4_t)SH_COL_RGBA(12, 12, 12, 245));
-    sh_draw_rect_outline(ox, oy, w, h, 1.0f, (col4_t)SH_COL_RGBA(45, 45, 45, 255));
+    content_h = g_tab_content_h[g_tab] + sh_menu_margin * 2.0f;
 
-    sh_draw_rect(ox, oy, w, 26.0f * s, (col4_t)SH_COL_RGBA(20, 20, 20, 255));
-    sh_text(ox + 12.0f * s, oy + 8.0f * s, (col4_t)SH_COL_RGBA(240, 240, 240, 255),
-            "%s  v%s", SH_NAME, SH_VERSION);
+    h = content_h * s + sh_menu_title_h * s;
 
-    f32 sidebar = 92.0f * s;
-    sh_draw_rect(ox, oy + 26.0f * s, sidebar, h - 26.0f * s,
-                 (col4_t)SH_COL_RGBA(16, 16, 16, 255));
+    if (h > sh_menu_h_max * s)
+        h = sh_menu_h_max * s;
+
+    /* начальная позиция — по центру, дальше запоминается */
+    if (g_win_x < 0.0f || g_win_y < 0.0f)
+    {
+        g_win_x = ((f32)sh_screen_width() - w) * 0.5f;
+        g_win_y = ((f32)sh_screen_height() - h) * 0.5f;
+    }
+
+    /* не даём утащить окно за пределы экрана */
+    if (g_win_x > (f32)sh_screen_width() - 60.0f * s)
+        g_win_x = (f32)sh_screen_width() - 60.0f * s;
+
+    if (g_win_y > (f32)sh_screen_height() - sh_menu_title_h * s)
+        g_win_y = (f32)sh_screen_height() - sh_menu_title_h * s;
+
+    if (g_win_x < -(w - 60.0f * s))
+        g_win_x = -(w - 60.0f * s);
+
+    if (g_win_y < 0.0f)
+        g_win_y = 0.0f;
+
+    ox = g_win_x;
+    oy = g_win_y;
 
     sh_menu_cursor_tick();
     sh_menu_input_begin();
 
-    POINT mp = g_mouse;
+    /* ---- зона заголовка / перетаскивание окна ---- */
+    g_title_x = ox;
+    g_title_y = oy;
+    g_title_w = w;
+    g_title_h = sh_menu_title_h * s;
 
-    /* именно фронт: g_click - уровень, при зажатой ЛКМ вкладки
-       переключались бы каждый кадр */
-    qbool clicked = sh_mouse_clicked();
+    {
+        qbool over_title = sh_mouse_in(g_title_x, g_title_y, g_title_w, g_title_h);
+
+        if (over_title && sh_mouse_clicked())
+        {
+            g_dragging_wnd = 1;
+            g_drag_dx = (f32)g_mouse.x - ox;
+            g_drag_dy = (f32)g_mouse.y - oy;
+        }
+
+        if (g_dragging_wnd && g_click)
+        {
+            g_win_x = (f32)g_mouse.x - g_drag_dx;
+            g_win_y = (f32)g_mouse.y - g_drag_dy;
+
+            ox = g_win_x;
+            oy = g_win_y;
+        }
+
+        if (!g_click)
+            g_dragging_wnd = 0;
+    }
+
+    /* ---- окно ---- */
+    sh_draw_rect(ox, oy, w, h, (col4_t)SH_COL_RGBA(12, 12, 12, 246));
+    sh_draw_rect_outline(ox, oy, w, h, 1.0f, (col4_t)SH_COL_RGBA(52, 52, 58, 255));
+
+    /* заголовок */
+    sh_draw_rect(ox, oy, w, sh_menu_title_h * s,
+                 (col4_t)SH_COL_RGBA(20, 20, 24, 255));
+    sh_draw_rect(ox, oy + sh_menu_title_h * s - 1.0f, w, 1.0f,
+                 (col4_t)SH_COL_RGBA(52, 52, 58, 255));
+
+    sh_text(ox + 12.0f * s, oy + 6.0f * s,
+            (col4_t)SH_COL_RGBA(235, 235, 240, 255),
+            "%s", SH_NAME);
+    sh_text(ox + 12.0f * s + sh_text_width(SH_NAME) + 6.0f * s,
+            oy + 7.0f * s, (col4_t)SH_COL_RGBA(110, 110, 120, 255),
+            "v%s", SH_VERSION);
+
+    /* подсказка справа в заголовке */
+    {
+        const char *hint = "INSERT / ESC";
+        f32 tw = sh_text_width(hint);
+
+        sh_text(ox + w - tw - 12.0f * s, oy + 7.0f * s,
+                (col4_t)SH_COL_RGBA(85, 85, 95, 255), "%s", hint);
+    }
+
+    /* ---- сайдбар ---- */
+    sidebar = sh_menu_sidebar_w * s;
+
+    sh_draw_rect(ox, oy + sh_menu_title_h * s, sidebar, h - sh_menu_title_h * s,
+                 (col4_t)SH_COL_RGBA(16, 16, 20, 255));
+    sh_draw_rect(ox + sidebar - 1.0f, oy + sh_menu_title_h * s, 1.0f,
+                 h - sh_menu_title_h * s, (col4_t)SH_COL_RGBA(40, 40, 46, 255));
 
     for (i32 i = 0; i < (i32)sh_countof(g_tabs); ++i)
     {
-        f32 ty = oy + 38.0f * s + (f32)i * 22.0f * s;
-        sh_draw_tab_button(ox + 10.0f * s, ty, sidebar, g_tabs[i], i);
+        f32 ty = oy + sh_menu_title_h * s + 10.0f * s + (f32)i * 24.0f * s;
 
-        if (clicked && mp.x >= ox && mp.x <= ox + sidebar &&
-            mp.y >= ty && mp.y <= ty + 16.0f * s)
+        sh_draw_tab_button(ox + 8.0f * s, ty, sidebar - 16.0f * s,
+                           g_tabs[i], i);
+
+        if (sh_mouse_clicked() &&
+            sh_mouse_in(ox + 8.0f * s, ty, sidebar - 16.0f * s, 19.0f * s))
         {
             g_tab = i;
+            g_dragging_wnd = 0;
         }
     }
 
-    f32 cx = ox + sidebar + 16.0f * s;
-    f32 cy = oy + 40.0f * s;
+    /* ---- область содержимого ---- */
+    g_scroll_rect_x = ox + sidebar + sh_menu_margin * s;
+    g_scroll_rect_y = oy + sh_menu_title_h * s + 8.0f * s;
+    g_scroll_rect_w = w - sidebar - sh_menu_margin * 2.0f * s;
+    g_scroll_rect_h = h - sh_menu_title_h * s - 16.0f * s;
+
+    g_scroll_content_h = g_tab_content_h[g_tab] * s;
+
+    sh_menu_scroll_clamp();
+    sh_menu_scroll_input();
+    sh_menu_scroll_clamp();
+
+    cx = g_scroll_rect_x;
+    cy = g_scroll_rect_y - g_scroll[g_tab];
+
+    /* без отсечения элементы, уехавшие за границу области, рисуются
+       поверх заголовка и сайдбара */
+    sh_render_scissor_begin(g_scroll_rect_x, g_scroll_rect_y,
+                            g_scroll_rect_w, g_scroll_rect_h);
 
     switch (g_tab)
     {
@@ -1171,5 +1549,19 @@ void sh_menu_draw(void)
     case 3: sh_menu_draw_misc(cx, cy); break;
     case 4: sh_menu_draw_movement(cx, cy); break;
     default: sh_menu_draw_settings(cx, cy); break;
+    }
+
+    sh_render_scissor_end();
+
+    sh_menu_scrollbar_draw();
+
+    /* индикатор прокрутки, если содержимое не влезло */
+    if (g_scroll_content_h > g_scroll_rect_h + 1.0f)
+    {
+        f32 pct = g_scroll[g_tab] / (g_scroll_content_h - g_scroll_rect_h);
+
+        sh_text(g_scroll_rect_x + g_scroll_rect_w - 60.0f * s,
+                oy + h - 12.0f * s,
+                (col4_t)SH_COL_RGBA(70, 70, 78, 255), "%d%%", (i32)(pct * 100.0f));
     }
 }

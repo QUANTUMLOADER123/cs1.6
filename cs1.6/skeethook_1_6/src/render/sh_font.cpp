@@ -70,6 +70,163 @@ static void *sh_proc(const char *n)
     return g_gl ? (void *)GetProcAddress(g_gl, n) : 0;
 }
 
+/* РЕНДЕР ШРИФТА ЧЕРЕЗ GDI.
+
+   Раньше тут был встроенный пиксельный шрифт 8x10 из
+   sh_font_data.cpp - отсюда и "пиксельный шрифт", который просили
+   убрать. Теперь атлас рисует сама Windows: берём Tahoma, включаем
+   сглаживание (CLEARTYPE_QUALITY) и раскладываем 95 глифов в
+   текстуру 512x256.
+
+   Тонкость: в DLL нет ресурсов и нет гарантии, что рядом лежит
+   .ttf, поэтому используем системный шрифт по имени - Tahoma есть
+   на любой Windows начиная с 2000, и выглядит заметно лучше
+   дефолтного MS Sans Serif.
+
+   Создание шрифта и DC делаем ОДИН раз при инициализации: этот код
+   вызывается из HUD_Redraw, а GDI в каждом кадре - это дорого. */
+
+#define sh_font_first 32
+#define sh_font_count 95
+#define sh_font_atlas_cols 16
+#define sh_font_px 14
+
+static u8 *sh_font_rasterize(i32 *out_w, i32 *out_h, i32 *out_cell_w,
+                             i32 *out_cell_h)
+{
+    HDC dc = CreateCompatibleDC(0);
+    HBITMAP bmp = 0;
+    HFONT font = 0;
+    HFONT old_font = 0;
+    HBITMAP old_bmp = 0;
+    u8 *bits = 0;
+    u8 *pixels = 0;
+
+    i32 cell_w = sh_font_px + 2;
+    i32 cell_h = sh_font_px + 4;
+    i32 tex_w = sh_font_atlas_cols * cell_w;
+    i32 rows = (sh_font_count + sh_font_atlas_cols - 1) / sh_font_atlas_cols;
+    i32 tex_h = rows * cell_h;
+
+    BITMAPINFO bi;
+    void *raw = 0;
+
+    if (!dc)
+        return 0;
+
+    /* 32-битный DIB сверху вниз: у него alpha=0 по умолчанию, а GDI
+       пишет только RGB - поэтому фон заливаем чёрным и потом берём
+       ЯРКОСТЬ как альфу (шрифт белый на чёрном). */
+    for (i32 i = 0; i < (i32)sizeof(bi); ++i)
+        ((u8 *)&bi)[i] = 0;
+
+    bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bi.bmiHeader.biWidth = tex_w;
+    bi.bmiHeader.biHeight = -tex_h;      /* минус = сверху вниз */
+    bi.bmiHeader.biPlanes = 1;
+    bi.bmiHeader.biBitCount = 32;
+    bi.bmiHeader.biCompression = 0;      /* BI_RGB */
+
+    bmp = CreateDIBSection(dc, &bi, 0, &raw, 0, 0);
+
+    if (!bmp || !raw)
+        goto done;
+
+    old_bmp = (HBITMAP)SelectObject(dc, bmp);
+
+    /* чёрный фон */
+    {
+        RECT rc;
+
+        rc.left = 0;
+        rc.top = 0;
+        rc.right = tex_w;
+        rc.bottom = tex_h;
+        SetBkColor(dc, RGB(0, 0, 0));
+        SetBkMode(dc, OPAQUE);
+        ExtTextOutA(dc, 0, 0, 0, &rc, 0, 0, 0);
+    }
+
+    font = CreateFontA(-sh_font_px, 0, 0, 0, FW_SEMIBOLD, 0, 0, 0,
+                       DEFAULT_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
+                       CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_SWISS,
+                       "Tahoma");
+
+    if (!font)
+        font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+
+    if (!font)
+        goto done;
+
+    old_font = (HFONT)SelectObject(dc, font);
+
+    SetBkMode(dc, TRANSPARENT);
+    SetTextColor(dc, RGB(255, 255, 255));
+
+    for (i32 i = 0; i < sh_font_count; ++i)
+    {
+        char ch = (char)(sh_font_first + i);
+        i32 cx = (i % sh_font_atlas_cols) * cell_w;
+        i32 cy = (i / sh_font_atlas_cols) * cell_h;
+
+        if (ch == ' ')
+            continue;
+
+        TextOutA(dc, cx + 1, cy + 1, &ch, 1);
+    }
+
+    GdiFlush();
+
+    bits = (u8 *)raw;
+
+    pixels = (u8 *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
+                             (SIZE_T)(tex_w * tex_h * 4));
+
+    if (!pixels)
+        goto done;
+
+    /* BGR от GDI -> RGBA с альфой из яркости */
+    for (i32 i = 0; i < tex_w * tex_h; ++i)
+    {
+        const u8 *src = bits + i * 4;
+
+        u8 lum = src[0] > src[1] ? src[0] : src[1];
+
+        if (src[2] > lum)
+            lum = src[2];
+
+        pixels[i * 4 + 0] = 255;
+        pixels[i * 4 + 1] = 255;
+        pixels[i * 4 + 2] = 255;
+        pixels[i * 4 + 3] = lum;
+    }
+
+done:
+    if (old_font)
+        SelectObject(dc, old_font);
+
+    if (font)
+        DeleteObject(font);
+
+    if (old_bmp)
+        SelectObject(dc, old_bmp);
+
+    if (bmp)
+        DeleteObject(bmp);
+
+    DeleteDC(dc);
+
+    if (pixels)
+    {
+        *out_w = tex_w;
+        *out_h = tex_h;
+        *out_cell_w = cell_w;
+        *out_cell_h = cell_h;
+    }
+
+    return pixels;
+}
+
 qbool sh_font_init(void)
 {
     p_gen = (gl_gen_textures_fn)sh_proc("glGenTextures");
@@ -91,55 +248,35 @@ qbool sh_font_init(void)
     if (!p_gen || !p_bind || !p_img || !p_begin || !p_end || !p_v2f || !p_t2f)
         return false;
 
-    g_cell_w = (f32)g_font_8x10_w + 1.0f;
-    g_cell_h = (f32)g_font_8x10_h;
-
-    i32 cols = 16;
-    i32 rows = (g_font_8x10_count + cols - 1) / cols;
-    g_tex_w = cols * (i32)g_cell_w;
-    g_tex_h = rows * (i32)g_cell_h;
-
-    u8 *pixels = (u8 *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
-                                 (SIZE_T)(g_tex_w * g_tex_h * 4));
-    if (!pixels)
-        return false;
-
-    for (i32 i = 0; i < g_font_8x10_count; ++i)
     {
-        i32 cx = (i % cols) * (i32)g_cell_w;
-        i32 cy = (i / cols) * (i32)g_cell_h;
+        i32 tw = 0, th = 0, cw = 0, ch = 0;
 
-        for (i32 y = 0; y < g_font_8x10_h; ++y)
-        {
-            u8 row = g_font_8x10[i][y];
-            for (i32 x = 0; x < g_font_8x10_w; ++x)
-            {
-                qbool on = (row & (1 << (g_font_8x10_w - 1 - x))) != 0;
-                i32 px = cx + x;
-                i32 py = cy + y;
-                if (px >= g_tex_w || py >= g_tex_h)
-                    continue;
-                u8 *dst = pixels + (py * g_tex_w + px) * 4;
-                dst[0] = 255;
-                dst[1] = 255;
-                dst[2] = 255;
-                dst[3] = on ? 255 : 0;
-            }
-        }
+        u8 *pixels = sh_font_rasterize(&tw, &th, &cw, &ch);
+
+        if (!pixels)
+            return false;
+
+        g_tex_w = tw;
+        g_tex_h = th;
+        g_cell_w = (f32)cw;
+        g_cell_h = (f32)ch;
+
+        p_gen(1, &g_atlas);
+        p_bind(sh_gl_texture_2d, g_atlas);
+        p_store(sh_gl_unpack_alignment, 1);
+        p_img(sh_gl_texture_2d, 0, 4, g_tex_w, g_tex_h, 0, sh_gl_rgba,
+              sh_gl_unsigned_byte, pixels);
+        /* линейная фильтрация: иначе сглаженный GDI-шрифт снова
+           станет рваным при масштабировании */
+        p_param(sh_gl_texture_2d, sh_gl_texture_min_filter, 0x2601);
+        p_param(sh_gl_texture_2d, sh_gl_texture_mag_filter, 0x2601);
+        p_param(sh_gl_texture_2d, sh_gl_texture_wrap_s, sh_gl_clamp);
+        p_param(sh_gl_texture_2d, sh_gl_texture_wrap_t, sh_gl_clamp);
+        p_bind(sh_gl_texture_2d, 0);
+
+        HeapFree(GetProcessHeap(), 0, pixels);
     }
 
-    p_gen(1, &g_atlas);
-    p_bind(sh_gl_texture_2d, g_atlas);
-    p_store(sh_gl_unpack_alignment, 1);
-    p_img(sh_gl_texture_2d, 0, 4, g_tex_w, g_tex_h, 0, sh_gl_rgba,
-          sh_gl_unsigned_byte, pixels);
-    p_param(sh_gl_texture_2d, sh_gl_texture_min_filter, sh_gl_nearest);
-    p_param(sh_gl_texture_2d, sh_gl_texture_mag_filter, sh_gl_nearest);
-    p_param(sh_gl_texture_2d, sh_gl_texture_wrap_s, sh_gl_clamp);
-    p_param(sh_gl_texture_2d, sh_gl_texture_wrap_t, sh_gl_clamp);
-    p_bind(sh_gl_texture_2d, 0);
-
-    HeapFree(GetProcessHeap(), 0, pixels);
     return true;
 }
 
@@ -166,10 +303,13 @@ f32 sh_font_width(const char *str, f32 scale)
 {
     if (!str)
         return 0.0f;
+
     i32 n = 0;
+
     while (str[n])
         ++n;
-    return (f32)n * (f32)g_font_8x10_w * scale;
+
+    return (f32)n * (f32)sh_font_px * 0.56f * scale;
 }
 
 void sh_font_draw(f32 x, f32 y, f32 scale, col4_t col, const char *str)
@@ -177,7 +317,6 @@ void sh_font_draw(f32 x, f32 y, f32 scale, col4_t col, const char *str)
     if (!str || !g_atlas || !p_begin)
         return;
 
-    i32 cols = 16;
     f32 cw = g_cell_w / (f32)g_tex_w;
     f32 ch = g_cell_h / (f32)g_tex_h;
 
@@ -185,43 +324,47 @@ void sh_font_draw(f32 x, f32 y, f32 scale, col4_t col, const char *str)
     sh_font_bind();
     p_env(sh_gl_texture_env, sh_gl_texture_env_mode, sh_gl_modulate);
 
+    f32 w = (f32)sh_font_px * scale;
+    f32 h = (f32)sh_font_px * scale;
     f32 pen = x;
+
     for (const char *p = str; *p; ++p)
     {
         u8 code = (u8)*p;
-        if (code < g_font_8x10_first || code >= g_font_8x10_first + g_font_8x10_count)
+
+        if (code < sh_font_first || code >= sh_font_first + sh_font_count)
             code = '?';
+
         if (code == ' ')
         {
-            pen += (f32)g_font_8x10_w * scale;
+            pen += w * 0.56f;
             continue;
         }
 
-        i32 idx = code - g_font_8x10_first;
-        i32 cx = idx % cols;
-        i32 cy = idx / cols;
+        {
+            i32 idx = code - sh_font_first;
+            i32 cx = idx % sh_font_atlas_cols;
+            i32 cy = idx / sh_font_atlas_cols;
 
-        f32 u0 = (f32)cx * cw;
-        f32 v0 = (f32)cy * ch;
-        f32 u1 = u0 + (f32)g_font_8x10_w / (f32)g_tex_w;
-        f32 v1 = v0 + (f32)g_font_8x10_h / (f32)g_tex_h;
+            f32 u0 = (f32)cx * cw;
+            f32 v0 = (f32)cy * ch;
+            f32 u1 = u0 + (f32)g_cell_w / (f32)g_tex_w;
+            f32 v1 = v0 + (f32)g_cell_h / (f32)g_tex_h;
 
-        f32 w = (f32)g_font_8x10_w * scale;
-        f32 h = (f32)g_font_8x10_h * scale;
+            p_c4ub(col.r, col.g, col.b, col.a);
+            p_begin(sh_gl_quads);
+            p_t2f(u0, v0);
+            p_v2f(pen, y);
+            p_t2f(u1, v0);
+            p_v2f(pen + w, y);
+            p_t2f(u1, v1);
+            p_v2f(pen + w, y + h);
+            p_t2f(u0, v1);
+            p_v2f(pen, y + h);
+            p_end();
 
-        p_c4ub(col.r, col.g, col.b, col.a);
-        p_begin(sh_gl_quads);
-        p_t2f(u0, v0);
-        p_v2f(pen, y);
-        p_t2f(u1, v0);
-        p_v2f(pen + w, y);
-        p_t2f(u1, v1);
-        p_v2f(pen + w, y + h);
-        p_t2f(u0, v1);
-        p_v2f(pen, y + h);
-        p_end();
-
-        pen += w;
+            pen += w * 0.56f;
+        }
     }
 
     p_disable(sh_gl_texture_2d);

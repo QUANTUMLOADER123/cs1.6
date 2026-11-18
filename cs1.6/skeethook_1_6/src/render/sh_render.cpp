@@ -19,6 +19,7 @@ typedef void(APIENTRY *gl_enable_fn)(u32 cap);
 typedef void(APIENTRY *gl_disable_fn)(u32 cap);
 typedef void(APIENTRY *gl_blend_fn)(u32 src, u32 dst);
 typedef void(APIENTRY *gl_tex2f_fn)(f32 s, f32 t);
+typedef void(APIENTRY *gl_scissor_fn)(i32 x, i32 y, i32 w, i32 h);
 
 static gl_vertex2f_fn p_gl_vertex2f;
 static gl_color4ub_fn p_gl_color4ub;
@@ -29,6 +30,7 @@ static gl_enable_fn p_gl_enable;
 static gl_disable_fn p_gl_disable;
 static gl_blend_fn p_gl_blend;
 static gl_tex2f_fn p_gl_tex2f;
+static gl_scissor_fn p_gl_scissor;
 
 static HMODULE g_gl;
 static i32 g_width;
@@ -67,6 +69,7 @@ void sh_render_init(void)
     p_gl_disable = (gl_disable_fn)sh_gl_proc("glDisable");
     p_gl_blend = (gl_blend_fn)sh_gl_proc("glBlendFunc");
     p_gl_tex2f = (gl_tex2f_fn)sh_gl_proc("glTexCoord2f");
+    p_gl_scissor = (gl_scissor_fn)sh_gl_proc("glScissor");
 }
 
 qbool sh_render_ready(void)
@@ -306,4 +309,31 @@ f32 sh_text_width(const char *str)
 f32 sh_text_height(void)
 {
     return (f32)10 * sh_scale();
+}
+
+/* Отсечение области вывода.
+
+   Нужно для прокрутки: без него элементы, уехавшие за границу
+   области содержимого, всё равно рисуются - поверх заголовка,
+   сайдбара и за пределами окна.
+
+   glScissor работает в координатах СНИЗУ ВВЕРХ (OpenGL), а всё
+   меню считает сверху вниз, поэтому Y переворачиваем. */
+#define sh_gl_scissor_test 0x0C11
+
+void sh_render_scissor_begin(f32 x, f32 y, f32 w, f32 h)
+{
+    if (!p_gl_scissor || w <= 0.0f || h <= 0.0f)
+        return;
+
+    p_gl_enable(sh_gl_scissor_test);
+    p_gl_scissor((i32)x, (i32)((f32)g_height - y - h), (i32)w, (i32)h);
+}
+
+void sh_render_scissor_end(void)
+{
+    if (!p_gl_scissor)
+        return;
+
+    p_gl_disable(sh_gl_scissor_test);
 }

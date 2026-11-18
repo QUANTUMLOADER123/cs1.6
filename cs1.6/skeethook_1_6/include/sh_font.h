@@ -2,11 +2,9 @@
 
 #include "sh_types.h"
 
-extern const u8 g_font_8x10[95][10];
-extern const i32 g_font_8x10_w;
-extern const i32 g_font_8x10_h;
-extern const i32 g_font_8x10_first;
-extern const i32 g_font_8x10_count;
+/* Шрифт рисуется GDI (Tahoma) в texture-атлас при инициализации,
+   встроенная пиксельная таблица 8x10 больше не используется. */
+#define sh_font_px_h 14
 
 qbool sh_font_init(void);
 void sh_font_shutdown(void);

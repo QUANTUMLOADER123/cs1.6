@@ -10,6 +10,10 @@ void sh_render_begin(i32 width, i32 height);
 void sh_render_end(void);
 
 void sh_draw_rect(f32 x, f32 y, f32 w, f32 h, col4_t col);
+
+/* отсечение области вывода - для прокрутки в меню */
+void sh_render_scissor_begin(f32 x, f32 y, f32 w, f32 h);
+void sh_render_scissor_end(void);
 void sh_draw_rect_outline(f32 x, f32 y, f32 w, f32 h, f32 thick, col4_t col);
 void sh_draw_rect_gradient(f32 x, f32 y, f32 w, f32 h, col4_t top, col4_t bottom);
 void sh_draw_line(f32 x0, f32 y0, f32 x1, f32 y1, f32 thick, col4_t col);
