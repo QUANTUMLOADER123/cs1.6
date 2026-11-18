@@ -359,10 +359,14 @@ static void sh_draw_history(const sh_player_t *p)
         return;
 
     f32 alpha_step = 200.0f / (f32)sh_hist_max;
-    f32 fade = 200.0f;
 
     for (i32 k = 1; k < sh_hist_max; ++k)
     {
+        f32 fade = 200.0f - alpha_step * (f32)(k - 1);
+
+        if (fade < 20.0f)
+            break;
+
         i32 a = (p->hist_head - k + sh_hist_max) % sh_hist_max;
         i32 b = (p->hist_head - k - 1 + sh_hist_max) % sh_hist_max;
 
@@ -385,11 +389,6 @@ static void sh_draw_history(const sh_player_t *p)
         col4_t c = SH_COL_RGBA(190, 190, 190, (u8)fade);
 
         sh_draw_line(sa.x, sa.y, sb.x, sb.y, 1.0f, c);
-
-        fade -= alpha_step;
-
-        if (fade < 20.0f)
-            break;
     }
 }
 
