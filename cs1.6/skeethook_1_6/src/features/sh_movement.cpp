@@ -299,6 +299,46 @@ void sh_jumpbug(sh_usercmd_t *cmd, sh_playermove_t *pm)
     cmd->buttons |= sh_in_duck;
 }
 
+static qbool g_tb_was_active;
+
+void sh_texturebug(sh_usercmd_t *cmd, sh_playermove_t *pm)
+{
+    if (!cmd || !pm)
+        return;
+
+    if (!g_cfg.movement.texturebug)
+    {
+        if (g_tb_was_active)
+        {
+            g_tb_was_active = (qbool)0;
+            cmd->upmove = 0.0f;
+        }
+
+        return;
+    }
+
+    if (pm->movetype != 3 && pm->movetype != 4)
+        return;
+
+    if (pm->waterlevel >= 2)
+        return;
+
+    if (pm->onground != -1)
+        return;
+
+    g_tb_was_active = (qbool)1;
+
+    f32 up = -12.7f;
+
+    if (pm->velocity.z > 0.0f)
+        up += pm->velocity.z;
+
+    if (pm->velocity.z < -2.0f)
+        up += pm->velocity.z + 2.0f;
+
+    cmd->upmove = up;
+}
+
 void sh_movement_fix(sh_usercmd_t *cmd, f32 yaw_delta)
 {
     if (!cmd || yaw_delta == 0.0f)
@@ -340,6 +380,7 @@ void sh_movement_run(sh_usercmd_t *cmd)
     sh_auto_jump_hold(cmd, pm);
 
     sh_jumpbug(cmd, pm);
+    sh_texturebug(cmd, pm);
 
     if (cmd->buttons & sh_in_attack)
         sh_shots_on_attack();
