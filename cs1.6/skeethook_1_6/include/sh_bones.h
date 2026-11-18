@@ -80,6 +80,7 @@ const sh_bone_snapshot_t *sh_bones_get(i32 index);
 void sh_bones_clear(void);
 qbool sh_bones_world_to_screen(const sh_bone_snapshot_t *snap, i32 bone, vec2_t *out);
 i32 sh_bones_bbox_corners(const sh_bone_snapshot_t *snap, i32 box, vec3_t out[8]);
+qbool sh_bones_segment_hitbox(const sh_bone_snapshot_t *snap, i32 box, const vec3_t *start, const vec3_t *end, f32 *out_frac);
 qbool sh_bones_backtrack_vec(i32 index, i32 bone, i32 back, vec3_t *out);
 i32 sh_bones_backtrack_frames(i32 index);
 #define sh_hist_mask 63

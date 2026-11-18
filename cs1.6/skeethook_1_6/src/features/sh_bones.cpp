@@ -571,3 +571,113 @@ f32 sh_backtrack_time(i32 ent_index, i32 frames_back)
 
     return target;
 }
+
+qbool sh_bones_segment_hitbox(const sh_bone_snapshot_t *snap, i32 box,
+                              const vec3_t *start, const vec3_t *end,
+                              f32 *out_frac)
+{
+    if (!snap || !snap->valid || !start || !end)
+        return 0;
+
+    if (box < 0 || box >= snap->bbox_count)
+        return 0;
+
+    const sh_bbox_snap_t *bb = &snap->bbox[box];
+
+    i32 bi = -1;
+
+    for (i32 b = 0; b < sh_bone_count; ++b)
+    {
+        if (snap->map[b] == bb->bone)
+        {
+            bi = b;
+            break;
+        }
+    }
+
+    if (bi < 0)
+        return 0;
+
+    const f32(*m)[4] = snap->mat[bi];
+
+    f32 inv[3][3];
+    f32 det = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+            - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+            + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+
+    if (det > -0.0000001f && det < 0.0000001f)
+        return 0;
+
+    f32 id = 1.0f / det;
+
+    inv[0][0] = (m[1][1] * m[2][2] - m[1][2] * m[2][1]) * id;
+    inv[0][1] = (m[0][2] * m[2][1] - m[0][1] * m[2][2]) * id;
+    inv[0][2] = (m[0][1] * m[1][2] - m[0][2] * m[1][1]) * id;
+    inv[1][0] = (m[1][2] * m[2][0] - m[1][0] * m[2][2]) * id;
+    inv[1][1] = (m[0][0] * m[2][2] - m[0][2] * m[2][0]) * id;
+    inv[1][2] = (m[0][2] * m[1][0] - m[0][0] * m[1][2]) * id;
+    inv[2][0] = (m[1][0] * m[2][1] - m[1][1] * m[2][0]) * id;
+    inv[2][1] = (m[0][1] * m[2][0] - m[0][0] * m[2][1]) * id;
+    inv[2][2] = (m[0][0] * m[1][1] - m[0][1] * m[1][0]) * id;
+
+    vec3_t org = { m[0][3], m[1][3], m[2][3] };
+
+    f32 ls[3];
+    f32 le[3];
+
+    for (i32 a = 0; a < 3; ++a)
+    {
+        f32 sx = start->x - org.x;
+        f32 sy = start->y - org.y;
+        f32 sz = start->z - org.z;
+
+        f32 ex = end->x - org.x;
+        f32 ey = end->y - org.y;
+        f32 ez = end->z - org.z;
+
+        ls[a] = inv[a][0] * sx + inv[a][1] * sy + inv[a][2] * sz;
+        le[a] = inv[a][0] * ex + inv[a][1] * ey + inv[a][2] * ez;
+    }
+
+    f32 entry = 0.0f;
+    f32 exit = 1.0f;
+
+    for (i32 a = 0; a < 3; ++a)
+    {
+        f32 d = le[a] - ls[a];
+        f32 mn = bb->bbmin[a];
+        f32 mx = bb->bbmax[a];
+
+        if (d > -0.000001f && d < 0.000001f)
+        {
+            if (ls[a] < mn || ls[a] > mx)
+                return 0;
+
+            continue;
+        }
+
+        f32 idir = 1.0f / d;
+        f32 t1 = (mn - ls[a]) * idir;
+        f32 t2 = (mx - ls[a]) * idir;
+
+        if (t1 > t2)
+        {
+            f32 tmp = t1;
+            t1 = t2;
+            t2 = tmp;
+        }
+
+        if (t1 > entry)
+            entry = t1;
+        if (t2 < exit)
+            exit = t2;
+
+        if (entry > exit)
+            return 0;
+    }
+
+    if (out_frac)
+        *out_frac = entry;
+
+    return 1;
+}
