@@ -116,6 +116,9 @@ qbool sh_demo_next(sh_demo_reader_t *r, sh_demo_block_t *blk, const u8 **payload
 
     if (blk->type == sh_demo_buffer || blk->type == sh_demo_file)
     {
+        if (r->pos > r->size)
+            return 0;
+
         char name[260];
         i32 used = sh_memstr_(r->data + r->pos, r->size - r->pos, name, 260);
         blk->size = used;
@@ -146,10 +149,18 @@ void sh_demo_rewind(sh_demo_reader_t *r)
     if (!r)
         return;
 
-    if (r->header.dirs_offset > 0 && r->header.dirs_offset < r->size)
-        r->pos = (i32)r->header.dirs_offset;
-    else
-        r->pos = 8 + 8 + 260 + 260 + 4 + 4;
+    i32 start = 8 + 8 + 260 + 260 + 4 + 4;
 
-    r->valid = r->data != 0;
+    if (r->header.dirs_offset > 0 && r->header.dirs_offset < r->size)
+        start = (i32)r->header.dirs_offset;
+
+    if (start > r->size)
+    {
+        r->pos = r->size;
+        r->valid = 0;
+        return;
+    }
+
+    r->pos = start;
+    r->valid = (r->data != 0) ? (qbool)1 : (qbool)0;
 }
