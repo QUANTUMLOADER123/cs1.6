@@ -432,6 +432,9 @@ static void sh_menu_draw_visuals(f32 x, f32 y)
     sh_menu_combo(x, cy, colw, "esp color", &g_cfg.visuals.esp_color_mode, g_espc_items, 3);
     cy += row;
 
+    sh_menu_checkbox(x, cy, "grenade radius", &g_cfg.misc.grenade_radius);
+    cy += row;
+
     sh_menu_checkbox(x, cy, "hitbox visibility", &g_cfg.visuals.hitbox_vis_check);
     sh_menu_checkbox(x + colw, cy, "hitbox scanner", &g_cfg.visuals.hitbox_scan);
     cy += row;

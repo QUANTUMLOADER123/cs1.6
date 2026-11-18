@@ -421,3 +421,89 @@ qbool sh_bones_backtrack_vec(i32 index, i32 bone, i32 back, vec3_t *out)
 
     return 1;
 }
+
+static f32 sh_ang_diff(f32 a, f32 b)
+{
+    f32 d = a - b;
+
+    while (d > 180.0f)
+        d -= 360.0f;
+    while (d < -180.0f)
+        d += 360.0f;
+
+    return d;
+}
+
+qbool sh_backtrack_lerp(i32 ent_index, f32 target_time, vec3_t *out_origin,
+                        vec3_t *out_angles, qbool *extrap)
+{
+    if (!out_origin || !out_angles)
+        return 0;
+
+    if (ent_index <= 0 || ent_index >= sh_max_bone_players)
+        return 0;
+
+    if (!g_engfuncs || !g_engfuncs->pfnGetEntityByIndex)
+        return 0;
+
+    sh_cl_entity_t *ent = (sh_cl_entity_t *)g_engfuncs->pfnGetEntityByIndex(ent_index);
+
+    if (!ent)
+        return 0;
+
+    i32 imod = ent->current_position & sh_hist_mask;
+    i32 i0 = imod;
+    i32 i1 = (imod - 1) & sh_hist_mask;
+    qbool extrapolate = 1;
+
+    if (target_time <= ent->ph[i0].animtime)
+    {
+        for (i32 i = 1; i < sh_hist_mask - 1; ++i)
+        {
+            f32 at = ent->ph[(imod - i) & sh_hist_mask].animtime;
+
+            if (at == 0.0f)
+                break;
+
+            if (target_time > at)
+            {
+                i0 = ((imod - i) + 1) & sh_hist_mask;
+                i1 = ((imod - i) + 0) & sh_hist_mask;
+                extrapolate = 0;
+                break;
+            }
+        }
+    }
+
+    const sh_position_history_t *p0 = &ent->ph[i0];
+    const sh_position_history_t *p1 = &ent->ph[i1];
+
+    f32 t0 = p0->animtime;
+    f32 t1 = p1->animtime;
+
+    if (t0 == 0.0f || t1 == 0.0f)
+        return 0;
+
+    f32 frac = 0.0f;
+
+    if (t0 != t1)
+        frac = (target_time - t0) / (t1 - t0);
+
+    if (frac < 0.0f)
+        frac = 0.0f;
+    if (frac > 1.0f)
+        frac = 1.0f;
+
+    out_origin->x = p0->origin.x + (p1->origin.x - p0->origin.x) * frac;
+    out_origin->y = p0->origin.y + (p1->origin.y - p0->origin.y) * frac;
+    out_origin->z = p0->origin.z + (p1->origin.z - p0->origin.z) * frac;
+
+    out_angles->x = p0->angles.x + (p1->angles.x - p0->angles.x) * frac;
+    out_angles->y = p0->angles.y + sh_ang_diff(p1->angles.y, p0->angles.y) * frac;
+    out_angles->z = p0->angles.z + (p1->angles.z - p0->angles.z) * frac;
+
+    if (extrap)
+        *extrap = extrapolate;
+
+    return 1;
+}

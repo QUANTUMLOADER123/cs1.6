@@ -13,6 +13,8 @@ typedef struct sh_grenade_path_s
     f32 launch_speed;
     vec3_t impact;
     qbool hit;
+    qbool fuse_done;
+    f32 fuse_time;
 } sh_grenade_path_t;
 
 f32  sh_grenade_launch_speed(f32 pitch);

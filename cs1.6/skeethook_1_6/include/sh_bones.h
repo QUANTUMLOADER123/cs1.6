@@ -82,3 +82,8 @@ qbool sh_bones_world_to_screen(const sh_bone_snapshot_t *snap, i32 bone, vec2_t 
 i32 sh_bones_bbox_corners(const sh_bone_snapshot_t *snap, i32 box, vec3_t out[8]);
 qbool sh_bones_backtrack_vec(i32 index, i32 bone, i32 back, vec3_t *out);
 i32 sh_bones_backtrack_frames(i32 index);
+#define sh_hist_mask 63
+#define sh_hist_max_rec 64
+
+qbool sh_backtrack_lerp(i32 ent_index, f32 target_time, vec3_t *out_origin,
+                        vec3_t *out_angles, qbool *extrap);

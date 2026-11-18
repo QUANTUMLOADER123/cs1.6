@@ -285,6 +285,15 @@ void sh_grenade_path_draw(void)
     vec3_t vel = g_pmove->velocity;
 
     sh_grenade_path_t path;
+    path.fuse_time = 0.0f;
+
+    if (wpn == 4)
+        path.fuse_time = 3.0f;
+    else if (wpn == 9)
+        path.fuse_time = 1.5f;
+    else if (wpn == 25)
+        path.fuse_time = 2.0f;
+
     sh_grenade_predict(&origin, &angles, &vel, &path);
 
     if (path.count < 2)
