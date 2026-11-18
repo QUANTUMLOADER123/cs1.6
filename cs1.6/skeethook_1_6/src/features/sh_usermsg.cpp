@@ -265,7 +265,15 @@ static i32 __cdecl sh_cb_weapon_list(const char *buf, i32 size, i32 read)
     if (!buf || read < 10)
         return 1;
 
-    u32 n = sh_str_len(buf, 63);
+    u32 limit = (u32)read < 63 ? (u32)read : 63;
+    u32 n = sh_str_len(buf, limit);
+
+    if (n >= limit || (i32)(n + 8) > read)
+        return 1;
+
+    if (buf[n] != '\0')
+        return 1;
+
     const u8 *b = (const u8 *)buf + n + 1;
 
     i32 primary_id = b[0];

@@ -765,6 +765,11 @@ qbool sh_hooks_install(void)
     if (!sh_is_ready())
         return false;
 
+    MH_STATUS init_status = MH_Initialize();
+
+    if (init_status != MH_OK && init_status != MH_ERROR_ALREADY_INITIALIZED)
+        return false;
+
     void *studio_event = sh_find_export_body("client.dll", "HUD_StudioEvent");
     void *post_run_cmd = sh_find_export_body("client.dll", "HUD_PostRunCmd");
 
@@ -804,9 +809,6 @@ qbool sh_hooks_install(void)
     void *hud_redraw = sh_find_export_body("client.dll", "HUD_Redraw");
     void *player_move = sh_find_export_body("client.dll", "HUD_PlayerMove");
 
-    if (MH_Initialize() != MH_OK)
-        return false;
-
     sh_aspect_init();
     sh_nightmode_init();
     sh_killsound_init();
@@ -817,18 +819,26 @@ qbool sh_hooks_install(void)
     sh_misc_screen_init();
     sh_skybox_fast_init();
 
+    i32 essential = 0;
+
     if (create_move)
     {
         if (MH_CreateHook(create_move, (void *)sh_create_move_hook,
                           (void **)&g_create_move_orig) == MH_OK)
+        {
             MH_EnableHook(create_move);
+            ++essential;
+        }
     }
 
     if (hud_redraw)
     {
         if (MH_CreateHook(hud_redraw, (void *)sh_hud_redraw_hook,
                           (void **)&g_hud_redraw_orig) == MH_OK)
+        {
             MH_EnableHook(hud_redraw);
+            ++essential;
+        }
     }
 
     void *ovr = sh_find_export_body("client.dll", "HUD_TxferLocalOverrides");
@@ -883,10 +893,13 @@ qbool sh_hooks_install(void)
     {
         if (MH_CreateHook(player_move, (void *)sh_player_move_hook,
                           (void **)&g_player_move_orig) == MH_OK)
+        {
             MH_EnableHook(player_move);
+            ++essential;
+        }
     }
 
-    return true;
+    return essential > 0;
 }
 
 void sh_hooks_uninstall(void)

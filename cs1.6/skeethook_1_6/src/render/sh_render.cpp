@@ -71,7 +71,9 @@ void sh_render_init(void)
 
 qbool sh_render_ready(void)
 {
-    return p_gl_begin && p_gl_vertex2f && p_gl_color4ub && p_gl_end;
+    return p_gl_begin && p_gl_vertex2f && p_gl_color4ub && p_gl_end &&
+           p_gl_enable && p_gl_disable && p_gl_blend && p_gl_line_width &&
+           p_gl_tex2f;
 }
 
 void sh_render_begin(i32 width, i32 height)
