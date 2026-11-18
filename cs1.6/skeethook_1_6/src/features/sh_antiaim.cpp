@@ -169,6 +169,13 @@ void sh_antiaim_apply_yaw(sh_usercmd_t *cmd, f32 time)
             spd = 15.0f;
 
         g_spin_accum += spd;
+
+        while (g_spin_accum >= 360.0f)
+            g_spin_accum -= 360.0f;
+
+        while (g_spin_accum < 0.0f)
+            g_spin_accum += 360.0f;
+
         cmd->viewangles.y = base + g_spin_accum;
         break;
     }
