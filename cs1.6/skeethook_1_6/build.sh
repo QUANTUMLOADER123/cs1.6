@@ -67,8 +67,12 @@ if [ "$fail" -ne 0 ]; then
     exit 1
 fi
 
+# -static-libgcc -static-libstdc++: библиотеки gcc/стдлиба вшиваются в DLL.
+# Без них DLL тянет api-ms-win-crt-*.dll и на машине без
+# "Visual C++ Redistributable" просто не загрузится.
 "$ZIG" c++ -target $T -shared -o "$OUT/skeethook_1_6.dll" "$OUT"/*.o \
-    -lopengl32 -lgdi32 -luser32 -lpsapi 2>"$OUT/link.txt"
+    -lopengl32 -lgdi32 -luser32 -lpsapi \
+    -static-libgcc -static-libstdc++ 2>"$OUT/link.txt"
 
 if [ -f "$OUT/skeethook_1_6.dll" ]; then
     echo "[+] $(du -h "$OUT/skeethook_1_6.dll" | cut -f1) $OUT/skeethook_1_6.dll"

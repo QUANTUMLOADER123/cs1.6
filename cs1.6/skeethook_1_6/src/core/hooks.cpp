@@ -201,10 +201,7 @@ namespace hooks
         if (view_params)
             chams::view_forward = view_params->forward;
 
-        /* ВАЖНО: проверяем и active - как в on_is_third_person.
-           Иначе камера отъезжает, когда третье лицо "выключено"
-           клавишей, но enabled остался включён. */
-        if (vars::third_person.enabled && vars::third_person.active)
+        if (vars::third_person.enabled)
             third_person::apply(view_params);
 
         return result;
@@ -214,18 +211,9 @@ namespace hooks
     {
         auto original = is_third_person_hook.get_original<decltype(&on_is_third_person)>();
 
-        /* РОДНОЕ ТРЕТЬЕ ЛИЦО НЕ ВКЛЮЧАЕМ.
+        if (vars::third_person.enabled && vars::third_person.active)
+            return 1;
 
-           Здесь было "return 1" при включённом third_person, и это
-           ломало камеру: движок включал СВОЙ режим третьего лица
-           (со своей обработкой углов и коллизий), а рядом
-           third_person::apply() двигал vieworg в V_CalcRefdef.
-           Два механизма дрались за одну камеру - она проваливалась
-           вниз, а мышь крутила углы вместо игрока.
-
-           Оставляем только свой механизм: он полностью управляет
-           камерой через vieworg в V_CalcRefdef, и углы игрока при
-           этом не трогаются. */
         return original();
     }
 }

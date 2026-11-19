@@ -5,7 +5,6 @@
 #include <cstrike1_5/interfaces/renderer/renderer.hpp>
 #include <core/input.hpp>
 #include <render/render.hpp>
-#include <core/misc/cursor/cursor.hpp>
 #include <render/menu.hpp>
 #include <render/menu_widgets.hpp>
 #include <features/players/esp/esp.hpp>
@@ -152,24 +151,6 @@ void render::draw(HDC device_context)
     bullet_tracers::render();
     legitbot::render();
     menu::render();
-
-    /* КУРСОР.
-
-       Основной путь - SDL2 (cursor::poll зовёт SDL_ShowCursor и
-       SDL_SetRelativeMouseMode каждый кадр, как в оригинале).
-       Если SDL2 не обнаружен, включаем программный курсор ImGui:
-       он рисуется вершинами и от игры не зависит. */
-    {
-        static int fallback = -1;
-
-        if (fallback < 0)
-            fallback = cursor::usable() ? 0 : 1;
-
-        if (fallback && menu::opened)
-            io.MouseDrawCursor = true;
-        else if (fallback)
-            io.MouseDrawCursor = false;
-    }
 
     ImGui::Render();
     ImGui_ImplOpenGL_RenderDrawData(ImGui::GetDrawData());

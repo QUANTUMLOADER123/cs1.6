@@ -26,17 +26,11 @@ namespace cursor
 
     static auto resolve() -> void
     {
-        /* ВАЖНО: resolved ставим только при УСПЕХЕ.
+        resolved = true;
 
-           В оригинале здесь было resolved = true до проверки: если
-           на момент инжекта SDL2.dll ещё не загружен (а грузится
-           он позже клиента), курсор не заработал бы никогда -
-           повторной попытки не было. */
         void* image = memory::get_module(modules::sdl2);
         if (!image)
             return;
-
-        resolved = true;
 
         HMODULE module = static_cast<HMODULE>(image);
 
@@ -50,17 +44,6 @@ namespace cursor
         available = show_cursor && set_cursor && create_cursor && get_cursor && set_relative && get_relative;
         if (available)
             arrow_cursor = create_cursor(0);
-    }
-
-    /* Доступен ли SDL2-путь. Если нет - render выставит
-       io.MouseDrawCursor, и ImGui нарисует курсор сам. Иначе
-       при отсутствии SDL2 курсора не было бы вообще. */
-    auto usable() -> bool
-    {
-        if (!resolved)
-            resolve();
-
-        return available;
     }
 
     auto poll() -> void
