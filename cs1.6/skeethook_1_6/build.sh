@@ -1,40 +1,80 @@
 #!/usr/bin/env bash
-set -euo pipefail
-cd "$(dirname "$0")"
+# Сборка skeethook 1.6 (база: gold-sdk).
+#
+# Собираем через zig cc/c++ под x86 (32-бит!): CS 1.6 - 32-битный
+# процесс, под x86_64 структуры выходят на 16 байт больше и все
+# смещения уезжают (проверено: cl_entity_t 3016 вместо 3000).
+set -u
 
-if command -v zig >/dev/null 2>&1; then ZIG=zig
-else ZIG=$(python3 -c 'import ziglang,os;print(os.path.join(os.path.dirname(ziglang.__file__),"zig"))'); fi
+cd "$(dirname "$0")" || exit 1
+
+if command -v zig >/dev/null 2>&1; then
+    ZIG=zig
+else
+    ZIG=$(python3 -c 'import ziglang,os;print(os.path.join(os.path.dirname(ziglang.__file__),"zig"))')
+fi
 
 OUT=build
-rm -rf "$OUT" && mkdir -p "$OUT"
 T=x86-windows-gnu
 
-CF="-target $T -O2 -Iext/minhook/include -Iext/minhook/src/hde -D_CRT_SECURE_NO_WARNINGS"
-IGF="-target $T -std=c++17 -O2 -fno-exceptions -fno-rtti -Iext -Iext/imgui -D_CRT_SECURE_NO_WARNINGS"
+CF="-target $T -O2 -w -Iinclude/minhook/include -Iinclude/minhook/src/hde"
+XF="-target $T -std=c++20 -O2 -w -Iinclude -Isrc -Iinclude/minhook/include -Iinclude/imgui"
 
-# ImGui: 4 больших файла + бэкенд. Компилируем отдельно,
-# объектники кэшируются в build/imgui и переиспользуются.
-mkdir -p "$OUT/imgui"
-for f in imgui imgui_draw imgui_tables imgui_widgets; do
-  "$ZIG" c++ $IGF -c "ext/imgui/$f.cpp" -o "$OUT/imgui/$f.o"
+rm -rf "$OUT"
+mkdir -p "$OUT"
+
+n=0
+fail=0
+
+compile() {
+    local f="$1"
+    local o="$OUT/$(echo "$f" | tr '/' '_' | sed 's/\.\(cpp\|c\)$/.o/')"
+    case "$f" in
+        *.c) "$ZIG" cc $CF -c "$f" -o "$o" 2>"$OUT/err.txt" ;;
+        *)   "$ZIG" c++ $XF -c "$f" -o "$o" 2>"$OUT/err.txt" ;;
+    esac
+    if [ -f "$o" ]; then
+        n=$((n + 1))
+    else
+        fail=$((fail + 1))
+        echo "  FAIL: $f"
+        head -4 "$OUT/err.txt"
+    fi
+}
+
+# C: MinHook
+for f in include/minhook/src/buffer.c include/minhook/src/hook.c \
+         include/minhook/src/trampoline.c include/minhook/src/hde/hde32.c; do
+    compile "$f"
 done
-"$ZIG" c++ $IGF -c ext/imgui/backend/imgui_impl_opengl.cpp -o "$OUT/imgui/backend.o"
 
-for f in ext/minhook/src/hook.c ext/minhook/src/buffer.c ext/minhook/src/trampoline.c ext/minhook/src/hde/hde32.c; do
-  "$ZIG" cc $CF -c "$f" -o "$OUT/$(basename ${f%.c}).o"
+# C++: ImGui + бэкенд
+for f in include/imgui/imgui.cpp include/imgui/imgui_draw.cpp \
+         include/imgui/imgui_tables.cpp include/imgui/imgui_widgets.cpp \
+         include/imgui/backend/imgui_impl_opengl.cpp; do
+    compile "$f"
 done
 
-CXF="-target $T -std=c++17 -O2 -fno-exceptions -fno-rtti -Iinclude -Iext/minhook/include -D_CRT_SECURE_NO_WARNINGS"
-SRC="src/core/sh_scanner.cpp src/core/sh_math.cpp src/core/sh_config.cpp src/core/sh_hooks.cpp src/core/sh_dllmain.cpp src/core/sh_crash.cpp
-     src/sdk/sh_patterns.cpp src/render/sh_render.cpp src/render/sh_font.cpp src/render/sh_imgui.cpp
-     src/features/sh_players.cpp src/features/sh_bones.cpp src/features/sh_antiaim.cpp
-     src/features/sh_misc.cpp src/features/sh_esp.cpp src/features/sh_menu.cpp src/features/sh_usermsg.cpp src/features/sh_ballistics.cpp src/features/sh_autowall.cpp src/features/sh_movement.cpp src/features/sh_visuals.cpp src/features/sh_events.cpp src/features/sh_nospread.cpp src/features/sh_modelchanger.cpp src/features/sh_soundesp.cpp \
-    src/features/sh_viewmodel.cpp src/features/sh_aspect.cpp src/features/sh_skybox_fast.cpp src/features/sh_matrix.cpp src/features/sh_chams.cpp src/features/sh_tracer3d.cpp src/features/sh_scope.cpp src/features/sh_nightmode.cpp src/features/sh_entityesp.cpp src/features/sh_demo.cpp src/features/sh_grenade.cpp src/features/sh_fakelag.cpp src/features/sh_rage.cpp src/features/sh_skybox.cpp src/features/sh_hitmarker.cpp src/features/sh_knife.cpp src/features/sh_worldfx.cpp src/features/sh_indicators.cpp src/features/sh_svc.cpp src/features/sh_surface.cpp src/features/sh_icons.cpp"
-for f in $SRC; do
-  "$ZIG" c++ $CXF -c "$f" -o "$OUT/$(basename ${f%.cpp}).o"
+# C++: проект
+for f in $(find src -name '*.cpp' | sort); do
+    compile "$f"
 done
 
-"$ZIG" c++ -target $T -shared -o "$OUT/skeethook_1_6.dll" "$OUT"/*.o "$OUT"/imgui/*.o \
-  -lopengl32 -lgdi32 -luser32 -lpsapi -static-libgcc -static-libstdc++
+echo "[*] объектов: $n, ошибок: $fail"
 
-echo "[+] $(ls -lh $OUT/skeethook_1_6.dll | awk '{print $5, $9}')"
+if [ "$fail" -ne 0 ]; then
+    echo "[-] сборка остановлена"
+    exit 1
+fi
+
+"$ZIG" c++ -target $T -shared -o "$OUT/skeethook_1_6.dll" "$OUT"/*.o \
+    -lopengl32 -lgdi32 -luser32 -lpsapi 2>"$OUT/link.txt"
+
+if [ -f "$OUT/skeethook_1_6.dll" ]; then
+    echo "[+] $(du -h "$OUT/skeethook_1_6.dll" | cut -f1) $OUT/skeethook_1_6.dll"
+    sha256sum "$OUT/skeethook_1_6.dll" | cut -d' ' -f1
+else
+    echo "[-] линковка не удалась"
+    head -10 "$OUT/link.txt"
+    exit 1
+fi
