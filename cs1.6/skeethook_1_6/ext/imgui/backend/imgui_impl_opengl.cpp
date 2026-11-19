@@ -63,6 +63,9 @@
 static bool g_initialized;
 static GLuint g_font_tex;
 
+/* какую текстуру вернуть движку после возни с атласом */
+static GLuint sh_restore_binding;
+
 static void sh_upload_font(void)
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -75,8 +78,25 @@ static void sh_upload_font(void)
     if (!pixels || w <= 0 || h <= 0)
         return;
 
-    glGenTextures(1, &g_font_tex);
-    glBindTexture(GL_TEXTURE_2D, g_font_tex);
+    /* СОХРАНЯЕМ ПРИВЯЗКУ ТЕКСТУРЫ ДВИЖКА.
+
+       GoldSrc кэширует текущую текстуру у себя и не ждёт, что её
+       кто-то переключит. Если после заливки атласа оставить
+       glBindTexture(GL_TEXTURE_2D, 0), движок продолжит рисовать
+       стены/оружие АТЛАСОМ ШРИФТА или пустой текстурой - на скрине
+       это выглядит как "все текстуры пропали, всё белое".
+
+       Поэтому запоминаем, что было привязано, и возвращаем. */
+    {
+        GLint prev_tex = 0;
+
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev_tex);
+
+        glGenTextures(1, &g_font_tex);
+        glBindTexture(GL_TEXTURE_2D, g_font_tex);
+
+        sh_restore_binding = (GLuint)prev_tex;
+    }
 
     /* GL_CLAMP, не GL_CLAMP_TO_EDGE: последнего нет в старых
        ICD, а GoldSrc ходит через GL 1.1 */
@@ -103,7 +123,8 @@ static void sh_upload_font(void)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, pixels);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    /* возвращаем движку его текстуру, а не 0 */
+    glBindTexture(GL_TEXTURE_2D, sh_restore_binding);
 
     io.Fonts->SetTexID((ImTextureID)(unsigned long)g_font_tex);
 }
@@ -145,15 +166,35 @@ void ImGui_ImplOpenGL_Shutdown(void)
    Старую текстуру удаляем: иначе они копятся при каждом ресайзе. */
 void ImGui_ImplOpenGL_RefreshFontTexture(void)
 {
+    GLint bound = 0;
+
+    /* если атлас всё ещё привязан - отвязываем перед удалением:
+       glDeleteTextures на привязанной текстуре оставляет GL в
+       состоянии "привязана к имени, которого уже нет", и
+       следующая отрисовка идёт пустой текстурой - всё белое. */
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &bound);
+
+    if (g_font_tex && (GLuint)bound == g_font_tex)
+    {
+        glBindTexture(GL_TEXTURE_2D, 0);
+        bound = 0;
+    }
+
     if (g_font_tex)
     {
-        glDeleteTextures(1, &g_font_tex);
+        GLuint old = g_font_tex;
+
         g_font_tex = 0;
+        glDeleteTextures(1, &old);
     }
 
     ImGui::GetIO().Fonts->SetTexID(0);
 
     sh_upload_font();
+
+    /* восстановить привязку движка */
+    if (bound && (GLuint)bound != g_font_tex)
+        glBindTexture(GL_TEXTURE_2D, (GLuint)bound);
 }
 
 void ImGui_ImplOpenGL_NewFrame(void)
@@ -172,6 +213,19 @@ void ImGui_ImplOpenGL_RenderDrawData(ImDrawData *draw_data)
 
     /* --- сохраняем то, что трогаем; glPushAttrib в GoldSrc
            восстанавливает не всё, поэтому явно --- */
+    /* ЕЩЁ ОДНА ПРИЧИНА БЕЛЫХ ТЕКСТУР.
+
+       ИСХОДНО: после прохода ImGui остаётся привязанным АТЛАС
+       ШРИФТА. GoldSrc кэширует свои привязки и не переустанавливает
+       их перед каждой отрисовкой - он считает, что текстура стены
+       всё ещё активна. В результате стены, оружие и модели рисуются
+       атласом шрифта: на экране "всё белое".
+
+       Поэтому запоминаем привязку ДО и возвращаем ПОСЛЕ. */
+    GLint prev_binding = 0;
+
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev_binding);
+
     GLboolean was_blend = glIsEnabled(GL_BLEND);
     GLboolean was_tex = glIsEnabled(GL_TEXTURE_2D);
     GLboolean was_depth = glIsEnabled(GL_DEPTH_TEST);
@@ -180,10 +234,6 @@ void ImGui_ImplOpenGL_RenderDrawData(ImDrawData *draw_data)
     GLboolean was_alpha = glIsEnabled(GL_ALPHA_TEST);
     GLboolean was_fog = glIsEnabled(GL_FOG);
     GLboolean was_scissor = glIsEnabled(GL_SCISSOR_TEST);
-
-    /* текстуру движка не восстанавливаем: GoldSrc биндит её сам
-       перед каждой своей отрисовкой, а лишний glGetIntegerv в
-       горячем пути ничего не даёт */
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -298,4 +348,7 @@ void ImGui_ImplOpenGL_RenderDrawData(ImDrawData *draw_data)
     if (was_fog) glEnable(GL_FOG); else glDisable(GL_FOG);
 
     if (was_scissor) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
+
+    /* вернуть движку ЕГО текстуру */
+    glBindTexture(GL_TEXTURE_2D, (GLuint)prev_binding);
 }
