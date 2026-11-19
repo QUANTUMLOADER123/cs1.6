@@ -214,6 +214,26 @@ void __cdecl sh_txfer_pred_hook(void *ps, const void *pps, void *pcd,
 
 static create_move_fn g_create_move_orig;
 static hud_redraw_fn g_hud_redraw_orig;
+
+/* --- ХУК SwapBuffers ---
+
+   HUD_Redraw вызывается только в игре. В главном меню игры и на
+   паузе его нет вообще - поэтому там меню не работало.
+
+   SwapBuffers зовётся всегда, когда кадр уходит на экран. Именно
+   так сделано в референсе (gold-sdk): вся отрисовка ImGui висит
+   на on_swap_buffers, а не на HUD_Redraw. */
+typedef BOOL(WINAPI *swap_buffers_fn)(HDC);
+
+/* проверка клавиш меню (INSERT/ESC) - зовётся каждый кадр */
+void sh_menu_poll_keys(void);
+
+static swap_buffers_fn g_swap_buffers_orig;
+
+/* Поставлен ли хук SwapBuffers. Если да - меню рисуется ТОЛЬКО
+   там, и в HUD_Redraw его рисовать нельзя (два NewFrame за кадр
+   ломают ввод). Если хук не встал - рисуем из HUD_Redraw. */
+static qbool g_swap_hook_ok;
 static hud_studio_event_fn g_hud_studio_event_orig;
 static hud_post_run_cmd_fn g_hud_post_run_cmd_orig;
 static u32 g_server_random_seed;
@@ -425,6 +445,82 @@ i32 __cdecl sh_create_move_hook(f32 frametime, sh_usercmd_t *cmd)
     return result;
 }
 
+/* Один кадр меню. Вынесено из HUD_Redraw, потому что теперь
+   вызывается из двух мест: HUD_Redraw (в игре) и SwapBuffers
+   (главное меню, пауза). */
+static void sh_imgui_draw_frame(i32 w, i32 h)
+{
+    static i32 imgui_tried;
+
+    /* клавиши меню - до всего остального */
+    sh_menu_poll_keys();
+
+    if (!sh_imgui_ready() && !imgui_tried)
+    {
+        imgui_tried = 1;
+
+        if (!sh_imgui_init((void *)sh_game_window_for_imgui()))
+            sh_crash_stage("imgui: инициализация не удалась");
+    }
+
+    if (!sh_imgui_ready())
+        return;
+
+    sh_imgui_begin(w, h, sh_menu_visible_now());
+    sh_menu_draw();
+    sh_imgui_end();
+}
+
+/* ХУК SwapBuffers.
+
+   Рисуем меню только если его ещё не нарисовал HUD_Redraw в этом
+   кадре (иначе два NewFrame подряд ломают ввод).
+
+   В главном меню и на паузе HUD_Redraw молчит - и меню рисуется
+   отсюда. Это и есть лечение "в мейн меню не ворк". */
+static BOOL WINAPI sh_swap_buffers_hook(HDC dc)
+{
+    /* защита от повторного входа: opengl32 и gdi32 могут иметь
+       РАЗНЫЕ адреса SwapBuffers, и мы хукаем оба под этот же
+       обработчик */
+    static i32 busy;
+
+    if (!g_swap_buffers_orig)
+        return TRUE;
+
+    if (busy)
+        return g_swap_buffers_orig(dc);
+
+    busy = 1;
+
+    /* КЛАВИШИ МЕНЮ ПРОВЕРЯЕМ ЗДЕСЬ, КАЖДЫЙ КАДР.
+
+       Раньше это делалось внутри sh_menu_draw, а он вызывается
+       только когда меню уже открыто - замкнутый круг. Плюс в
+       главном меню игры sh_menu_draw не зовётся вовсе, поэтому
+       меню там не открывалось вообще. */
+    sh_menu_poll_keys();
+
+    {
+        HWND w = (HWND)sh_game_window_for_imgui();
+
+        if (w && sh_menu_visible_now())
+        {
+            RECT rc;
+
+            if (GetClientRect(w, &rc))
+            {
+                if (rc.right > 0 && rc.bottom > 0)
+                    sh_imgui_draw_frame(rc.right, rc.bottom);
+            }
+        }
+    }
+
+    busy = 0;
+
+    return g_swap_buffers_orig(dc);
+}
+
 i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 {
     i32 result = 0;
@@ -538,67 +634,20 @@ i32 __cdecl sh_hud_redraw_hook(f32 time, i32 intermission)
 
     sh_crash_stage("HUD_Redraw: меню");
 
-    /* ImGui-кадр. Важно: begin/end оборачивают ТОЛЬКО меню,
-       иначе ImGui перехватит ввод у ESP-отрисовки и хуков.
+    /* МЕНЮ.
 
-       sh_imgui_init вызывается один раз при первом кадре: он
-       создаёт контекст, грузит шрифт через GDI/FreeType и отдаёт
-       текстуру бэкенду. */
-    {
-        static i32 imgui_tried;
+       Рисуем общей функцией: в игре её зовёт этот хук, а в
+       главном меню и на паузе - хук SwapBuffers, потому что
+       HUD_Redraw там не вызывается вообще.
 
-        if (!sh_imgui_ready() && !imgui_tried)
-        {
-            imgui_tried = 1;
+       sh_render_end() идёт ПОСЛЕ меню: он возвращает движку
+       GL_TEXTURE_2D, которое sh_render_begin() выключает для ESP.
+       Без этого мир рисовался без текстур. Перед меню его звать
+       нельзя - он выключает блендинг, и ImGui теряет прозрачность. */
+    if (!g_swap_hook_ok)
+        sh_imgui_draw_frame(w, h);
 
-            if (!sh_imgui_init((void *)sh_game_window_for_imgui()))
-                sh_crash_stage("imgui: инициализация не удалась");
-        }
-
-        if (sh_imgui_ready())
-        {
-            /* ВАЖНО ПРО ПОРЯДОК: sh_render_end() стоит ПОСЛЕ
-               sh_imgui_end(), а не до.
-
-               Если вызвать его перед ImGui, он включает
-               GL_TEXTURE_2D и ВЫКЛЮЧАЕТ блендинг - ImGui получает
-               GL без GL_BLEND, и вся прозрачность (вместе с альфой
-               шрифта) уходит в никуда.
-
-               Сам бэкенд ImGui выставляет нужное состояние:
-               glEnable(GL_BLEND) + glBlendFunc + сброс прочего. */
-            sh_imgui_begin(w, h, sh_menu_visible_now());
-            sh_menu_draw();
-            sh_imgui_end();
-
-            /* ВОЗВРАЩАЕМ ТЕКСТУРИРОВАНИЕ ДВИЖКУ.
-
-               sh_render_begin() в начале HUD_Redraw делает
-               glDisable(GL_TEXTURE_2D) - это нормально для нашей
-               ESP-отрисовки, она рисует чистые квады.
-
-               Но выключенное состояние переживает кадр, и мир
-               рисуется БЕЗ ТЕКСТУР: на скрине вся карта серая,
-               видны только лайтмапы.
-
-               Раньше это лечил sh_render_end() - он делает
-               glEnable(GL_TEXTURE_2D). При переходе на ImGui я
-               убрал его отсюда (он мешал блендингу), и текстуры
-               пропали.
-
-               Теперь порядок правильный: ImGui рисует кадр в
-               своём состоянии и восстанавливает флаги сам, а
-               sh_render_end() возвращает движку GL_TEXTURE_2D
-               ПОСЛЕ него. Блендинг ImGui уже не портит. */
-            sh_render_end();
-        }
-        else
-        {
-            sh_menu_draw();
-
-            sh_render_end();
-        }
-    }
+    sh_render_end();
 
     return result;
 }
@@ -989,6 +1038,64 @@ qbool sh_hooks_install(void)
         {
             MH_EnableHook(hud_redraw);
             ++essential;
+        }
+    }
+
+    /* ХУК SwapBuffers - чтобы меню работало в главном меню игры и
+       на паузе, где HUD_Redraw не вызывается.
+
+       Адрес берём в gdi32.dll: игра его импортирует, значит
+       библиотека уже загружена. */
+    {
+        HMODULE gdi = GetModuleHandleA("gdi32.dll");
+
+        if (!gdi)
+            gdi = LoadLibraryA("gdi32.dll");
+
+        /* ВАЖНО: SwapBuffers есть и в gdi32.dll, и в opengl32.dll
+           (там он реэкспортирован). Обычно это ОДИН адрес, но
+           если библиотеки разные - игра может звать через
+           opengl32, и хук по gdi32 не поймает.
+
+           Поэтому берём адрес из gdi32; если opengl32 отдаёт
+           ДРУГОЙ адрес - хукаем его тоже (второй вызов под тот
+           же обработчик). Оригинал сохраняем только один раз:
+           оба ведут в одну и ту же функцию Windows. */
+        if (gdi)
+        {
+            void *swap = (void *)GetProcAddress(gdi, "SwapBuffers");
+
+            if (swap)
+            {
+                if (MH_CreateHook(swap, (void *)sh_swap_buffers_hook,
+                                  (void **)&g_swap_buffers_orig) == MH_OK)
+                {
+                    MH_EnableHook(swap);
+                    g_swap_hook_ok = 1;
+                    ++essential;
+                }
+
+                /* opengl32.dll может отдавать СВОЙ адрес */
+                {
+                    HMODULE ogl = GetModuleHandleA("opengl32.dll");
+
+                    if (ogl)
+                    {
+                        void *swap2 = (void *)GetProcAddress(ogl, "SwapBuffers");
+
+                        if (swap2 && swap2 != swap)
+                        {
+                            if (MH_CreateHook(swap2,
+                                              (void *)sh_swap_buffers_hook,
+                                              0) == MH_OK)
+                            {
+                                MH_EnableHook(swap2);
+                                g_swap_hook_ok = 1;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

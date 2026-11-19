@@ -37,28 +37,34 @@ static qbool g_menu_visible;
 static f32 g_ui_scale = 1.0f;
 static i32 g_cur_tab;
 
-static void sh_menu_release_mouse(qbool release);
+/* ОКНО ИГРЫ для ImGui и для подкласса колеса.
 
-static HWND sh_game_window(void)
+   Класс окна GoldSrc - "Valve001". Если по какой-то причине
+   FindWindowA не нашёл (другая сборка, обёртка), идём по
+   запасным вариантам: активное окно и окно процесса. */
+void *sh_game_window_for_imgui(void)
 {
     static HWND cached;
 
     if (cached && IsWindow(cached))
-        return cached;
+        return (void *)cached;
 
     cached = FindWindowA("Valve001", 0);
 
     if (!cached)
+        cached = GetActiveWindow();
+
+    if (!cached)
         cached = GetForegroundWindow();
 
-    return cached;
+    return (void *)cached;
 }
 
-void *sh_game_window_for_imgui(void)
-{
-    return (void *)sh_game_window();
-}
+/* IN_DeactivateMouse / IN_ActivateMouse из client.dll.
 
+   Эти функции управляют захватом мыши на стороне клиента:
+   деактивация отпускает курсор, чтобы игра не крутила камеру,
+   пока открыто меню. */
 typedef void (*in_mouse_fn)(void);
 
 static in_mouse_fn sh_in_mouse(const char *name)
@@ -75,6 +81,24 @@ static void sh_menu_release_mouse(qbool release)
 {
     if (release)
     {
+        /* ОТПУСКАЕМ ЗАХВАТ МЫШИ, НО НЕ ТРОГАЕМ КУРСОР.
+
+           Раньше здесь были ShowCursor(TRUE) и ClipCursor(0).
+           Это не работало: GoldSrc/клиент перехватывает мышь
+           КАЖДЫЙ кадр (ClipCursor + ShowCursor(FALSE) внутри
+           IN_ActivateMouse), поэтому наш разовый вызов
+           отменялся на следующем же кадре.
+
+           В референсе (gold-sdk) проблему решают иначе: там
+           КАЖДЫЙ КАДР зовут SDL_SetRelativeMouseMode(0) +
+           SDL_ShowCursor(1), то есть постоянно перебивают игру.
+           У нас SDL2 нет, зато ImGui рисует курсор сам
+           (MouseDrawCursor) - это обычные вершины, их никто
+           не отнимет.
+
+           Здесь оставляем только то, что действительно нужно:
+           деактивировать захват мыши в клиенте, чтобы игра
+           не крутила камеру, пока меню открыто. */
         in_mouse_fn deact = sh_in_mouse("IN_DeactivateMouse");
 
         if (deact)
@@ -82,15 +106,6 @@ static void sh_menu_release_mouse(qbool release)
 
         ClipCursor(0);
         ReleaseCapture();
-
-        {
-            i32 guard = 0;
-
-            while (ShowCursor(TRUE) < 0 && ++guard < 32)
-                ;
-        }
-
-        SetCursor(LoadCursorA(0, IDC_ARROW));
     }
     else
     {
@@ -100,26 +115,6 @@ static void sh_menu_release_mouse(qbool release)
             act();
 
         ClipCursor(0);
-        ShowCursor(FALSE);
-
-        {
-            HWND w = sh_game_window();
-
-            if (w)
-            {
-                RECT rc;
-
-                if (GetClientRect(w, &rc))
-                {
-                    POINT c;
-
-                    c.x = (rc.right - rc.left) / 2;
-                    c.y = (rc.bottom - rc.top) / 2;
-                    ClientToScreen(w, &c);
-                    SetCursorPos(c.x, c.y);
-                }
-            }
-        }
     }
 }
 
@@ -396,6 +391,15 @@ static void sh_menu_tab_settings(void)
     ImGui::Separator();
 }
 
+/* Публичная проверка клавиши. Зовётся КАЖДЫЙ кадр из хука
+   SwapBuffers, независимо от того, видимо меню или нет.
+
+   Почему: раньше toggle вызывался из sh_menu_draw, а draw - только
+   когда меню УЖЕ открыто. То есть открыть меню можно было лишь
+   случайно. В главном меню игры sh_menu_draw не зовётся вовсе,
+   поэтому там меню не открывалось никак. */
+void sh_menu_poll_keys(void);
+
 static void sh_menu_toggle(void)
 {
     static i32 prev;
@@ -429,6 +433,11 @@ static void sh_menu_toggle(void)
     }
 }
 
+void sh_menu_poll_keys(void)
+{
+    sh_menu_toggle();
+}
+
 /* watermark-заглушка: вызывается из HUD_Redraw, пока SDK не готов.
    С ImGui рисуем отдельным проходом, но он ещё не инициализирован,
    поэтому просто ничего не делаем - сам факт вызова важен для
@@ -444,8 +453,6 @@ qbool sh_menu_visible_now(void)
 
 void sh_menu_draw(void)
 {
-    sh_menu_toggle();
-
     if (!g_menu_visible)
         return;
 

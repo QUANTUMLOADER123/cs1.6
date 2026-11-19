@@ -36,7 +36,18 @@
 static qbool g_init;
 static qbool g_frame_open;
 static HWND g_window;
+
+/* подкласс окна для перехвата WM_MOUSEWHEEL (см. ниже) */
+static void sh_wheel_install(HWND w);
 static f32 g_font_scale = -1.0f;
+
+/* Метка последнего нарисованного кадра.
+
+   Меню рисуется из двух мест: HUD_Redraw (в игре) и хук
+   SwapBuffers (главное меню, пауза). Если оба сработают за один
+   кадр, ImGui получит два NewFrame подряд - это ломает ввод и
+   состояние. Поэтому помечаем кадр по счётчику отрисовки. */
+static u64 g_last_drawn_tick;
 static f32 g_draw_w = 640.0f;
 static f32 g_draw_h = 480.0f;
 
@@ -103,13 +114,21 @@ static void sh_imgui_style(void)
     ImGuiStyle *st = &ImGui::GetStyle();
     ImVec4 *c = st->Colors;
 
-    st->WindowRounding = 6.0f;
-    st->ChildRounding = 4.0f;
-    st->FrameRounding = 3.0f;
-    st->PopupRounding = 4.0f;
-    st->ScrollbarRounding = 4.0f;
-    st->GrabRounding = 3.0f;
-    st->TabRounding = 3.0f;
+    /* БЕЗ ЗАКРУГЛЕНИЙ.
+
+       Просили убрать: в CS 1.6 интерфейс строго прямоугольный,
+       скругления выглядят чужеродно. Ставим 0 всем элементам. */
+    st->WindowRounding = 0.0f;
+    st->ChildRounding = 0.0f;
+    st->FrameRounding = 0.0f;
+    st->PopupRounding = 0.0f;
+    st->ScrollbarRounding = 0.0f;
+    st->GrabRounding = 0.0f;
+    st->TabRounding = 0.0f;
+    st->WindowBorderSize = 1.0f;
+    st->ChildBorderSize = 1.0f;
+    st->FrameBorderSize = 0.0f;
+    st->PopupBorderSize = 1.0f;
     st->WindowBorderSize = 1.0f;
     st->FrameBorderSize = 0.0f;
     st->WindowPadding = ImVec2(10.0f, 10.0f);
@@ -284,6 +303,9 @@ qbool sh_imgui_init(void *game_window)
 
     g_window = (HWND)game_window;
 
+    /* подкласс окна: ловим WM_MOUSEWHEEL для прокрутки меню */
+    sh_wheel_install(g_window);
+
     ImGui::CreateContext();
     sh_imgui_style();
 
@@ -292,6 +314,24 @@ qbool sh_imgui_init(void *game_window)
     io->ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
     io->IniFilename = 0;   /* не пишем imgui.ini рядом с игрой */
     io->LogFilename = 0;
+
+    /* КУРСОР РИСУЕМ САМИ (ImGui MouseDrawCursor).
+
+       Почему не системный: GoldSrc/клиент перехватывает мышь
+       каждый кадр (ClipCursor + ShowCursor), и любой наш вызов
+       ShowCursor(TRUE) отменяется на следующем кадре - курсора
+       просто нет. Так же пытались чинить раньше, и не помогло.
+
+       В референсе (gold-sdk) курсор сделан через SDL2: они
+       КАЖДЫЙ КАДР зовут SDL_SetRelativeMouseMode(0) +
+       SDL_ShowCursor(1). То есть постоянно перебивают игру.
+
+       У нас SDL2 нет, зато ImGui умеет рисовать курсор сам -
+       это обычные вершины в draw-list, их никто не отнимет.
+       Плюс бонус: курсор всегда точно совпадает с тем местом,
+       где ImGui считает позицию мыши, поэтому клики не могут
+       расходиться с картинкой. */
+    io->MouseDrawCursor = 1;
 
     /* ВАЖНО: шрифт добавляется ДО Init(). Бэкенд в Init() заливает
        атлас в текстуру; если добавить шрифт после, атлас уйдёт
@@ -329,6 +369,62 @@ void sh_imgui_shutdown(void)
     ImGui_ImplOpenGL_Shutdown();
     ImGui::DestroyContext();
     g_init = 0;
+}
+
+/* КОЛЕСО МЫШИ.
+
+   В Win32 у колеса НЕТ состояния - только сообщение
+   WM_MOUSEWHEEL. А окно игры нам не принадлежит, и его WndProc
+   трогать нельзя: GoldSrc/клиент переустанавливают его сам.
+
+   Рабочий способ - подкласс окна: SetWindowLongPtr(GWLP_WNDPROC)
+   ставит нашу функцию ПЕРЕД обработчиком игры. Это не перехват
+   чужого WndProc, а обычная цепочка: наша функция получает все
+   сообщения окна и передаёт их дальше через CallWindowProc.
+
+   В отличие от SetWindowsHookEx(WH_MOUSE_LL) подкласс не
+   требует таймаутов, не тормозит систему и не мешает игре. */
+static HWND g_wheel_hwnd;
+static WNDPROC g_wheel_old_proc;
+static f32 g_wheel_accum;
+
+static LRESULT CALLBACK sh_wheel_wndproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
+{
+    if (msg == WM_MOUSEWHEEL)
+    {
+        i32 delta = GET_WHEEL_DELTA_WPARAM(wp);
+
+        /* ImGui ждёт ±1.0 за щелчок, а WM_MOUSEWHEEL даёт 120 */
+        g_wheel_accum += (f32)delta / 120.0f;
+    }
+
+    if (g_wheel_old_proc)
+        return CallWindowProcA(g_wheel_old_proc, w, msg, wp, lp);
+
+    return DefWindowProcA(w, msg, wp, lp);
+}
+
+/* Повесить подкласс. Вызывается один раз при инициализации. */
+static void sh_wheel_install(HWND w)
+{
+    if (!w || g_wheel_hwnd == w)
+        return;
+
+    g_wheel_old_proc = (WNDPROC)SetWindowLongPtrA(w, GWLP_WNDPROC,
+                                                  (LONG_PTR)sh_wheel_wndproc);
+
+    if (g_wheel_old_proc)
+        g_wheel_hwnd = w;
+}
+
+/* Забрать накопленное колесо. Возвращает ±1.0 за щелчок. */
+f32 sh_mouse_wheel_read(void)
+{
+    f32 v = g_wheel_accum;
+
+    g_wheel_accum = 0.0f;
+
+    return v;
 }
 
 void sh_imgui_begin(i32 width, i32 height, qbool menu_visible)
@@ -436,6 +532,18 @@ void sh_imgui_begin(i32 width, i32 height, qbool menu_visible)
             }
         }
 
+        /* КОЛЕСО МЫШИ.
+
+           Раньше его не передавали вообще - отсюда "не реагирует
+           на листание колёсиком". Значение копится в подклассе
+           окна (см. sh_wheel_wndproc) и раз в кадр уходит в ImGui. */
+        {
+            f32 wheel = sh_mouse_wheel_read();
+
+            if (wheel != 0.0f)
+                io->AddMouseWheelEvent(0.0f, wheel);
+        }
+
         {
             i32 mb[3];
 
@@ -488,6 +596,24 @@ void sh_imgui_begin(i32 width, i32 height, qbool menu_visible)
     g_frame_open = 1;
 }
 
+/* Рисовали ли меню только что (в пределах одного кадра).
+
+   16 мс - примерно кадр при 60 FPS: если HUD_Redraw уже отрисовал
+   меню, хук SwapBuffers в этом же кадре второй раз не рисует. */
+qbool sh_imgui_drawn_this_frame(void)
+{
+    if (!g_last_drawn_tick)
+        return 0;
+
+    /* 10 мс: при 60 FPS кадр 16.6 мс, при 100 FPS - 10 мс.
+       Порог должен быть МЕНЬШЕ кадра, иначе на высоком FPS
+       меню вообще перестанет рисоваться из SwapBuffers.
+       При этом двух вызовов за 10 мс быть не может: даже 300 FPS
+       даёт 3.3 мс, но HUD_Redraw и SwapBuffers за один кадр
+       идут встык, а не с интервалом. */
+    return (GetTickCount64() - g_last_drawn_tick) < 10;
+}
+
 void sh_imgui_end(void)
 {
     if (!g_frame_open)
@@ -497,6 +623,9 @@ void sh_imgui_end(void)
 
     ImGui::Render();
     ImGui_ImplOpenGL_RenderDrawData(ImGui::GetDrawData());
+
+    /* отмечаем, что кадр отрисован */
+    g_last_drawn_tick = GetTickCount64();
 }
 
 qbool sh_imgui_ready(void)
