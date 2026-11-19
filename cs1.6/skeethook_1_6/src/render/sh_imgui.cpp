@@ -29,6 +29,8 @@
 #include "../../ext/imgui/imgui.h"
 #include "../../ext/imgui/backend/imgui_impl_opengl.h"
 
+#include <GL/gl.h>
+
 #include <windows.h>
 
 static qbool g_init;
@@ -153,6 +155,43 @@ static void sh_imgui_style(void)
    Стоит дорого (растеризация сотен глифов), а вызывается из
    HUD_Redraw, поэтому пересобираем ТОЛЬКО при смене масштаба -
    сравнение с шагом 0.1. */
+/* Реальная высота кадра в пикселях (из GL_VIEWPORT).
+
+   sh_screen_height() отдаёт значение движка, а оно в оконном
+   режиме может отличаться от того, что реально видно - именно
+   из-за этого окно считалось "огромным" и не влезало на экран.
+   Меню должно масштабироваться от РЕАЛЬНОЙ высоты. */
+f32 sh_imgui_frame_height(void)
+{
+    if (g_draw_h > 1.0f)
+        return g_draw_h;
+
+    return 480.0f;
+}
+
+/* МАСШТАБ ИНТЕРФЕЙСА - один на всё меню и на шрифт.
+
+   Раньше база была 480p: на 1080p множитель выходил 2.25 и
+   упирался в потолок 1.6, то есть окно 1216x832 при экране
+   1916x1028 - 81% высоты. Это и есть "огромная".
+
+   База 850: на 1080p множитель ~1.2, окно ~920x630 (около
+   половины экрана), шрифт 17px - читается и не заслоняет игру.
+   На 4K множитель ~2.5 ограничен двойкой, окно 1520x1040. */
+f32 sh_imgui_ui_scale(void)
+{
+    f32 h = sh_imgui_frame_height();
+    f32 s = h / 850.0f;
+
+    if (s < 0.85f)
+        s = 0.85f;
+
+    if (s > 2.0f)
+        s = 2.0f;
+
+    return s;
+}
+
 void sh_imgui_scale_font(f32 scale)
 {
     ImGuiIO *io;
@@ -189,12 +228,20 @@ void sh_imgui_scale_font(f32 scale)
 
     g_font_scale = scale;
 
-    px = (i32)(14.0f * scale + 0.5f);
+    /* 15px при масштабе 1.0: на 1080p масштаб 1.27 -> 19px,
+       читается без прищуривания, но не занимает пол-экрана */
+    px = (i32)(15.0f * scale + 0.5f);
 
     if (px < 10)
         px = 10;
 
     io = &ImGui::GetIO();
+
+    /* Атлас заблокирован между NewFrame() и Render() - Clear()
+       в этом состоянии ассертит и валит игру. Подстраховка на
+       случай, если порядок вызовов когда-нибудь поедет. */
+    if (io->Fonts->Locked)
+        return;
 
     io->Fonts->Clear();
     io->FontGlobalScale = 1.0f;
@@ -293,6 +340,32 @@ void sh_imgui_begin(i32 width, i32 height, qbool menu_visible)
 
     io = &ImGui::GetIO();
 
+    /* РАЗМЕР ДЛЯ IMGUI - ИЗ РЕАЛЬНОГО GL-ВЬЮПОРТА.
+
+       width/height приходят из GetScreenInfo движка, и в оконном
+       режиме они НЕ совпадают с тем, что реально видно. На скрине
+       это дало коэффициент 0.748 по обеим осям: окно рисовалось
+       в 1.34 раза мельче задуманного, а glScissor считался от
+       чужой высоты - и мелкие квады (буквы, чекбоксы, вкладки)
+       срезались целиком.
+
+       glGetIntegerv(GL_VIEWPORT) даёт настоящие пиксели кадра.
+       Если по какой-то причине вернулся мусор - берём то, что
+       передал движок. */
+    {
+        GLint vp[4];
+
+        vp[0] = 0; vp[1] = 0; vp[2] = 0; vp[3] = 0;
+
+        glGetIntegerv(GL_VIEWPORT, vp);
+
+        if (vp[2] > 0 && vp[3] > 0 && vp[2] < 20000 && vp[3] < 20000)
+        {
+            width = (i32)vp[2];
+            height = (i32)vp[3];
+        }
+    }
+
     io->DisplaySize = ImVec2((f32)width, (f32)height);
     g_draw_w = (f32)width;
     g_draw_h = (f32)height;
@@ -310,22 +383,7 @@ void sh_imgui_begin(i32 width, i32 height, qbool menu_visible)
 
        Внутри стоит защита по масштабу: если он не изменился,
        пересборки не будет (растеризация сотен глифов дорога). */
-    {
-        f32 want;
-
-        if (height > 0)
-            want = (f32)height / 480.0f;
-        else
-            want = 1.0f;
-
-        if (want < 0.85f)
-            want = 0.85f;
-
-        if (want > 1.6f)
-            want = 1.6f;
-
-        sh_imgui_scale_font(want);
-    }
+    sh_imgui_scale_font(sh_imgui_ui_scale());
 
     /* --- ВВОД ---
        Без этого блока ImGui рисует, но не реагирует на клики:

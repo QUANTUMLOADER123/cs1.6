@@ -459,17 +459,10 @@ void sh_menu_draw(void)
        база 480p (в GoldSrc это исходное разрешение интерфейса).
        Множитель ограничиваем 0.85..1.6, чтобы на 4K окно не
        разрослось во весь экран. */
-    {
-        f32 sh = (f32)sh_screen_height();
-
-        g_ui_scale = sh / 480.0f;
-
-        if (g_ui_scale < 0.85f)
-            g_ui_scale = 0.85f;
-
-        if (g_ui_scale > 1.6f)
-            g_ui_scale = 1.6f;
-    }
+    /* Масштаб берём из того же места, что и шрифт, иначе окно
+       и текст поедут в разные стороны. База 850p, а не 480p:
+       на 1080p окно выходит ~46% высоты экрана, а не 81%. */
+    g_ui_scale = sh_imgui_ui_scale();
 
     /* РАНЬШЕ ТУТ БЫЛ ВЫЗОВ sh_imgui_scale_font(g_ui_scale) - И ЭТО
        КРАШИЛО ИГРУ.
@@ -483,12 +476,38 @@ void sh_menu_draw(void)
        Пересборка перенесена в sh_imgui_begin(), ДО NewFrame -
        там её единственное безопасное место. */
 
-    ImGui::SetNextWindowSize(ImVec2(760.0f * g_ui_scale,
-                                    520.0f * g_ui_scale),
-                             ImGuiCond_FirstUseEver);
+    /* Окно обязано влезать на экран целиком.
+
+       На скрине оно уходило за нижний край: ни заголовка, ни
+       вкладок не видно. Ограничиваем размер рамками кадра. */
+    {
+        ImGuiIO *io2 = &ImGui::GetIO();
+        f32 max_w = io2->DisplaySize.x - 24.0f;
+        f32 max_h = io2->DisplaySize.y - 24.0f;
+        /* 620x440 вместо 760x520: окно не должно закрывать
+           пол-экрана. Раньше при масштабе 1.6 выходило 81%
+           высоты - отсюда "огромная". */
+        f32 want_w = 620.0f * g_ui_scale;
+        f32 want_h = 440.0f * g_ui_scale;
+
+        if (max_w > 200.0f && want_w > max_w)
+            want_w = max_w;
+
+        if (max_h > 200.0f && want_h > max_h)
+            want_h = max_h;
+
+        ImGui::SetNextWindowSize(ImVec2(want_w, want_h),
+                                 ImGuiCond_FirstUseEver);
+    }
     ImGui::SetNextWindowSizeConstraints(
-        ImVec2(560.0f * g_ui_scale, 360.0f * g_ui_scale),
-        ImVec2(1100.0f * g_ui_scale, 900.0f * g_ui_scale));
+        ImVec2(460.0f * g_ui_scale, 300.0f * g_ui_scale),
+        ImVec2(900.0f * g_ui_scale, 760.0f * g_ui_scale));
+
+    /* чтобы окно не появлялось за краем экрана */
+    ImGui::SetNextWindowPos(
+        ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f,
+               ImGui::GetIO().DisplaySize.y * 0.5f),
+        ImGuiCond_FirstUseEver, ImVec2(0.5f, 0.5f));
 
     ImGui::Begin("skeethook##main", 0,
                  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
@@ -496,7 +515,7 @@ void sh_menu_draw(void)
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
                         ImVec2(7.0f * g_ui_scale, 4.0f * g_ui_scale));
 
-    ImGui::BeginChild("##tabs", ImVec2(132.0f * g_ui_scale, 0.0f), 1);
+    ImGui::BeginChild("##tabs", ImVec2(120.0f * g_ui_scale, 0.0f), 1);
 
     for (i32 i = 0; i < 6; ++i)
     {

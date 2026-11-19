@@ -17,3 +17,9 @@ void *sh_imgui_font(void);
 
 /* пересобрать атлас под масштаб (вызывается при смене разрешения) */
 void sh_imgui_scale_font(f32 scale);
+
+/* реальная высота кадра в пикселях (GL_VIEWPORT), не из движка */
+f32 sh_imgui_frame_height(void);
+
+/* масштаб интерфейса: один для окна, отступов и шрифта */
+f32 sh_imgui_ui_scale(void);

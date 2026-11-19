@@ -208,8 +208,54 @@ void ImGui_ImplOpenGL_RenderDrawData(ImDrawData *draw_data)
     if (!draw_data || draw_data->CmdListsCount == 0)
         return;
 
-    const float fb_w = draw_data->DisplaySize.x;
-    const float fb_h = draw_data->DisplaySize.y;
+    /* РЕАЛЬНЫЙ ВЬЮПОРТ, А НЕ io->DisplaySize.
+
+       Это была причина и "огромного меню", и невидимого текста.
+
+       io->DisplaySize приходит из GetScreenInfo движка (например
+       2560x1440), а GL-вьюпорт при этом может быть 1916x1028 -
+       масштаб/оконный режим/DPI. На скрине меню 911 px вместо
+       задуманных 1216, то есть рисовалось с коэффициентом 0.748
+       по ОБЕИМ осям: 1916/2560 = 0.7485.
+
+       Чем это ломало текст: glScissor пересчитывается через
+       fb_h (из DisplaySize), а вьюпорт другой высоты - область
+       отсечения уезжает вверх, и все мелкие квады (буквы,
+       чекбоксы, строки вкладок) режутся ЦЕЛИКОМ. Большой фон
+       окна частично выживает - ровно то, что видно на скрине:
+       чёрный прямоугольник без единого символа.
+
+       Поэтому берём размеры у GL и масштабируем координаты ImGui
+       в реальные пиксели. */
+    GLint vp[4] = { 0, 0, 0, 0 };
+
+    glGetIntegerv(GL_VIEWPORT, vp);
+
+    if (vp[2] <= 0 || vp[3] <= 0)
+    {
+        vp[2] = (GLint)draw_data->DisplaySize.x;
+        vp[3] = (GLint)draw_data->DisplaySize.y;
+    }
+
+    const float fb_w = (float)vp[2];
+    const float fb_h = (float)vp[3];
+
+    /* во сколько раз реальные пиксели отличаются от логических */
+    float kx = 1.0f;
+    float ky = 1.0f;
+
+    if (draw_data->DisplaySize.x > 0.0f && draw_data->DisplaySize.y > 0.0f)
+    {
+        kx = fb_w / draw_data->DisplaySize.x;
+        ky = fb_h / draw_data->DisplaySize.y;
+
+        /* защита от безумных значений (свёрнутое окно и т.п.) */
+        if (kx < 0.2f || kx > 5.0f)
+            kx = 1.0f;
+
+        if (ky < 0.2f || ky > 5.0f)
+            ky = 1.0f;
+    }
 
     /* --- сохраняем то, что трогаем; glPushAttrib в GoldSrc
            восстанавливает не всё, поэтому явно --- */
@@ -281,14 +327,20 @@ void ImGui_ImplOpenGL_RenderDrawData(ImDrawData *draw_data)
                 continue;
 
             {
-                /* scissor в координатах снизу вверх */
-                int sx = (int)cmd->ClipRect.x;
-                int sy = (int)(fb_h - cmd->ClipRect.w);
-                int sw = (int)(cmd->ClipRect.z - cmd->ClipRect.x);
-                int sh = (int)(cmd->ClipRect.w - cmd->ClipRect.y);
+                /* scissor в реальных пикселях, снизу вверх.
+
+                   ClipRect задан в логических координатах ImGui,
+                   поэтому умножаем на коэффициент пересчёта.
+                   Раньше fb_h брался из DisplaySize, и вся область
+                   отсечения уезжала - мелкие квады исчезали. */
+                int sx = (int)(cmd->ClipRect.x * kx);
+                int sy = (int)(fb_h - cmd->ClipRect.w * ky);
+                int sw = (int)((cmd->ClipRect.z - cmd->ClipRect.x) * kx);
+                int sh = (int)((cmd->ClipRect.w - cmd->ClipRect.y) * ky);
 
                 if (sw < 0) sw = 0;
                 if (sh < 0) sh = 0;
+                if (sy < 0) sy = 0;
 
                 glScissor(sx, sy, sw, sh);
             }
@@ -321,7 +373,8 @@ void ImGui_ImplOpenGL_RenderDrawData(ImDrawData *draw_data)
                            (GLubyte)((v->col >> 24) & 0xFF));
 
                 glTexCoord2f(v->uv.x, v->uv.y);
-                glVertex2f(v->pos.x, v->pos.y);
+                /* логические координаты -> реальные пиксели */
+                glVertex2f(v->pos.x * kx, v->pos.y * ky);
             }
 
             glEnd();
