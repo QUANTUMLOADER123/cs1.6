@@ -7,6 +7,7 @@
 #include <cstrike1_5/interfaces/studio/studio.hpp>
 #include <cstrike1_5/spread/spread.hpp>
 #include <core/hooks.hpp>
+#include <core/debug.hpp>
 #include <features/vars.hpp>
 #include <core/misc/cursor/cursor.hpp>
 #include <render/render.hpp>
@@ -40,10 +41,16 @@ namespace hooks
 
             void* target = reinterpret_cast<void*>(GetProcAddress(static_cast<HMODULE>(gdi32_module), "SwapBuffers"));
             if (!target)
+            {
+                debug::print("[hook] SwapBuffers НЕ НАЙДЕН в gdi32.dll");
                 return false;
+            }
 
             swap_buffers_hook.create(target, reinterpret_cast<void*>(on_swap_buffers));
             core_initialized = true;
+
+            debug::print("[hook] SwapBuffers перехвачен, адрес = %p", target);
+            debug::print("[hook] меню рисуется именно отсюда");
         }
 
         if (!renderer_initialized)
@@ -108,7 +115,10 @@ namespace hooks
         auto original = swap_buffers_hook.get_original<decltype(&on_swap_buffers)>();
 
         if (GetAsyncKeyState(VK_INSERT) & 1)
+        {
             menu::opened = !menu::opened;
+            debug::print("[input] INSERT -> меню %s", menu::opened ? "ОТКРЫТО" : "закрыто");
+        }
 
         cursor::poll();
 

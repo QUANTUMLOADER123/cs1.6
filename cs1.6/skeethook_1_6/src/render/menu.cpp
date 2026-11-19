@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <features/vars.hpp>
+#include <core/debug.hpp>
 #include <core/config/config.hpp>
 #include <render/render.hpp>
 #include <render/menu.hpp>
@@ -21,6 +22,22 @@ void menu::render()
 {
     if (!opened)
         return;
+
+    /* Один раз сообщаем, что меню реально начало рисоваться.
+       Если этой строки в консоли нет, а INSERT ловится -
+       значит до отрисовки не доходит. */
+    static bool reported = false;
+    static int frames = 0;
+
+    if (!reported)
+    {
+        reported = true;
+        debug::print("[menu] меню РИСУЕТСЯ (первый кадр), окно %.0fx%.0f",
+                     ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
+    }
+
+    if (++frames % 600 == 0)
+        debug::print("[menu] отрисовано кадров: %d", frames);
 
     const char* tabs[] = { "assault", "visuals", "misc" };
 

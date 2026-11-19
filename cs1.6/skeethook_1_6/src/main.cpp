@@ -13,6 +13,9 @@
 #include <core/hooks.hpp>
 #include <features/vars.hpp>
 #include <core/console.hpp>
+#include <core/debug.hpp>
+#include <memory/scanner.hpp>
+#include <render/menu.hpp>
 #include <render/render.hpp>
 #include <render/sprites.hpp>
 #include <features/players/chams/chams.hpp>
@@ -34,9 +37,21 @@ bool should_unload = false;
 
 
 DWORD WINAPI main_thread(LPVOID parameter) {
-    console::create();
+    /* СВОЯ КОНСОЛЬ. Поднимаем её ПЕРВОЙ строкой, до всего
+       остального: если игра падает на инициализации, окно всё
+       равно будет и в нём будет видно, на чём именно.
+       Она не зависит ни от экрана игры, ни от паттернов. */
+    debug::enable();
 
-    MH_Initialize();
+    debug::print("[main] поток запущен");
+
+    debug::print("[main] console::create() - ищем функцию печати игры...");
+    const bool game_console = console::create();
+    debug::print("[main] console::create() = %s", game_console ? "OK" : "НЕ НАЙДЕНА (лог игры недоступен, это не смертельно)");
+
+    debug::print("[main] MH_Initialize()...");
+    const MH_STATUS mh = MH_Initialize();
+    debug::print("[main] MH_Initialize() = %d %s", static_cast<int>(mh), mh == MH_OK ? "OK" : "ОШИБКА");
 
     /* Порядок инициализации - РОВНО как у автора, не меняем:
        каждый следующий шаг опирается на указатели предыдущего.
@@ -79,6 +94,17 @@ DWORD WINAPI main_thread(LPVOID parameter) {
 
     constexpr int step_count = sizeof(steps) / sizeof(steps[0]);
 
+    debug::print("[main] какие модули видит чит:");
+    {
+        const wchar_t* names[] = { L"next_engine_mini.dll", L"client.dll",
+                                   L"client_mini.dll", L"hw.dll", L"mp.dll", L"SDL2.dll" };
+        for (const wchar_t* name : names)
+        {
+            void* base = memory::get_module(name);
+            debug::print("    %-22ls %s", name, base ? "загружен" : "НЕ ЗАГРУЖЕН");
+        }
+    }
+
     int attempts = 0;
     int logged = -1;
 
@@ -101,12 +127,15 @@ DWORD WINAPI main_thread(LPVOID parameter) {
         if (failed != logged)
         {
             logged = failed;
+            debug::print("[init] ПРОВАЛ на шаге %d/%d: %s  (повтор каждые 200 мс)",
+                         failed + 1, step_count, steps[failed].name);
             console::log("[gold] шаг %s (%d/%d) не прошёл, повтор",
                          steps[failed].name, failed + 1, step_count);
         }
 
         if (++attempts >= 150)
         {
+            debug::print("[init] СДАЮСЬ: 150 попыток, последний шаг = %s", steps[failed].name);
             console::log("[gold] стоп после 150 попыток на шаге %s",
                          steps[failed].name);
             break;
@@ -114,7 +143,24 @@ DWORD WINAPI main_thread(LPVOID parameter) {
 
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
+    debug::print("[init] ВСЕ ШАГИ ПРОЙДЕНЫ");
     console::log("[gold] initialized");
+
+    /* Главная проверка: встал ли хук SwapBuffers.
+       Именно он рисует меню. Не встал - меню не будет никогда,
+       сколько ни жми Insert. */
+    debug::print("[check] хук SwapBuffers: %s",
+                 hooks::swap_buffers_hook.enabled() ? "ВСТАЛ" : "НЕ ВСТАЛ (меню не появится!)");
+    debug::print("[hint] INSERT - открыть меню, END - выгрузить чит.");
+
+    int idle = 0;
+    while (!should_unload)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        if (++idle % 50 == 0)
+            debug::print("[state] жив, меню %s", menu::opened ? "ОТКРЫТО" : "закрыто");
+    }
 
     while (!should_unload)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -160,9 +206,17 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserved) {
         DisableThreadLibraryCalls(module);
         module_handle = module;
 
+        /* Консоль поднимаем прямо здесь: DllMain держит loader lock,
+           поэтому тяжёлое (сканирование) оставляем в потоке, но само
+           окно и одну строку "загрузились" можно сделать сразу. */
+        debug::enable();
+        debug::print("[dll] DLL_PROCESS_ATTACH, база = %p", static_cast<void*>(module));
+
         HANDLE thread = CreateThread(nullptr, 0, main_thread, nullptr, 0, nullptr);
         if (thread)
             CloseHandle(thread);
+        else
+            debug::print("[dll] ОШИБКА: CreateThread не удался, код %u", GetLastError());
     }
 
     return TRUE;

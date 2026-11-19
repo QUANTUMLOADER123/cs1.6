@@ -5,6 +5,7 @@
 #include <cstrike1_5/interfaces/renderer/renderer.hpp>
 #include <core/input.hpp>
 #include <render/render.hpp>
+#include <core/debug.hpp>
 #include <render/menu.hpp>
 #include <render/menu_widgets.hpp>
 #include <features/players/esp/esp.hpp>
@@ -86,7 +87,12 @@ bool render::initialize(HDC device_context)
 {
     window = WindowFromDC(device_context);
     if (!window)
+    {
+        debug::print("[render] WindowFromDC вернул NULL - не могу получить окно");
         return false;
+    }
+
+    debug::print("[render] окно получено, инициализирую ImGui");
 
     ImGui::CreateContext();
     apply_style();
@@ -101,10 +107,16 @@ bool render::initialize(HDC device_context)
 
     tahoma_font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\verdana.ttf", 13.0f, &config, io.Fonts->GetGlyphRangesCyrillic());
 
+    if (!tahoma_font)
+        debug::print("[render] ВНИМАНИЕ: verdana.ttf не загрузился, берём встроенный шрифт");
+
     io.Fonts->AddFontDefault();
     io.Fonts->Build();
 
     imgui_initialized = true;
+
+    debug::print("[render] ImGui готов, шрифт: %s", tahoma_font ? "verdana" : "встроенный");
+    debug::print("[render] размер окна: %dx%d", width, height);
 
     return true;
 }

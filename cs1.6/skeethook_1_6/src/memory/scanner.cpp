@@ -3,6 +3,7 @@
 #include <crt/crt.h>
 #include <pe32/pe32.h>
 #include <memory/scanner.hpp>
+#include <core/debug.hpp>
 
 #include <iostream>
 #include <malloc.h>
@@ -92,8 +93,15 @@ uint8_t* memory::find_pattern(const wchar_t* module_name, const char* pattern)
     uint8_t* result = find_pattern(module_name, reinterpret_cast<const char*>(byte_buffer), mask_buffer);
 
     if (!result)
+    {
+        /* Раньше это уходило только в std::cout, а сборка - GUI
+           (подсистема 2): stdout ни к чему не привязан, и сообщение
+           пропадало целиком. Теперь дополнительно пишем в нашу
+           дебаг-консоль, а std::cout туда же перенаправлен в
+           debug::enable(). */
         std::cout << "Pattern Not Found: " << pattern << std::endl;
-
+        debug::pattern_not_found(nullptr, pattern);
+    }
     _freea(mask_buffer);
     _freea(byte_buffer);
 
